@@ -111,33 +111,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-3 border-t border-zinc-800/80 space-y-2">
-          {trader.wallet ? (
-            <>
-              <div className="rounded-lg border border-zinc-700/80 bg-zinc-900/50 px-3 py-2">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Trader wallet</p>
-                <p className="text-xs text-cyan-300 font-mono truncate">{trader.trunc}</p>
-                <p className="text-[10px] mt-1">
-                  {trader.isAdminWallet && (
-                    <span className="text-amber-400 font-bold block mb-0.5">BUDJU ADMIN · Ops unlocked</span>
-                  )}
-                  {trader.eligible ? (
-                    <span className="text-green-400 font-bold">Unlocked · Swap &amp; Portfolio</span>
-                  ) : (
-                    <span className="text-amber-500/90">
-                      Need {(trader.eligibility?.budju_shortfall ?? 0).toLocaleString()} more $BUDJU
-                    </span>
-                  )}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => trader.disconnect()}
-                className="w-full text-xs text-zinc-500 hover:text-red-400 transition-colors"
-              >
-                Disconnect wallet
-              </button>
-            </>
-          ) : (
+          {!trader.wallet ? (
             <>
               <button
                 type="button"
@@ -159,6 +133,10 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
                 Hold ≥{(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} $BUDJU on-chain to swap
               </p>
             </>
+          ) : (
+            <p className="text-[10px] text-zinc-600 text-center leading-snug px-1">
+              Wallet connected — use the button top-right for holdings, send, and disconnect.
+            </p>
           )}
           {opsUnlocked && !trader.isAdminWallet && (
             <button
