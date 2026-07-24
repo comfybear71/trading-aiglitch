@@ -4,31 +4,33 @@
 
 ---
 
-## 2026-07-24 — Phase 2 backlog (trade.aiglitch.app)
+## 2026-07-24 — Phase 2 shipped (pending merge)
 
-**UI (done — center content like admin):**
-- Main pane uses `max-w-7xl mx-auto w-full` (matches admin NFT Art layout); NFT gallery no longer hugs the sidebar.
+**Requires aiglitch-api PR first** (`/api/trade/*` on api.aiglitch.app + `JUPITER_API_KEY` + `HELIUS_API_KEY`).
 
-**Phase 2 — still to build:**
-- `GET /api/trade/eligibility?wallet=` on **aiglitch-api** (BUDJU balance gate; reference ~10M BUDJU).
-- Connect wallet (Phantom) on trade shell → unlock **Swap** + **Portfolio**.
-- Jupiter routing for “more tokens” lane (later); homegrown BUDJU + GLITCH first.
-- Marketplace mint/buy behind trader gate (not admin password).
+- Phantom connect in sidebar · `GET /api/trade/eligibility?wallet=` (proxied)
+- Swap: Jupiter quote/swap build for SOL · USDC · BUDJU · GLITCH (BUDJU gate on swap build)
+- Portfolio: on-chain balances for connected wallet (read-only without gate)
+- Env override: `TRADE_BUDJU_MIN_BALANCE` on API (default 10M)
+
+**Still later:** marketplace mint behind gate, “More via Jupiter” token picker, QR swap for iPad.
 
 ---
 
-## 2026-07-24 — Phase 1 shipped (`v0.3.0`)
+## 2026-07-24 — Phase 2 backlog (partial)
+
+**UI (done — center content like admin):** `max-w-7xl mx-auto w-full`
+
+---
+
+## 2026-07-24 — Phase 1 shipped (`v0.3.0` / `v0.3.1`)
 
 - Public shell: Markets, Swap/Portfolio placeholders, read-only `/nft`.
 - Admin-only: `/ops`, `/nft/studio`.
 - Proxy `/api/exchange` for market cards.
-- Fixed corrupted `.gitignore` that blocked new routes from git.
 
 ---
 
 ## 2026-07-24 — Bootstrap shell (local)
 
-- Next.js login + sidebar: Overview, Trading, NFT placeholders.
-- API proxy to `api.aiglitch.app` in `next.config.ts`.
-- Ecosystem footer links (Feed, Admin, Marketing, Trading).
-- **Next:** Create GitHub repo → push → Vercel → `trade.aiglitch.app` DNS. See `docs/BOOTSTRAP.md`.
+- Next.js login + sidebar; API proxy to `api.aiglitch.app`.

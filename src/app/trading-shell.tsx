@@ -9,6 +9,7 @@ import {
   OPS_NAV,
   slugFromPathname,
 } from "./nav";
+import { useTraderWallet } from "@/context/TraderWalletContext";
 
 function NavLink({
   href,
@@ -37,6 +38,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const slug = slugFromPathname(pathname);
   const [opsUnlocked, setOpsUnlocked] = useState(false);
+  const trader = useTraderWallet();
 
   useEffect(() => {
     fetch("/api/auth/admin", { credentials: "include" })
@@ -107,17 +109,47 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-3 border-t border-zinc-800/80 space-y-2">
-          <button
-            type="button"
-            disabled
-            title="Phase 2: BUDJU balance gate + Phantom"
-            className="w-full rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2.5 text-sm font-medium text-cyan-200/90 cursor-not-allowed opacity-80"
-          >
-            Connect wallet
-          </button>
-          <p className="text-[10px] text-zinc-600 text-center leading-snug">
-            Trader access: hold enough $BUDJU on-chain (Phase 2)
-          </p>
+          {trader.wallet ? (
+            <>
+              <div className="rounded-lg border border-zinc-700/80 bg-zinc-900/50 px-3 py-2">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Trader wallet</p>
+                <p className="text-xs text-cyan-300 font-mono truncate">{trader.trunc}</p>
+                <p className="text-[10px] mt-1">
+                  {trader.eligible ? (
+                    <span className="text-green-400 font-bold">Unlocked · Swap &amp; Portfolio</span>
+                  ) : (
+                    <span className="text-amber-500/90">
+                      Need {(trader.eligibility?.budju_shortfall ?? 0).toLocaleString()} more $BUDJU
+                    </span>
+                  )}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => trader.disconnect()}
+                className="w-full text-xs text-zinc-500 hover:text-red-400 transition-colors"
+              >
+                Disconnect wallet
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled={trader.loading}
+                onClick={() => trader.connect()}
+                className="w-full rounded-lg border border-cyan-500/40 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 px-3 py-2.5 text-sm font-medium text-cyan-100 hover:border-cyan-400/60 disabled:opacity-50"
+              >
+                {trader.loading ? "Connecting…" : "Connect Phantom"}
+              </button>
+              {trader.error && (
+                <p className="text-[10px] text-red-400 text-center">{trader.error}</p>
+              )}
+              <p className="text-[10px] text-zinc-600 text-center leading-snug">
+                Hold ≥{(trader.eligibility?.budju_required ?? 10_000_000).toLocaleString()} $BUDJU on-chain to swap
+              </p>
+            </>
+          )}
           {!opsUnlocked ? (
             <Link
               href="/login?next=/ops"

@@ -13,6 +13,7 @@ const config: NextConfig = {
       { source: "/api/admin/:path*", destination: `${apiOrigin}/api/admin/:path*` },
       { source: "/api/exchange", destination: `${apiOrigin}/api/exchange` },
       { source: "/api/exchange/:path*", destination: `${apiOrigin}/api/exchange/:path*` },
+      { source: "/api/trade/:path*", destination: `${apiOrigin}/api/trade/:path*` },
     ],
   }),
 };
