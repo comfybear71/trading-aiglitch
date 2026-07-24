@@ -94,7 +94,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
             </div>
           ))}
 
-          {opsUnlocked && (
+          {(opsUnlocked || trader.isAdminWallet) && (
             <div>
               <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-amber-700/80">
                 Ops
@@ -115,6 +115,9 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
                 <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Trader wallet</p>
                 <p className="text-xs text-cyan-300 font-mono truncate">{trader.trunc}</p>
                 <p className="text-[10px] mt-1">
+                  {trader.isAdminWallet && (
+                    <span className="text-amber-400 font-bold block mb-0.5">BUDJU ADMIN · Ops unlocked</span>
+                  )}
                   {trader.eligible ? (
                     <span className="text-green-400 font-bold">Unlocked · Swap &amp; Portfolio</span>
                   ) : (
@@ -146,18 +149,11 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
                 <p className="text-[10px] text-red-400 text-center">{trader.error}</p>
               )}
               <p className="text-[10px] text-zinc-600 text-center leading-snug">
-                Hold ≥{(trader.eligibility?.budju_required ?? 10_000_000).toLocaleString()} $BUDJU on-chain to swap
+                Hold ≥{(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} $BUDJU on-chain to swap
               </p>
             </>
           )}
-          {!opsUnlocked ? (
-            <Link
-              href="/login?next=/ops"
-              className="block text-center text-xs text-zinc-500 hover:text-purple-400 transition-colors"
-            >
-              Admin sign-in → Ops
-            </Link>
-          ) : (
+          {opsUnlocked && !trader.isAdminWallet && (
             <button
               type="button"
               onClick={async () => {

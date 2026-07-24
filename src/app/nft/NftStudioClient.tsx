@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { MARKETPLACE_PRODUCTS } from "@/lib/marketplace";
+import { useTraderWallet } from "@/context/TraderWalletContext";
+import { adminApiFetch } from "@/lib/admin-api-fetch";
 
 interface ProductImage {
   product_id: string;
@@ -10,6 +12,7 @@ interface ProductImage {
 }
 
 export default function NftStudioClient() {
+  const trader = useTraderWallet();
   const [images, setImages] = useState<Record<string, ProductImage>>({});
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState<string | null>(null);
@@ -34,7 +37,7 @@ export default function NftStudioClient() {
     setGenerating(productId);
     setLog((prev: string[]) => [...prev, `Generating: ${emoji} ${name}...`]);
     try {
-      const res = await fetch("/api/admin/nft-marketplace", {
+      const res = await adminApiFetch(trader.wallet, "/api/admin/nft-marketplace", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ product_id: productId, product_name: name, product_description: description, product_emoji: emoji }),
@@ -68,7 +71,7 @@ export default function NftStudioClient() {
   };
 
   const deleteImage = async (productId: string) => {
-    await fetch("/api/admin/nft-marketplace", {
+    await adminApiFetch(trader.wallet, "/api/admin/nft-marketplace", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "delete", product_id: productId }),

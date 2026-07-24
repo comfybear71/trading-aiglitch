@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useTradingSession } from "@/context/TradingSessionContext";
+import { useTraderWallet } from "@/context/TraderWalletContext";
+import { adminApiFetch } from "@/lib/admin-api-fetch";
 import GlitchTradingView from "./GlitchTradingView";
 import BudjuTradingView from "./BudjuTradingView";
 import WalletDashboard from "./WalletDashboard";
@@ -131,6 +133,7 @@ function WalletCard({ label, balances, loading, gradient, onRefresh }: {
 
 export default function TradingPage() {
   const { authenticated } = useTradingSession();
+  const trader = useTraderWallet();
   const [activeView, setActiveView] = useState<"home" | "glitch" | "budju">("home");
 
   // Wallet balances
@@ -141,7 +144,7 @@ export default function TradingPage() {
   const fetchBalances = useCallback(async () => {
     setWalletLoading(true);
     try {
-      const res = await fetch("/api/admin/budju-trading", {
+      const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "wallet_balances" }),
@@ -153,7 +156,7 @@ export default function TradingPage() {
       }
     } catch { /* ignore */ }
     setWalletLoading(false);
-  }, []);
+  }, [trader.wallet]);
 
   useEffect(() => { if (authenticated) fetchBalances(); }, [authenticated, fetchBalances]);
 
@@ -165,6 +168,11 @@ export default function TradingPage() {
   const [pollStatus, setPollStatus] = useState<string>("waiting");
 
   useEffect(() => {
+    if (trader.isAdminWallet && trader.wallet) {
+      setWalletAuthed(true);
+      setWalletChecking(false);
+      return;
+    }
     const token = localStorage.getItem(WALLET_SESSION_KEY);
     if (token) {
       fetch(`/api/admin/wallet-auth?session=${token}`)
@@ -178,7 +186,7 @@ export default function TradingPage() {
     } else {
       setWalletChecking(false);
     }
-  }, []);
+  }, [trader.isAdminWallet, trader.wallet]);
 
   const generateChallenge = useCallback(async () => {
     setPollStatus("generating");
@@ -193,8 +201,9 @@ export default function TradingPage() {
   }, []);
 
   useEffect(() => {
+    if (trader.isAdminWallet) return;
     if (!walletChecking && !walletAuthed && authenticated) generateChallenge();
-  }, [walletChecking, walletAuthed, authenticated, generateChallenge]);
+  }, [walletChecking, walletAuthed, authenticated, generateChallenge, trader.isAdminWallet]);
 
   useEffect(() => {
     if (!challengeId || walletAuthed || pollStatus !== "waiting") return;
@@ -360,7 +369,7 @@ function HomeView() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/budju-trading?t=${Date.now()}`);
+      const res = await adminApiFetch(trader.wallet, `/api/admin/budju-trading?t=${Date.now()}`);
       if (res.ok) {
         const d = await res.json();
         if (!d.error) setBudjuData(d);
@@ -373,7 +382,7 @@ function HomeView() {
 
   const postAction = async (action: string, body: Record<string, unknown> = {}) => {
     try {
-      const res = await fetch("/api/admin/budju-trading", {
+      const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, ...body }),
@@ -391,7 +400,7 @@ function HomeView() {
     setGroupLoading(true);
     setGroupResult(`Distributing ${groupFundAmount} ${groupFundToken.token} to Group ${groupFundToken.group}...`);
     try {
-      const res = await fetch("/api/admin/budju-trading", {
+      const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -574,7 +583,7 @@ function HomeView() {
             if (members === 0) continue;
             const total = parseFloat(amount) * members;
             try {
-              const res = await fetch("/api/admin/budju-trading", {
+              const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "distribute_to_group", group_number: d.group_number, token: "SOL", amount: total }),
               });

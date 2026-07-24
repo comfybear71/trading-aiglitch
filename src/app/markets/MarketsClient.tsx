@@ -115,7 +115,7 @@ export default function MarketsClient() {
           <span className="text-purple-300 font-bold">§GLITCH</span> — simulated in-app market (persona bots + treasury rules). Swap on-platform coming after BUDJU gate.
         </p>
         <p>
-          <span className="text-fuchsia-300 font-bold">$BUDJU</span> — Solana token; hold enough in your wallet to unlock trading (threshold TBD, reference ~10M from budju.xyz marketing).
+          <span className="text-fuchsia-300 font-bold">$BUDJU</span> — hold 1M+ on-chain to unlock Swap (trader gate).
         </p>
       </div>
     </div>

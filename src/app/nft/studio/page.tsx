@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation";
-import { isAdminAuthenticatedServer } from "@/lib/admin-auth.server";
-import NftStudioClient from "../NftStudioClient";
+import NftStudioEntry from "./NftStudioEntry";
 
-export default async function NftStudioPage() {
-  if (!(await isAdminAuthenticatedServer())) redirect("/login?next=/nft/studio");
-  return <NftStudioClient />;
+export default function NftStudioPage() {
+  return <NftStudioEntry />;
 }

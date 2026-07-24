@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation";
-import { isAdminAuthenticatedServer } from "@/lib/admin-auth.server";
-import TradingPageClient from "../trading/TradingPageClient";
+import OpsEntry from "./OpsEntry";
 
-export default async function OpsPage() {
-  if (!(await isAdminAuthenticatedServer())) redirect("/login?next=/ops");
-  return <TradingPageClient />;
+export default function OpsPage() {
+  return <OpsEntry />;
 }
