@@ -1,8 +1,6 @@
-import { redirect } from "next/navigation";
-import { isAdminAuthenticatedServer } from "@/lib/admin-auth.server";
-import NftMarketplaceClient from "./NftMarketplaceClient";
+import NftGalleryClient from "./NftGalleryClient";
 
-export default async function NftPage() {
-  if (!(await isAdminAuthenticatedServer())) redirect("/login");
-  return <NftMarketplaceClient />;
+/** Public read-only NFT gallery — no login required. */
+export default function NftPage() {
+  return <NftGalleryClient />;
 }

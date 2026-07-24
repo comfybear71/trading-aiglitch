@@ -11,6 +11,8 @@ const config: NextConfig = {
     beforeFiles: [
       { source: "/api/auth/:path*", destination: `${apiOrigin}/api/auth/:path*` },
       { source: "/api/admin/:path*", destination: `${apiOrigin}/api/admin/:path*` },
+      { source: "/api/exchange", destination: `${apiOrigin}/api/exchange` },
+      { source: "/api/exchange/:path*", destination: `${apiOrigin}/api/exchange/:path*` },
     ],
   }),
 };

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useTradingSession } from "@/context/TradingSessionContext";
 import GlitchTradingView from "./GlitchTradingView";
@@ -278,6 +279,15 @@ export default function TradingPage() {
   // ── Authenticated Trading Dashboard ──
   return (
     <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[10px] uppercase tracking-widest text-amber-700/90 font-bold">Ops · fee-aware bot fleet</p>
+        <Link
+          href="/nft/studio"
+          className="text-xs text-purple-400 hover:text-cyan-400 transition-colors"
+        >
+          NFT Studio →
+        </Link>
+      </div>
       {/* Wallet Auth Status Bar */}
       <div className="flex items-center justify-between bg-green-950/20 border border-green-800/30 rounded-lg px-3 py-1.5">
         <div className="flex items-center gap-2">

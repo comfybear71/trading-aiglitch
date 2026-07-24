@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
-import { isAdminAuthenticatedServer } from "@/lib/admin-auth.server";
-import TradingPageClient from "./TradingPageClient";
 
-export default async function TradingTabPage() {
-  if (!(await isAdminAuthenticatedServer())) redirect("/login");
-  return <TradingPageClient />;
+/** Legacy URL — bot fleet lives under Ops. */
+export default function TradingRedirectPage() {
+  redirect("/ops");
 }
