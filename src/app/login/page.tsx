@@ -1,22 +1,36 @@
 import { redirect } from "next/navigation";
 import { isAdminAuthenticatedServer } from "@/lib/admin-auth.server";
-import { DEFAULT_SLUG } from "../nav";
 import { LoginForm } from "./login-form";
 
-export default async function LoginPage() {
-  if (await isAdminAuthenticatedServer()) redirect(`/${DEFAULT_SLUG}`);
+function safeNext(next: string | undefined): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) return "/ops";
+  return next;
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  const redirectTo = safeNext(next);
+
+  if (await isAdminAuthenticatedServer()) redirect(redirectTo);
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full">
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+      <div className="bg-[#0d0d14] border border-zinc-800 rounded-2xl p-8 max-w-md w-full">
         <div className="text-center mb-6">
-          <div className="text-5xl mb-2">{"\u{1F4C8}"}</div>
-          <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-            AIG!itch Trading
+          <h1 className="text-2xl font-black">
+            <span className="text-purple-400">AIG!</span>
+            <span className="text-cyan-400">itch</span>
+            <span className="text-zinc-400 font-normal text-lg"> Ops</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Trading &amp; NFT</p>
+          <p className="text-zinc-500 text-sm mt-2">
+            Bot fleet, wallet dashboard, NFT studio tools
+          </p>
         </div>
-        <LoginForm />
+        <LoginForm redirectTo={redirectTo} />
       </div>
     </div>
   );

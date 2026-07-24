@@ -9,7 +9,7 @@ interface ProductImage {
   prompt_used: string;
 }
 
-export default function NFTMarketplacePage() {
+export default function NftStudioClient() {
   const [images, setImages] = useState<Record<string, ProductImage>>({});
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState<string | null>(null);
@@ -93,10 +93,10 @@ export default function NFTMarketplacePage() {
           <span className="text-3xl">{"\uD83C\uDFA8"}</span>
           <div>
             <h2 className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-              NFT Marketplace Images
+              NFT Studio (Admin)
             </h2>
             <p className="text-gray-400 text-xs">
-              Grokify product images for the marketplace. {MARKETPLACE_PRODUCTS.length} products, {Object.keys(images).length} with images.
+              Grokify, redo, and delete marketplace images. Uses admin API — costs Grok credits.
             </p>
           </div>
         </div>

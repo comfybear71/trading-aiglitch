@@ -2,16 +2,54 @@ export interface NavItem {
   slug: string;
   label: string;
   icon: string;
+  /** Shown in sidebar section header context */
+  section?: "trade" | "manage";
 }
 
-export const NAV: NavItem[] = [
-  { slug: "overview", label: "Overview", icon: "\u{1F4CA}" },
-  { slug: "trading", label: "Trading", icon: "\u{1F4C8}" },
-  { slug: "nft", label: "NFT Art", icon: "\u{1F3A8}" },
+export interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+/** Public trade shell — Jupiter-style grouping, AIG!itch scope only. */
+export const NAV_SECTIONS: NavSection[] = [
+  {
+    title: "Trade",
+    items: [
+      { slug: "markets", label: "Markets", icon: "\u{1F4CA}", section: "trade" },
+      { slug: "swap", label: "Swap", icon: "\u{21C4}", section: "trade" },
+      { slug: "nft", label: "NFT", icon: "\u{1F3A8}", section: "trade" },
+    ],
+  },
+  {
+    title: "Manage",
+    items: [
+      { slug: "portfolio", label: "Portfolio", icon: "\u{1F45B}", section: "manage" },
+    ],
+  },
 ];
 
-export const DEFAULT_SLUG = NAV[0].slug;
+export const OPS_NAV: NavItem = {
+  slug: "ops",
+  label: "Ops",
+  icon: "\u{2699}\uFE0F",
+};
+
+export const ALL_PUBLIC_SLUGS = NAV_SECTIONS.flatMap((s) => s.items.map((i) => i.slug));
+
+export const DEFAULT_SLUG = "markets";
 
 export function navItemForSlug(slug: string): NavItem | undefined {
-  return NAV.find((item) => item.slug === slug);
+  for (const section of NAV_SECTIONS) {
+    const found = section.items.find((item) => item.slug === slug);
+    if (found) return found;
+  }
+  if (slug === OPS_NAV.slug) return OPS_NAV;
+  return undefined;
+}
+
+/** First path segment for sidebar highlight (e.g. /nft/studio → nft). */
+export function slugFromPathname(pathname: string): string {
+  const seg = pathname.split("/").filter(Boolean)[0];
+  return seg ?? DEFAULT_SLUG;
 }
