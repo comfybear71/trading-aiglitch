@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { MARKETPLACE_PRODUCTS } from "@/lib/marketplace";
+import { useTraderWallet } from "@/context/TraderWalletContext";
 
 interface ProductImage {
   product_id: string;
@@ -9,6 +11,7 @@ interface ProductImage {
 }
 
 export default function NftGalleryClient() {
+  const trader = useTraderWallet();
   const [images, setImages] = useState<Record<string, ProductImage>>({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -47,18 +50,28 @@ export default function NftGalleryClient() {
                 NFT Gallery
               </h2>
               <p className="text-gray-400 text-xs max-w-md">
-                Browse marketplace art. Trading mints unlocks with a connected wallet and enough $BUDJU (coming soon).
+                Browse marketplace art. Connect with 1M+ $BUDJU to swap; admin wallet unlocks Studio tools.
               </p>
             </div>
           </div>
-          <a
+          <div className="flex flex-wrap gap-2 justify-end">
+            {trader.isAdminWallet && (
+              <Link
+                href="/nft/studio"
+                className="px-3 py-2 bg-purple-500/20 border border-purple-500/40 text-purple-200 rounded-lg text-xs font-bold hover:bg-purple-500/30"
+              >
+                NFT Studio (admin)
+              </Link>
+            )}
+            <a
             href="https://aiglitch.app/marketplace"
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-2 bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 rounded-lg text-xs font-bold hover:bg-cyan-500/25"
           >
             Open marketplace on aiglitch.app ↗
-          </a>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -117,7 +130,9 @@ export default function NftGalleryClient() {
       )}
 
       <p className="text-[10px] text-gray-600 text-center">
-        Connect wallet with enough $BUDJU to mint and trade on the marketplace (coming soon).
+        {trader.eligible
+          ? "Trader unlocked — swap on the Swap tab."
+          : "Hold 1M+ $BUDJU in Phantom to unlock Swap & Portfolio."}
       </p>
     </div>
   );

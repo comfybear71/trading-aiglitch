@@ -15,12 +15,15 @@ import {
 import {
   connectPhantom,
   disconnectPhantom,
+  getPhantom,
   truncWallet,
 } from "@/lib/phantom";
+import { isTradeAdminWallet } from "@/lib/trade-admin";
 
 interface TraderWalletContextValue {
   wallet: string | null;
   trunc: string | null;
+  isAdminWallet: boolean;
   eligibility: TradeEligibility | null;
   eligible: boolean;
   loading: boolean;
@@ -64,9 +67,12 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
     let cancelled = false;
     (async () => {
       const stored = localStorage.getItem(TRADER_WALLET_STORAGE_KEY);
-      if (stored) {
-        setWallet(stored);
-        await refresh(stored);
+      const phantomPk = getPhantom()?.publicKey?.toBase58();
+      const addr = phantomPk ?? stored;
+      if (addr) {
+        setWallet(addr);
+        localStorage.setItem(TRADER_WALLET_STORAGE_KEY, addr);
+        await refresh(addr);
       }
       if (!cancelled) setLoading(false);
     })();
@@ -102,6 +108,7 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
     (): TraderWalletContextValue => ({
       wallet,
       trunc: wallet ? truncWallet(wallet) : null,
+      isAdminWallet: isTradeAdminWallet(wallet),
       eligibility,
       eligible: !!eligibility?.eligible,
       loading,
