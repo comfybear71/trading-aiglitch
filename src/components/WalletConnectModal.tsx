@@ -6,6 +6,7 @@ import { useTraderWallet } from "@/context/TraderWalletContext";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { getPhantom } from "@/lib/phantom";
 import { balanceForSymbol } from "@/lib/trade-balance";
+import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 
 type Step = "choose" | "qr";
 
@@ -193,6 +194,7 @@ export function WalletConnectMenu({
 }) {
   const trader = useTraderWallet();
   const [chipFilter, setChipFilter] = useState<string | null>(null);
+  const { prices } = useTradePrices(open && !!trader.wallet);
   if (!open || !trader.wallet) return null;
 
   const b = trader.eligibility?.balances;
@@ -260,16 +262,16 @@ export function WalletConnectMenu({
           {b && (
             <ul className="space-y-2 text-sm">
               {(!chipFilter || chipFilter === "USDC") && (
-                <HoldingRow symbol="USDC" amount={b.usdc} decimals={3} />
+                <HoldingRow symbol="USDC" amount={b.usdc} decimals={3} usd={usdValue(b.usdc, "USDC", prices)} />
               )}
               {(!chipFilter || chipFilter === "SOL") && (
-                <HoldingRow symbol="SOL" amount={b.sol} decimals={4} />
+                <HoldingRow symbol="SOL" amount={b.sol} decimals={4} usd={usdValue(b.sol, "SOL", prices)} />
               )}
               {(!chipFilter || chipFilter === "BUDJU") && (
-                <HoldingRow symbol="BUDJU" amount={b.budju} decimals={2} compact />
+                <HoldingRow symbol="BUDJU" amount={b.budju} decimals={2} compact usd={usdValue(b.budju, "BUDJU", prices)} />
               )}
               {(!chipFilter || chipFilter === "GLITCH") && (
-                <HoldingRow symbol="GLITCH" amount={b.glitch} decimals={0} />
+                <HoldingRow symbol="GLITCH" amount={b.glitch} decimals={0} usd={usdValue(b.glitch, "GLITCH", prices)} />
               )}
             </ul>
           )}
@@ -308,21 +310,28 @@ function HoldingRow({
   amount,
   decimals,
   compact,
+  usd,
 }: {
   symbol: string;
   amount: number;
   decimals: number;
   compact?: boolean;
+  usd?: number | null;
 }) {
   const display = compact && amount >= 1_000_000
     ? `${(amount / 1_000_000).toFixed(2)}M`
     : amount.toLocaleString(undefined, { maximumFractionDigits: decimals });
   return (
-    <li className="flex justify-between items-center py-2 border-b border-zinc-800/80 last:border-0">
+    <li className="flex justify-between items-center py-2 border-b border-zinc-800/80 last:border-0 gap-3">
       <span className="text-zinc-300 font-medium">{symbol}</span>
-      <span className="text-zinc-400 font-mono text-xs">
-        {display} {symbol}
-      </span>
+      <div className="text-right">
+        <span className="text-zinc-400 font-mono text-xs block">
+          {display} {symbol}
+        </span>
+        {usd != null && Number.isFinite(usd) && (
+          <span className="text-[10px] text-zinc-500">{fmtUsd(usd)}</span>
+        )}
+      </div>
     </li>
   );
 }

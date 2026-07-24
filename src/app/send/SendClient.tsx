@@ -81,6 +81,7 @@ export default function SendClient() {
 
       const phantom = getPhantom();
       if (!phantom) throw new Error("Phantom not available");
+      await phantom.connect({ onlyIfTrusted: true }).catch(() => phantom.connect());
 
       const raw = atob(data.transaction);
       const bytes = new Uint8Array(raw.length);
@@ -100,7 +101,11 @@ export default function SendClient() {
       setRecipient("");
       await trader.refresh();
     } catch (e) {
-      pushToast(e instanceof Error ? e.message : String(e), "error");
+      const raw = e instanceof Error ? e.message : String(e);
+      const msg = /not been authorized|user rejected|user denied/i.test(raw)
+        ? "Phantom blocked the send — open Phantom and approve the transaction."
+        : raw;
+      pushToast(msg, "error");
     } finally {
       setBusy(false);
     }

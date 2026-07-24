@@ -223,6 +223,7 @@ export default function SwapClient() {
 
       const phantom = getPhantom();
       if (!phantom) throw new Error("Phantom not available");
+      await phantom.connect({ onlyIfTrusted: true }).catch(() => phantom.connect());
 
       const raw = atob(sData.swapTransaction);
       const bytes = new Uint8Array(raw.length);
@@ -258,7 +259,10 @@ export default function SwapClient() {
       setStoredQuote(null);
       await trader.refresh();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const raw = e instanceof Error ? e.message : String(e);
+      const msg = /not been authorized|user rejected|user denied/i.test(raw)
+        ? "Phantom blocked the swap — open Phantom and approve the transaction."
+        : raw;
       setStatus(msg);
       pushToast(msg, "error");
     } finally {
@@ -485,9 +489,15 @@ export default function SwapClient() {
               onRouteClick={() => setRoutingOpen(true)}
             />
           ) : (
-            <p className="text-[10px] text-zinc-600 text-center">
-              Network priority ≤ {maxPrioritySol.toFixed(4)} SOL · enter amount for full quote
-            </p>
+            <IdleSwapFeePanel
+              maxPrioritySol={maxPrioritySol}
+              slippageBps={slippageBps}
+              networkFeeUsd={
+                prices.SOL != null
+                  ? fmtUsd((estimateNetworkFeeSol(maxPrioritySol).sol * prices.SOL) as number)
+                  : null
+              }
+            />
           )}
 
           {quoteError && <p className="text-xs text-red-400/90 text-center">{quoteError}</p>}
@@ -684,6 +694,29 @@ function TokenHintCard({ symbol }: { symbol: string }) {
       <p className="text-sm font-bold text-white">{symbol}</p>
       <p className="text-[10px] text-zinc-600 mt-1 font-mono truncate">{token?.mint.slice(0, 8)}…</p>
       <p className="text-[10px] text-zinc-500 mt-2">AIG!itch trade lane · price chart later</p>
+    </div>
+  );
+}
+
+function IdleSwapFeePanel({
+  maxPrioritySol,
+  slippageBps,
+  networkFeeUsd,
+}: {
+  maxPrioritySol: number;
+  slippageBps: number;
+  networkFeeUsd: string | null;
+}) {
+  const net = estimateNetworkFeeSol(maxPrioritySol);
+  const networkLabel = networkFeeUsd ? `${networkFeeUsd} (${net.label})` : net.label;
+  return (
+    <div className="rounded-xl border border-zinc-800/90 bg-zinc-950/30 divide-y divide-zinc-800/80 text-[11px]">
+      <ReviewRow label="Network fee (est.)" value={networkLabel} mono />
+      <ReviewRow label="Platform fee" value={formatPlatformFee(null)} />
+      <ReviewRow label="Max slippage" value={formatPct(slippageBps)} />
+      <p className="px-3 py-2 text-[10px] text-zinc-600 text-center">
+        Enter an amount for rate, route, and min received
+      </p>
     </div>
   );
 }
