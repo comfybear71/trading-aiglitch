@@ -28,7 +28,8 @@ interface TraderWalletContextValue {
   eligible: boolean;
   loading: boolean;
   error: string | null;
-  connect: () => Promise<void>;
+  connect: () => Promise<boolean>;
+  linkWallet: (address: string) => Promise<void>;
   disconnect: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -81,20 +82,30 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
     };
   }, [refresh]);
 
-  const connect = useCallback(async () => {
+  const linkWallet = useCallback(
+    async (addr: string) => {
+      setWallet(addr);
+      localStorage.setItem(TRADER_WALLET_STORAGE_KEY, addr);
+      setError(null);
+      await refresh(addr);
+    },
+    [refresh],
+  );
+
+  const connect = useCallback(async (): Promise<boolean> => {
     setLoading(true);
     setError(null);
     try {
       const addr = await connectPhantom();
-      setWallet(addr);
-      localStorage.setItem(TRADER_WALLET_STORAGE_KEY, addr);
-      await refresh(addr);
+      await linkWallet(addr);
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+      return false;
     } finally {
       setLoading(false);
     }
-  }, [refresh]);
+  }, [linkWallet]);
 
   const disconnect = useCallback(async () => {
     await disconnectPhantom();
@@ -114,10 +125,11 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
       loading,
       error,
       connect,
+      linkWallet,
       disconnect,
       refresh: async () => refresh(wallet),
     }),
-    [wallet, eligibility, loading, error, connect, disconnect, refresh],
+    [wallet, eligibility, loading, error, connect, linkWallet, disconnect, refresh],
   );
 
   return (

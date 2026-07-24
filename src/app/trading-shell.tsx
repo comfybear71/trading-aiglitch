@@ -10,6 +10,7 @@ import {
   slugFromPathname,
 } from "./nav";
 import { useTraderWallet } from "@/context/TraderWalletContext";
+import { WalletConnectButton, WalletConnectModal } from "@/components/WalletConnectModal";
 
 function NavLink({
   href,
@@ -38,6 +39,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const slug = slugFromPathname(pathname);
   const [opsUnlocked, setOpsUnlocked] = useState(false);
+  const [sidebarConnectOpen, setSidebarConnectOpen] = useState(false);
   const trader = useTraderWallet();
 
   useEffect(() => {
@@ -140,11 +142,16 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
               <button
                 type="button"
                 disabled={trader.loading}
-                onClick={() => trader.connect()}
+                onClick={() => setSidebarConnectOpen(true)}
                 className="w-full rounded-lg border border-cyan-500/40 bg-gradient-to-r from-purple-600/20 to-cyan-600/20 px-3 py-2.5 text-sm font-medium text-cyan-100 hover:border-cyan-400/60 disabled:opacity-50"
               >
-                {trader.loading ? "Connecting…" : "Connect Phantom"}
+                {trader.loading ? "Connecting…" : "Connect wallet"}
               </button>
+              <WalletConnectModal
+                open={sidebarConnectOpen}
+                onClose={() => setSidebarConnectOpen(false)}
+                purpose="Connect to swap & portfolio"
+              />
               {trader.error && (
                 <p className="text-[10px] text-red-400 text-center">{trader.error}</p>
               )}
@@ -173,13 +180,16 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center justify-between px-4 py-3 border-b border-zinc-800/80 bg-[#0d0d14]">
-          <Link href={homeHref} className="font-bold text-purple-400">
-            Trade
-          </Link>
-          <span className="text-xs text-zinc-500 capitalize">
-            {slug.replace(/-/g, " ")}
-          </span>
+        <header className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/80 bg-[#0d0d14] shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href={homeHref} className="md:hidden font-bold text-purple-400 shrink-0">
+              Trade
+            </Link>
+            <span className="text-xs text-zinc-500 capitalize truncate hidden sm:inline">
+              {slug.replace(/-/g, " ")}
+            </span>
+          </div>
+          <WalletConnectButton />
         </header>
         <main className="flex-1 overflow-auto min-w-0 w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:px-6">
           {children}

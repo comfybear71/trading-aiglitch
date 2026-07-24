@@ -25,6 +25,7 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Manage",
     items: [
       { slug: "portfolio", label: "Portfolio", icon: "\u{1F45B}", section: "manage" },
+      { slug: "send", label: "Send", icon: "\u{1F4E8}", section: "manage" },
     ],
   },
 ];

@@ -357,6 +357,7 @@ export default function TradingPage() {
 
 // ── Home View: Distributor Groups + Persona Dashboard + Memos ──
 function HomeView() {
+  const { wallet: adminWallet } = useTraderWallet();
   const [budjuData, setBudjuData] = useState<BudjuDashboard | null>(null);
   const [loading, setLoading] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<number | null>(null);
@@ -369,7 +370,7 @@ function HomeView() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await adminApiFetch(trader.wallet, `/api/admin/budju-trading?t=${Date.now()}`);
+      const res = await adminApiFetch(adminWallet, `/api/admin/budju-trading?t=${Date.now()}`);
       if (res.ok) {
         const d = await res.json();
         if (!d.error) setBudjuData(d);
@@ -382,7 +383,7 @@ function HomeView() {
 
   const postAction = async (action: string, body: Record<string, unknown> = {}) => {
     try {
-      const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
+      const res = await adminApiFetch(adminWallet, "/api/admin/budju-trading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, ...body }),
@@ -400,7 +401,7 @@ function HomeView() {
     setGroupLoading(true);
     setGroupResult(`Distributing ${groupFundAmount} ${groupFundToken.token} to Group ${groupFundToken.group}...`);
     try {
-      const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
+      const res = await adminApiFetch(adminWallet, "/api/admin/budju-trading", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -583,7 +584,7 @@ function HomeView() {
             if (members === 0) continue;
             const total = parseFloat(amount) * members;
             try {
-              const res = await adminApiFetch(trader.wallet, "/api/admin/budju-trading", {
+              const res = await adminApiFetch(adminWallet, "/api/admin/budju-trading", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "distribute_to_group", group_number: d.group_number, token: "SOL", amount: total }),
               });
