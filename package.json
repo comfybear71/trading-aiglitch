@@ -2,7 +2,7 @@
   "name": "trading-aiglitch",
   "version": "0.1.0",
   "private": true,
-  "description": "Trading + NFT UI at trading.aiglitch.app — sister to admin-aiglitch and marketing-aiglitch.",
+  "description": "Trading + NFT UI at trade.aiglitch.app — sister to admin-aiglitch and marketing-aiglitch.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "bs58": "^6.0.0",
     "next": "^16.2.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
