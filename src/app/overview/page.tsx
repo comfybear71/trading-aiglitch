@@ -8,7 +8,7 @@ export default async function OverviewGatePage() {
   return (
     <Placeholder
       title="Trading hub"
-      next="BUDJU bot, GLITCH trading, persona wallets, and NFT marketplace will live here — same API proxy pattern as marketing.aiglitch.app."
+      next="Use the sidebar: Trading (Phantom QR + BUDJU/GLITCH) and NFT Art (Grokify grid). All calls proxy to api.aiglitch.app."
     />
   );
 }

@@ -6,10 +6,16 @@ import { NAV } from "./nav";
 import { ECOSYSTEM_LINKS } from "@/lib/ecosystem-urls";
 
 const SHELL_SUPPRESSED_PATHS = new Set(["/login"]);
+const SHELL_SUPPRESSED_PREFIXES = ["/auth/"];
 
 export function TradingShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (SHELL_SUPPRESSED_PATHS.has(pathname)) return <>{children}</>;
+  if (
+    SHELL_SUPPRESSED_PATHS.has(pathname) ||
+    SHELL_SUPPRESSED_PREFIXES.some((p) => pathname.startsWith(p))
+  ) {
+    return <>{children}</>;
+  }
   return <TradingShellInner pathname={pathname}>{children}</TradingShellInner>;
 }
 
@@ -63,7 +69,7 @@ function TradingShellInner({
 
   const ecosystemLinks = (
     <div className="flex flex-col gap-2">
-      {ECOSYSTEM_LINKS.map((link) => (
+      {ECOSYSTEM_LINKS.filter((link) => link.id !== "trading").map((link) => (
         <a
           key={link.id}
           href={link.href}

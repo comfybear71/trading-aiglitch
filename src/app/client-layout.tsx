@@ -1,7 +1,12 @@
 "use client";
 
 import { TradingShell } from "./trading-shell";
+import { TradingSessionProvider } from "@/context/TradingSessionContext";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-  return <TradingShell>{children}</TradingShell>;
+  return (
+    <TradingSessionProvider>
+      <TradingShell>{children}</TradingShell>
+    </TradingSessionProvider>
+  );
 }
