@@ -153,7 +153,9 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
             {slug.replace(/-/g, " ")}
           </span>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6 max-w-5xl">{children}</main>
+        <main className="flex-1 overflow-auto min-w-0 w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:px-6">
+          {children}
+        </main>
       </div>
     </div>
   );
