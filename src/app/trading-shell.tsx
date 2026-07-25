@@ -110,6 +110,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
           )}
         </nav>
 
+        {(!trader.wallet || (opsUnlocked && !trader.isAdminWallet)) && (
         <div className="p-3 border-t border-zinc-800/80 space-y-2">
           {!trader.wallet ? (
             <>
@@ -133,11 +134,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
                 Hold ≥{(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} $BUDJU on-chain to swap
               </p>
             </>
-          ) : (
-            <p className="text-[10px] text-zinc-600 text-center leading-snug px-1">
-              Wallet connected — use the button top-right for holdings, send, and disconnect.
-            </p>
-          )}
+          ) : null}
           {opsUnlocked && !trader.isAdminWallet && (
             <button
               type="button"
@@ -155,6 +152,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
             </button>
           )}
         </div>
+        )}
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">

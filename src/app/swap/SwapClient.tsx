@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { VersionedTransaction } from "@solana/web3.js";
 import { useTraderWallet } from "@/context/TraderWalletContext";
-import { getPhantom } from "@/lib/phantom";
+import { phantomSignAndSubmit } from "@/lib/phantom-submit";
 import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
 import {
   balanceForSymbol,
@@ -185,30 +185,25 @@ export default function SwapClient() {
       const atomic = toAtomic(amount, inputToken.decimals);
       if (atomic === "0") throw new Error("Enter a valid amount");
 
-      let quote = storedQuote;
-      let qDataFees = feesMeta;
-      if (!quote) {
-        const qData = await fetchQuote(
-          inputToken.mint,
-          outputToken.mint,
-          atomic,
-          slippageBps,
-        );
-        quote = qData.quote;
-        qDataFees = qData.fees ?? null;
-        setFeesMeta(qDataFees);
-        setStoredQuote(quote);
-        setParsedQuote(
-          parseJupiterQuote(
-            quote,
-            inputToken.decimals,
-            outputToken.decimals,
-            inputSymbol,
-            outputSymbol,
-            qDataFees,
-          ),
-        );
-      }
+      const qData = await fetchQuote(
+        inputToken.mint,
+        outputToken.mint,
+        atomic,
+        slippageBps,
+      );
+      const quote = qData.quote;
+      const qDataFees = qData.fees ?? null;
+      setFeesMeta(qDataFees);
+      setStoredQuote(quote);
+      const parsedForHistory = parseJupiterQuote(
+        quote,
+        inputToken.decimals,
+        outputToken.decimals,
+        inputSymbol,
+        outputSymbol,
+        qDataFees,
+      );
+      setParsedQuote(parsedForHistory);
 
       const sRes = await fetch("/api/trade/jupiter/swap", {
         method: "POST",
@@ -221,25 +216,12 @@ export default function SwapClient() {
       const sData = await sRes.json();
       if (!sRes.ok) throw new Error(sData.error || "Swap build failed");
 
-      const phantom = getPhantom();
-      if (!phantom) throw new Error("Phantom not available");
-      await phantom.connect({ onlyIfTrusted: true }).catch(() => phantom.connect());
-
       const raw = atob(sData.swapTransaction);
       const bytes = new Uint8Array(raw.length);
       for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
       const tx = VersionedTransaction.deserialize(bytes);
-      const { signature } = await phantom.signAndSendTransaction(tx);
-      const outHuman =
-        parsedQuote?.outHuman ??
-        parseJupiterQuote(
-          quote,
-          inputToken.decimals,
-          outputToken.decimals,
-          inputSymbol,
-          outputSymbol,
-          qDataFees,
-        ).outHuman;
+      const signature = await phantomSignAndSubmit(tx);
+      const outHuman = parsedForHistory.outHuman;
       appendSwapHistory({
         signature,
         sellSymbol: inputSymbol,
@@ -259,10 +241,7 @@ export default function SwapClient() {
       setStoredQuote(null);
       await trader.refresh();
     } catch (e) {
-      const raw = e instanceof Error ? e.message : String(e);
-      const msg = /not been authorized|user rejected|user denied/i.test(raw)
-        ? "Phantom blocked the swap — open Phantom and approve the transaction."
-        : raw;
+      const msg = e instanceof Error ? e.message : String(e);
       setStatus(msg);
       pushToast(msg, "error");
     } finally {
