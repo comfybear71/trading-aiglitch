@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { VersionedTransaction } from "@solana/web3.js";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
-import { getPhantom, truncWallet } from "@/lib/phantom";
+import { truncWallet } from "@/lib/phantom";
+import { phantomSignAndSubmit } from "@/lib/phantom-submit";
 import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
 import {
   balanceForSymbol,
@@ -79,15 +80,11 @@ export default function SendClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Transfer build failed");
 
-      const phantom = getPhantom();
-      if (!phantom) throw new Error("Phantom not available");
-      await phantom.connect({ onlyIfTrusted: true }).catch(() => phantom.connect());
-
       const raw = atob(data.transaction);
       const bytes = new Uint8Array(raw.length);
       for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
       const tx = VersionedTransaction.deserialize(bytes);
-      const { signature } = await phantom.signAndSendTransaction(tx);
+      const signature = await phantomSignAndSubmit(tx);
 
       appendSendHistory({
         signature,
@@ -101,10 +98,7 @@ export default function SendClient() {
       setRecipient("");
       await trader.refresh();
     } catch (e) {
-      const raw = e instanceof Error ? e.message : String(e);
-      const msg = /not been authorized|user rejected|user denied/i.test(raw)
-        ? "Phantom blocked the send — open Phantom and approve the transaction."
-        : raw;
+      const msg = e instanceof Error ? e.message : String(e);
       pushToast(msg, "error");
     } finally {
       setBusy(false);
