@@ -8,6 +8,7 @@ import { phantomSignAndSubmit } from "@/lib/phantom-submit";
 import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
 import { balanceForSymbol, formatSwapAmount, maxPayAmount } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { appendSendHistory } from "@/lib/send-history";
 
 function toAtomic(amount: string, decimals: number): string {
   const n = Number(amount);
@@ -19,9 +20,10 @@ type Props = {
   symbol: string;
   setSymbol: (s: string) => void;
   balance: number;
+  onActivityChange?: () => void;
 };
 
-export function MagicLinkSendPanel({ symbol, setSymbol, balance }: Props) {
+export function MagicLinkSendPanel({ symbol, setSymbol, balance, onActivityChange }: Props) {
   const trader = useTraderWallet();
   const { pushToast } = useTradeToast();
   const { prices } = useTradePrices(!!trader.wallet);
@@ -29,6 +31,8 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance }: Props) {
   const [busy, setBusy] = useState(false);
   const [claimUrl, setClaimUrl] = useState<string | null>(null);
   const [claimId, setClaimId] = useState<string | null>(null);
+  /** Amount locked in active link (for refund activity row). */
+  const [activeLinkAmount, setActiveLinkAmount] = useState<string | null>(null);
 
   const token = TRADE_SWAP_TOKENS.find((t) => t.symbol === symbol)!;
 
@@ -74,8 +78,19 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance }: Props) {
         }),
       });
 
+      const amountHuman = amount;
+      appendSendHistory({
+        signature: depositSig,
+        symbol,
+        amount: amountHuman,
+        toTrunc: `Magic link · ${data.claimId.slice(0, 8)}…`,
+        kind: "magic_link",
+      });
+      onActivityChange?.();
+
       setClaimUrl(data.claimUrl);
       setClaimId(data.claimId);
+      setActiveLinkAmount(amountHuman);
       pushToast("Magic link ready — share the URL", "success");
       setAmount("");
       await trader.refresh();
@@ -110,9 +125,19 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance }: Props) {
         body: JSON.stringify({ refundSignature: sig, senderPublicKey: trader.wallet }),
       });
 
+      appendSendHistory({
+        signature: sig,
+        symbol,
+        amount: activeLinkAmount ?? "—",
+        toTrunc: `Refund · ${claimId.slice(0, 8)}…`,
+        kind: "magic_refund",
+      });
+      onActivityChange?.();
+
       pushToast("Link cancelled — funds refunded", "success");
       setClaimUrl(null);
       setClaimId(null);
+      setActiveLinkAmount(null);
       await trader.refresh();
     } catch (e) {
       pushToast(e instanceof Error ? e.message : String(e), "error");
@@ -131,7 +156,7 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance }: Props) {
     <div className="space-y-3">
       <p className="text-xs text-zinc-500 leading-snug px-1">
         Lock funds in escrow and share a link. Recipient claims with any wallet. You can cancel anytime before
-        they claim. 7-day expiry · $500 max · devnet USDC first.
+        they claim. 7-day expiry · $500 max · USDC (when enabled on this network).
       </p>
       <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
         <div className="p-4 border-b border-zinc-800/80">

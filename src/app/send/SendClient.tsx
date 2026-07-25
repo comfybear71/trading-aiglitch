@@ -13,7 +13,7 @@ import {
   maxPayAmount,
 } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
-import { appendSendHistory, loadSendHistory, type SendHistoryEntry } from "@/lib/send-history";
+import { appendSendHistory, loadSendHistory, solscanTxUrl, type SendHistoryEntry } from "@/lib/send-history";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { MagicLinkSendPanel } from "@/components/MagicLinkSendPanel";
 
@@ -96,7 +96,7 @@ export default function SendClient() {
         toTrunc: truncWallet(to),
       });
       setActivity(loadSendHistory());
-      pushToast(`Sent · ${signature.slice(0, 8)}…`, "success", `https://solscan.io/tx/${signature}`);
+      pushToast(`Sent · ${signature.slice(0, 8)}…`, "success", solscanTxUrl(signature));
       setAmount("");
       setRecipient("");
       await trader.refresh();
@@ -106,6 +106,14 @@ export default function SendClient() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const refreshActivity = () => setActivity(loadSendHistory());
+
+  const activityLabel = (a: SendHistoryEntry) => {
+    if (a.kind === "magic_link") return `${a.amount} ${a.symbol} · ${a.toTrunc}`;
+    if (a.kind === "magic_refund") return `Refund ${a.amount} ${a.symbol} · ${a.toTrunc}`;
+    return `${a.amount} ${a.symbol} → ${a.toTrunc}`;
   };
 
   const copyAddress = async () => {
@@ -225,9 +233,13 @@ export default function SendClient() {
           </div>
 
           {sendMode === "magic" ? (
-            <MagicLinkSendPanel symbol={symbol} setSymbol={setSymbol} balance={balance} />
+            <MagicLinkSendPanel
+              symbol={symbol}
+              setSymbol={setSymbol}
+              balance={balance}
+              onActivityChange={refreshActivity}
+            />
           ) : (
-            <>
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
             <p className="px-4 pt-4 text-xs text-zinc-500">Send money to any wallet address.</p>
             <div className="p-4 border-b border-zinc-800/80">
@@ -288,6 +300,7 @@ export default function SendClient() {
               </button>
             </div>
           </div>
+          )}
 
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
             <p className="px-4 py-2 text-[10px] uppercase text-zinc-500 font-semibold border-b border-zinc-800">
@@ -298,15 +311,13 @@ export default function SendClient() {
             ) : (
               <ul className="divide-y divide-zinc-800/80 max-h-48 overflow-y-auto">
                 {activity.map((a) => (
-                  <li key={a.signature} className="px-4 py-2.5 flex justify-between text-sm">
-                    <span className="text-zinc-300">
-                      {a.amount} {a.symbol} → {a.toTrunc}
-                    </span>
+                  <li key={`${a.signature}-${a.at}`} className="px-4 py-2.5 flex justify-between gap-2 text-sm">
+                    <span className="text-zinc-300 truncate">{activityLabel(a)}</span>
                     <a
-                      href={`https://solscan.io/tx/${a.signature}`}
+                      href={solscanTxUrl(a.signature)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] text-cyan-500 hover:underline"
+                      className="text-[10px] text-cyan-500 hover:underline shrink-0"
                     >
                       Solscan
                     </a>
@@ -315,8 +326,6 @@ export default function SendClient() {
               </ul>
             )}
           </div>
-            </>
-          )}
         </>
       )}
 
