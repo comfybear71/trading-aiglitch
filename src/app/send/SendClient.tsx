@@ -15,8 +15,10 @@ import {
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 import { appendSendHistory, loadSendHistory, type SendHistoryEntry } from "@/lib/send-history";
 import { HoldingsChips } from "@/components/HoldingsChips";
+import { MagicLinkSendPanel } from "@/components/MagicLinkSendPanel";
 
 type MainTab = "send" | "receive";
+type SendMode = "transfer" | "magic";
 
 function toAtomic(amount: string, decimals: number): string {
   const n = Number(amount);
@@ -33,6 +35,7 @@ export default function SendClient() {
   const { pushToast } = useTradeToast();
   const { prices } = useTradePrices(!!trader.wallet);
   const [mainTab, setMainTab] = useState<MainTab>("send");
+  const [sendMode, setSendMode] = useState<SendMode>("transfer");
   const [symbol, setSymbol] = useState("USDC");
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
@@ -197,14 +200,34 @@ export default function SendClient() {
       ) : (
         <>
           <div className="flex gap-2 text-[10px]">
-            <span className="px-2 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 font-bold border border-cyan-500/30">
+            <button
+              type="button"
+              onClick={() => setSendMode("transfer")}
+              className={`px-2 py-1 rounded-lg font-bold border ${
+                sendMode === "transfer"
+                  ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/30"
+                  : "text-zinc-600 border-zinc-800"
+              }`}
+            >
               Transfer
-            </span>
-            <span className="px-2 py-1 rounded-lg text-zinc-600 border border-zinc-800" title="Coming later">
+            </button>
+            <button
+              type="button"
+              onClick={() => setSendMode("magic")}
+              className={`px-2 py-1 rounded-lg font-bold border ${
+                sendMode === "magic"
+                  ? "bg-purple-500/15 text-purple-300 border-purple-500/30"
+                  : "text-zinc-600 border-zinc-800"
+              }`}
+            >
               Magic Link
-            </span>
+            </button>
           </div>
 
+          {sendMode === "magic" ? (
+            <MagicLinkSendPanel symbol={symbol} setSymbol={setSymbol} balance={balance} />
+          ) : (
+            <>
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
             <p className="px-4 pt-4 text-xs text-zinc-500">Send money to any wallet address.</p>
             <div className="p-4 border-b border-zinc-800/80">
@@ -292,6 +315,8 @@ export default function SendClient() {
               </ul>
             )}
           </div>
+            </>
+          )}
         </>
       )}
 
