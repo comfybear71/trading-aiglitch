@@ -1,14 +1,26 @@
-import { Connection, VersionedTransaction } from "@solana/web3.js";
+import type { VersionedTransaction } from "@solana/web3.js";
 
 import { formatPhantomWalletError, getPhantom } from "@/lib/phantom";
 
-function mainnetRpcUrl(): string {
-  const custom = process.env.NEXT_PUBLIC_SOLANA_RPC_URL?.trim();
-  if (custom) return custom;
-  return "https://api.mainnet-beta.solana.com";
+function u8ToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]!);
+  return btoa(binary);
 }
 
-/** Connect if needed, sign in Phantom, broadcast (sign-only path avoids some send-path blocks). */
+async function submitViaApi(signed: Uint8Array): Promise<string> {
+  const res = await fetch("/api/trade/submit", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ signedTransaction: u8ToBase64(signed) }),
+  });
+  const data = (await res.json()) as { signature?: string; error?: string };
+  if (!res.ok) throw new Error(data.error || `Broadcast failed (${res.status})`);
+  if (!data.signature) throw new Error("No signature returned");
+  return data.signature;
+}
+
+/** Connect if needed, sign in Phantom, broadcast via api.aiglitch.app (Helius RPC). */
 export async function phantomSignAndSubmit(tx: VersionedTransaction): Promise<string> {
   const phantom = getPhantom();
   if (!phantom) throw new Error("Phantom not available");
@@ -19,20 +31,9 @@ export async function phantomSignAndSubmit(tx: VersionedTransaction): Promise<st
   if (typeof signTx === "function") {
     try {
       const signed = await signTx.call(phantom, tx);
-      const connection = new Connection(mainnetRpcUrl(), "confirmed");
-      const signature = await connection.sendRawTransaction(signed.serialize(), {
-        skipPreflight: false,
-        maxRetries: 3,
-      });
-      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
-      await connection.confirmTransaction(
-        { signature, blockhash, lastValidBlockHeight },
-        "confirmed",
-      );
-      return signature;
+      return await submitViaApi(signed.serialize());
     } catch (e) {
-      const msg = formatPhantomWalletError(e);
-      throw new Error(msg);
+      throw new Error(formatPhantomWalletError(e));
     }
   }
 
