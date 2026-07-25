@@ -1,6 +1,11 @@
 /** Mainnet mints — keep in sync with aiglitch-api TRADE_ALLOWED_MINTS */
 export const SOL_MINT = "So11111111111111111111111111111111111111112";
-export const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+/** Circle USDC on Solana devnet (magic link v1) */
+export const DEVNET_USDC_MINT = "4zMMC9srt5Ri5X14GPhXUK7WJ37xN8Z7J2q8o9Y9M4";
+export const USDC_MINT =
+  process.env.NEXT_PUBLIC_SOLANA_NETWORK === "devnet"
+    ? DEVNET_USDC_MINT
+    : "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 export const BUDJU_MINT = "2ajYe8eh8btUZRpaZ1v7ewWDkcYJmVGvPuDTU5xrpump";
 export const GLITCH_MINT = "5hfHCmaL6e9bvruy35RQyghMXseTE2mXJ7ukqKAcS8fT";
 
