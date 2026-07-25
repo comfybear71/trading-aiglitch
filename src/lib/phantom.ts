@@ -60,6 +60,9 @@ export function formatPhantomWalletError(e: unknown): string {
   else if (typeof e === "object" && e && "message" in e) raw = String((e as { message: unknown }).message);
   else raw = String(e);
 
+  if (/403|access forbidden|forbidden/i.test(raw)) {
+    return "Network blocked the transaction broadcast. Refresh and try again — if it persists, the trade app may need an API update.";
+  }
   if (/unexpected error/i.test(raw)) {
     return (
       "Phantom blocked or closed the request. If you saw a red security warning, only continue if you trust trade.aiglitch.app " +
