@@ -1,12 +1,22 @@
 const STORAGE_KEY = "aiglitch-trade-send-history";
 const MAX = 40;
 
+export type SendHistoryKind = "transfer" | "magic_link" | "magic_refund";
+
 export interface SendHistoryEntry {
   at: string;
   signature: string;
   symbol: string;
   amount: string;
   toTrunc: string;
+  kind?: SendHistoryKind;
+}
+
+/** Solscan tx URL — devnet when trade app is on devnet. */
+export function solscanTxUrl(signature: string): string {
+  const cluster =
+    process.env.NEXT_PUBLIC_SOLANA_NETWORK === "devnet" ? "?cluster=devnet" : "";
+  return `https://solscan.io/tx/${signature}${cluster}`;
 }
 
 export function loadSendHistory(): SendHistoryEntry[] {

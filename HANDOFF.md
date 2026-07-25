@@ -4,6 +4,31 @@
 
 ---
 
+## 2026-07-25 — Send activity + mainnet cutover
+
+**Activity fix (local):** Magic Link deposits/refunds now append to the same localStorage history as Transfer; Activity panel shows under both Send modes with devnet-aware Solscan links.
+
+**Your 2.5 USDC:** Magic Link (not Transfer) — past sends won’t backfill; new magic links will appear after this ships.
+
+### Switch trade + API back to **mainnet** (Vercel — you)
+
+| Project | Variable | Production value |
+|---------|----------|------------------|
+| **aiglitch-api** | `NEXT_PUBLIC_SOLANA_NETWORK` | `mainnet-beta` (or **delete** the var — default is mainnet) |
+| **aiglitch-api** | `TRADE_MAGIC_CLAIM_PROGRAM_ID` | **Remove** devnet program id `3m1zLK…` (wrong cluster on mainnet) |
+| **aiglitch-api** | `TRADE_MAGIC_LINK_ENABLED` | leave **unset** / `false` until mainnet program deploy |
+| **trading-aiglitch** | `NEXT_PUBLIC_SOLANA_NETWORK` | `mainnet-beta` or **delete** |
+
+**Phantom:** Settings → Developer → **Testnet Mode OFF**.
+
+**What works on mainnet immediately:** swap, transfer, portfolio balances (Helius), real USDC mint.
+
+**Magic Link:** stays **off** on mainnet until you deploy the escrow program to mainnet, set the new program id on API, then `TRADE_MAGIC_LINK_ENABLED=true`. Devnet smoke test program id must not stay in production env.
+
+Redeploy **both** projects after env changes.
+
+---
+
 ## 2026-07-24 — Send/Receive + swap parity (committed, merge after API)
 
 **API dependency:** `POST /api/trade/transfer`, `GET /api/trade/prices`, quote `fees` payload.
