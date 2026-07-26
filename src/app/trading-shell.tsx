@@ -11,6 +11,7 @@ import {
 } from "./nav";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { WalletConnectButton, WalletConnectModal } from "@/components/WalletConnectModal";
+import { EcosystemFooter } from "@/components/EcosystemFooter";
 
 function NavLink({
   href,
@@ -169,6 +170,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
         </header>
         <main className="flex-1 overflow-auto min-w-0 w-full max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 md:px-6">
           {children}
+          <EcosystemFooter />
         </main>
       </div>
     </div>

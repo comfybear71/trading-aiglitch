@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { BudjuMarketsPromo } from "@/components/BudjuMarketsPromo";
 import { useTraderWallet } from "@/context/TraderWalletContext";
+import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
 /** External DEX reference lane only — §GLITCH uses platform OTC promo above. */
@@ -165,7 +166,10 @@ export default function MarketsClient() {
             <h1 className="text-xl font-black text-white mt-1">Live pairs — coming soon</h1>
             <p className="text-sm text-zinc-500 mt-1 max-w-xl">
               This area will list every Jupiter route, charts, and limits. For now use Swap and the
-              lanes below.
+              lanes below.{" "}
+              <Link href={`${GLITCH_EXCHANGE_PATH}#how-we-earn`} className="text-purple-400/90 hover:underline">
+                How AIG!itch earns →
+              </Link>
             </p>
           </div>
           <div className="rounded-xl border border-dashed border-zinc-700/80 bg-black/20 px-4 py-3 text-[11px] text-zinc-500 max-w-xs">
