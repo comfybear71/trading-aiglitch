@@ -8,7 +8,7 @@ Locked **2026-07-26** after mainnet market swaps shipped.
 |---------|---------|-----|
 | **Market swap** | `GET /api/trade/jupiter/quote`, `POST /api/trade/jupiter/swap`, `POST /api/trade/submit` | Sell/Buy, slippage, quote review, route modal, activity |
 | **BUDJU gate** | `GET /api/trade/eligibility`, 403 on swap build | Locked state + required balance copy |
-| **Tokens** | SOL, USDC, BUDJU, GLITCH mints only | Same four on swap |
+| **Tokens** | Jupiter: SOL, USDC, BUDJU only | §GLITCH → [aiglitch.app/exchange](https://aiglitch.app/exchange) OTC |
 | **History** | `POST/GET /api/trade/activity` | Swap history panel + Portfolio activity |
 
 Deep links: `/swap?sell=USDC&buy=SOL` (optional query params).

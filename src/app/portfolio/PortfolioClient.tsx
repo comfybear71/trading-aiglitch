@@ -101,10 +101,19 @@ export default function PortfolioClient() {
               Send
             </Link>
             <Link
-              href={chipFilter ? `/swap?sell=${encodeURIComponent(chipFilter)}` : "/swap"}
+              href={
+                chipFilter === "GLITCH"
+                  ? "https://aiglitch.app/exchange"
+                  : chipFilter
+                    ? `/swap?sell=${encodeURIComponent(chipFilter)}`
+                    : "/swap"
+              }
+              {...(chipFilter === "GLITCH"
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
               className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-cyan-600/80 text-xs font-bold text-white"
             >
-              Swap
+              {chipFilter === "GLITCH" ? "Invest §GLITCH" : "Swap"}
             </Link>
           </div>
         </div>
@@ -192,12 +201,23 @@ export default function PortfolioClient() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
-                  <Link
-                    href={`/swap?sell=${encodeURIComponent(h.symbol)}`}
-                    className="text-[10px] text-cyan-500/80 hover:text-cyan-400 mt-1 inline-block"
-                  >
-                    Trade
-                  </Link>
+                  {h.symbol === "GLITCH" ? (
+                    <a
+                      href="https://aiglitch.app/exchange"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-purple-400/90 hover:text-purple-300 mt-1 inline-block"
+                    >
+                      Invest (OTC)
+                    </a>
+                  ) : (
+                    <Link
+                      href={`/swap?sell=${encodeURIComponent(h.symbol)}`}
+                      className="text-[10px] text-cyan-500/80 hover:text-cyan-400 mt-1 inline-block"
+                    >
+                      Trade
+                    </Link>
+                  )}
                 </div>
               </li>
             );

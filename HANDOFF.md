@@ -4,9 +4,15 @@
 
 ---
 
-## 2026-07-26 — Markets v2 (in PR)
+## 2026-07-26 — §GLITCH OTC (not Jupiter) — in PR
 
-**Branch:** `claude/markets-v2` — price cards link to `/swap?sell=&buy=`, refresh, updated copy (swap live; not an order book).
+**Branch:** `claude/glitch-otc-not-jupiter` — Remove §GLITCH from Jupiter swap tokens; OTC callout on `/swap?buy=GLITCH`; Markets OTC panel + `otc-swap` proxy; Portfolio → exchange for GLITCH. Bonding curve: +$0.01 / 10k sold; treasury `7SGf93…`. See `docs/trade-markets-glitch.md`.
+
+---
+
+## 2026-07-26 — Markets v2 (merged #17)
+
+Price cards, refresh, swap deep links.
 
 ---
 
