@@ -9,18 +9,11 @@ function fmtCompact(n: number) {
   return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
-export function BudjuGateCallout({
-  budjuBalance,
-  budjuRequired = BUDJU_GATE_REQUIRED_DEFAULT,
-  showSwapHint = true,
-}: {
-  budjuBalance: number;
-  budjuRequired?: number;
-  showSwapHint?: boolean;
-}) {
-  const pct = Math.min(100, (budjuBalance / budjuRequired) * 100);
-  const shortfall = Math.max(0, budjuRequired - budjuBalance);
+function fmtFull(n: number) {
+  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
 
+function BudjuPanelShell({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="relative overflow-hidden rounded-2xl border border-fuchsia-500/45 p-4 space-y-3 shadow-[0_0_32px_-8px_rgba(217,70,239,0.35)]"
@@ -36,7 +29,147 @@ export function BudjuGateCallout({
           backgroundSize: "12px 12px",
         }}
       />
-      <div className="relative flex flex-wrap items-start gap-3">
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
+function BudjuLinkPills() {
+  return (
+    <div className="flex flex-wrap gap-2 pt-1">
+      {(
+        [
+          ["budju.xyz", BUDJU_SITE.home],
+          ["How to buy", BUDJU_SITE.trade],
+          ["Tokenomics", BUDJU_SITE.tokenomics],
+        ] as const
+      ).map(([label, href]) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-fuchsia-500/40 text-fuchsia-200/90 hover:bg-fuchsia-500/15 hover:text-white transition-colors"
+        >
+          {label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function RefreshBalancesButton({
+  onRefresh,
+  refreshing,
+}: {
+  onRefresh?: () => void;
+  refreshing?: boolean;
+}) {
+  if (!onRefresh) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => void onRefresh()}
+      disabled={refreshing}
+      className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-fuchsia-400/50 text-fuchsia-100 hover:bg-fuchsia-500/20 disabled:opacity-50 transition-colors shrink-0"
+    >
+      {refreshing ? "Refreshing…" : "Refresh balance"}
+    </button>
+  );
+}
+
+export function BudjuApprovedCallout({
+  budjuBalance,
+  budjuRequired = BUDJU_GATE_REQUIRED_DEFAULT,
+  onRefresh,
+  refreshing,
+}: {
+  budjuBalance: number;
+  budjuRequired?: number;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+}) {
+  return (
+    <BudjuPanelShell>
+      <div className="flex flex-wrap items-start gap-3">
+        <a
+          href={BUDJU_SITE.home}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 block rounded-lg bg-fuchsia-950/40 p-2 border border-fuchsia-500/30 hover:border-fuchsia-400/60 transition-colors"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BUDJU_SITE.logo} alt="BUDJU" className="h-10 w-auto max-w-[140px] object-contain" />
+        </a>
+        <div className="min-w-0 flex-1">
+          <p className="text-lg font-black text-fuchsia-100 tracking-tight uppercase">$BUDJU</p>
+          <p className="text-[11px] text-fuchsia-100/70 mt-0.5">
+            Gate token ·{" "}
+            <a
+              href={BUDJU_SITE.home}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fuchsia-300 hover:text-white underline underline-offset-2"
+            >
+              budju.xyz
+            </a>
+          </p>
+        </div>
+        <RefreshBalancesButton onRefresh={onRefresh} refreshing={refreshing} />
+      </div>
+
+      <div className="mt-3 rounded-xl border border-emerald-400/40 bg-emerald-950/30 px-3 py-2.5 flex flex-wrap items-center gap-2">
+        <span className="text-emerald-300 text-lg" aria-hidden>
+          ✓
+        </span>
+        <span className="text-sm font-black text-emerald-200 uppercase tracking-wide">
+          Approved for trading
+        </span>
+        <span className="text-[11px] text-emerald-100/80 ml-auto">
+          Full swap · portfolio · send unlocked
+        </span>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex flex-wrap justify-between gap-2 text-[11px]">
+          <span className="text-zinc-300">
+            Your balance:{" "}
+            <span className="font-bold text-fuchsia-200 text-sm">{fmtFull(budjuBalance)} $BUDJU</span>
+            <span className="text-zinc-500 ml-1">({fmtCompact(budjuBalance)})</span>
+          </span>
+          <span className="text-emerald-400/90 font-medium">
+            ≥ {budjuRequired.toLocaleString()} required
+          </span>
+        </div>
+        <div className="h-2 rounded-full bg-black/50 overflow-hidden ring-1 ring-emerald-500/30">
+          <div className="h-full w-full rounded-full bg-gradient-to-r from-emerald-600 via-fuchsia-500 to-pink-300" />
+        </div>
+      </div>
+
+      <BudjuLinkPills />
+    </BudjuPanelShell>
+  );
+}
+
+export function BudjuGateCallout({
+  budjuBalance,
+  budjuRequired = BUDJU_GATE_REQUIRED_DEFAULT,
+  showSwapHint = true,
+  onRefresh,
+  refreshing,
+}: {
+  budjuBalance: number;
+  budjuRequired?: number;
+  showSwapHint?: boolean;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+}) {
+  const pct = Math.min(100, (budjuBalance / budjuRequired) * 100);
+  const shortfall = Math.max(0, budjuRequired - budjuBalance);
+
+  return (
+    <BudjuPanelShell>
+      <div className="flex flex-wrap items-start gap-3">
         <a
           href={BUDJU_SITE.home}
           target="_blank"
@@ -51,7 +184,8 @@ export function BudjuGateCallout({
             Hold $BUDJU to unlock AIG!itch Trade
           </p>
           <p className="text-[11px] text-fuchsia-100/70 mt-0.5">
-            Official gate token ·{" "}
+            Official gate token · checks your{" "}
+            <span className="text-fuchsia-200/90">connected wallet</span> ·{" "}
             <a
               href={BUDJU_SITE.home}
               target="_blank"
@@ -62,13 +196,15 @@ export function BudjuGateCallout({
             </a>
           </p>
         </div>
+        <RefreshBalancesButton onRefresh={onRefresh} refreshing={refreshing} />
       </div>
 
-      <div className="relative space-y-2">
+      <div className="space-y-2">
         <div className="flex flex-wrap justify-between gap-2 text-[11px]">
           <span className="text-zinc-300">
             Your balance:{" "}
             <span className="font-bold text-fuchsia-200">{fmtCompact(budjuBalance)} $BUDJU</span>
+            <span className="text-zinc-500 ml-1">({fmtFull(budjuBalance)})</span>
           </span>
           <span className="text-zinc-500">
             Need {budjuRequired.toLocaleString()} ({fmtCompact(shortfall)} more)
@@ -83,7 +219,7 @@ export function BudjuGateCallout({
       </div>
 
       {showSwapHint && (
-        <p className="relative text-[11px] text-zinc-400 leading-relaxed">
+        <p className="text-[11px] text-zinc-400 leading-relaxed">
           Below the gate you can still swap{" "}
           <span className="text-fuchsia-200 font-medium">SOL or USDC → $BUDJU</span> here on Jupiter. Get $BUDJU on{" "}
           <a
@@ -94,11 +230,11 @@ export function BudjuGateCallout({
           >
             budju.xyz
           </a>{" "}
-          or Jupiter, then refresh your wallet.
+          or Jupiter, then tap <span className="text-fuchsia-200">Refresh balance</span>.
         </p>
       )}
 
-      <div className="relative flex flex-wrap gap-2 pt-1">
+      <div className="flex flex-wrap gap-2 pt-1">
         {(
           [
             ["budju.xyz", BUDJU_SITE.home],
@@ -123,6 +259,39 @@ export function BudjuGateCallout({
           Buy $BUDJU
         </Link>
       </div>
-    </div>
+    </BudjuPanelShell>
+  );
+}
+
+export function BudjuTraderStatus({
+  eligible,
+  budjuBalance,
+  budjuRequired = BUDJU_GATE_REQUIRED_DEFAULT,
+  onRefresh,
+  refreshing,
+}: {
+  eligible: boolean;
+  budjuBalance: number;
+  budjuRequired?: number;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+}) {
+  if (eligible) {
+    return (
+      <BudjuApprovedCallout
+        budjuBalance={budjuBalance}
+        budjuRequired={budjuRequired}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
+      />
+    );
+  }
+  return (
+    <BudjuGateCallout
+      budjuBalance={budjuBalance}
+      budjuRequired={budjuRequired}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+    />
   );
 }
