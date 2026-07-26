@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchOtcConfig, peekOtcConfigCache, type OtcPublicConfig } from "@/lib/glitch-otc";
 
 export function useOtcConfig(pollMs = 0) {
@@ -13,7 +13,7 @@ export function useOtcConfig(pollMs = 0) {
   const [refreshing, setRefreshing] = useState(false);
 
   const refresh = useCallback(async (force = true) => {
-    const hadData = !!peekOtcConfigCache() || !!otc;
+    const hadData = !!peekOtcConfigCache();
     if (!hadData) setLoading(true);
     else setRefreshing(true);
     try {
@@ -23,7 +23,10 @@ export function useOtcConfig(pollMs = 0) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [otc]);
+  }, []);
+
+  const refreshRef = useRef(refresh);
+  refreshRef.current = refresh;
 
   useEffect(() => {
     const cached = peekOtcConfigCache();
@@ -31,12 +34,13 @@ export function useOtcConfig(pollMs = 0) {
       setOtc(cached);
       setLoading(false);
     }
-    void refresh(true);
+    void refreshRef.current(true);
     if (pollMs <= 0) return;
-    const id = window.setInterval(() => void refresh(true), pollMs);
+    const id = window.setInterval(() => void refreshRef.current(true), pollMs);
     return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount + poll interval only
   }, [pollMs]);
 
-  return { otc, loading, refreshing, refresh: () => refresh(true) };
+  const refreshStable = useCallback(() => refreshRef.current(true), []);
+
+  return { otc, loading, refreshing, refresh: refreshStable };
 }

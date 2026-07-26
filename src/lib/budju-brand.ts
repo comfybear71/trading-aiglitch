@@ -2,7 +2,9 @@
 export const BUDJU_SITE = {
   home: "https://www.budju.xyz/",
   logo: "https://www.budju.xyz/images/logo.svg",
-  trade: "https://www.budju.xyz/trade",
+  howToBuy: "https://www.budju.xyz/how-to-buy",
+  /** @deprecated use howToBuy */
+  trade: "https://www.budju.xyz/how-to-buy",
   /** DCA trading bot (deposit + automated trades on budju.xyz). */
   dcaBot: "https://www.budju.xyz/trade",
   tokenomics: "https://www.budju.xyz/tokenomics",

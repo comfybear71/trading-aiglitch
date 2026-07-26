@@ -150,7 +150,7 @@ export default function PortfolioClient() {
             </Link>
             ,{" "}
             <a
-              href={BUDJU_SITE.trade}
+              href={BUDJU_SITE.howToBuy}
               target="_blank"
               rel="noopener noreferrer"
               className="text-fuchsia-300 hover:text-white font-bold underline"

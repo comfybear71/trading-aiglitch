@@ -50,7 +50,7 @@ function BudjuLinkPills({ showBuyOnSwap = true }: { showBuyOnSwap?: boolean }) {
       {(
         [
           ["budju.xyz", BUDJU_SITE.home],
-          ["How to buy", BUDJU_SITE.trade],
+          ["How to buy", BUDJU_SITE.howToBuy],
           ["Tokenomics", BUDJU_SITE.tokenomics],
         ] as const
       ).map(([label, href]) => (
@@ -243,7 +243,7 @@ export function BudjuGateCallout({
           Below the gate you can still swap{" "}
           <span className="text-fuchsia-200 font-medium">SOL or USDC → $BUDJU</span> here on Jupiter. Get $BUDJU on{" "}
           <a
-            href={BUDJU_SITE.trade}
+            href={BUDJU_SITE.howToBuy}
             target="_blank"
             rel="noopener noreferrer"
             className="text-fuchsia-300 hover:text-white underline"

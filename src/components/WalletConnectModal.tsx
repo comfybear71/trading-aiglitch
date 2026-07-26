@@ -324,7 +324,7 @@ export function WalletConnectMenu({
                 <>
                   Swap & Portfolio unlocked ·{" "}
                   <a
-                    href={BUDJU_SITE.trade}
+                    href={BUDJU_SITE.howToBuy}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-fuchsia-300 hover:text-white underline"

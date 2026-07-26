@@ -36,7 +36,7 @@ export function EcosystemFooter() {
         <Link href={GLITCH_EXCHANGE_PATH} className="text-purple-400/90 hover:text-purple-300">
           Buy §GLITCH (OTC)
         </Link>
-        <a href={ECOSYSTEM_LINKS.budjuTrade} target="_blank" rel="noopener noreferrer" className="hover:text-fuchsia-300">
+        <a href={ECOSYSTEM_LINKS.budjuBot} target="_blank" rel="noopener noreferrer" className="hover:text-fuchsia-300">
           $BUDJU bot
         </a>
         <a href={ECOSYSTEM_LINKS.sponsor} target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300">

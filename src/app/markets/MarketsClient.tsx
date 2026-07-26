@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { BudjuMarketsPromo } from "@/components/BudjuMarketsPromo";
 import { useTraderWallet } from "@/context/TraderWalletContext";
@@ -96,6 +96,9 @@ export default function MarketsClient() {
   const [balanceRefreshing, setBalanceRefreshing] = useState(false);
   const { otc, loading: otcLoading, refreshing: otcRefreshing, refresh: refreshOtc } =
     useOtcConfig();
+  const refreshOtcRef = useRef(refreshOtc);
+  refreshOtcRef.current = refreshOtc;
+
   const [markets, setMarkets] = useState<MarketSnapshot[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -112,9 +115,8 @@ export default function MarketsClient() {
     if (trader.wallet) void trader.refresh();
   }, [trader.wallet, trader.refresh]);
 
-  const refresh = useCallback(async () => {
+  const loadMarkets = useCallback(async () => {
     setLoading(true);
-    await refreshOtc();
     try {
       const pairsRes = await fetch("/api/exchange?action=pairs");
       const pairsData = await pairsRes.json();
@@ -130,11 +132,16 @@ export default function MarketsClient() {
     } finally {
       setLoading(false);
     }
-  }, [refreshOtc]);
+  }, []);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    void loadMarkets();
+  }, [loadMarkets]);
+
+  const refreshAll = useCallback(() => {
+    void refreshOtcRef.current();
+    void loadMarkets();
+  }, [loadMarkets]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-5">
@@ -189,11 +196,11 @@ export default function MarketsClient() {
         </div>
         <button
           type="button"
-          onClick={() => void refresh()}
-          disabled={loading || otcLoading}
+          onClick={() => refreshAll()}
+          disabled={loading}
           className="px-3 py-1.5 rounded-lg border border-zinc-700 text-xs text-zinc-400 hover:text-cyan-300 disabled:opacity-50"
         >
-          Refresh
+          {loading ? "Refreshing…" : "Refresh"}
         </button>
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           {(["SOL", "USDC", "BUDJU"] as const).map((sym) => (

@@ -13,8 +13,7 @@ import {
   fmtCompact,
 } from "@/components/BudjuGateCallout";
 
-const DEX_CHART = `https://dexscreener.com/solana/${BUDJU_MINT}?embed=1&theme=dark`;
-const SOLSCAN_TOKEN = `https://solscan.io/token/${BUDJU_MINT}`;
+const SOLSCAN_HOLDERS = `https://solscan.io/token/${BUDJU_MINT}#holders`;
 
 function StatChip({
   label,
@@ -150,32 +149,11 @@ export function BudjuMarketsPromo({
           loading={marketLoading}
           value={market?.holders != null ? market.holders.toLocaleString() : "—"}
           sub={
-            market?.holders == null ? (
-              <a href={`${SOLSCAN_TOKEN}#holders`} className="text-fuchsia-400/90 hover:underline">
-                View on Solscan
-              </a>
-            ) : (
-              "on-chain"
-            )
+            <a href={SOLSCAN_HOLDERS} target="_blank" rel="noopener noreferrer" className="text-fuchsia-400/90 hover:underline">
+              {market?.holders != null ? "Solscan" : "View on Solscan"}
+            </a>
           }
         />
-      </div>
-
-      <div className="rounded-lg border border-zinc-800/90 overflow-hidden bg-black/40 min-h-[88px]">
-        <iframe
-          title="BUDJU price chart"
-          src={DEX_CHART}
-          className="w-full h-[88px] border-0 pointer-events-none"
-          sandbox="allow-scripts allow-same-origin"
-        />
-        <a
-          href={`https://dexscreener.com/solana/${BUDJU_MINT}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-center text-[9px] text-fuchsia-400/80 hover:text-fuchsia-300 py-0.5 border-t border-zinc-800/80"
-        >
-          Full chart on DexScreener →
-        </a>
       </div>
 
       {walletConnected && (
@@ -209,7 +187,7 @@ export function BudjuMarketsPromo({
           Launch trading bot →
         </a>
         <a
-          href={BUDJU_SITE.trade}
+          href={BUDJU_SITE.howToBuy}
           target="_blank"
           rel="noopener noreferrer"
           className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1.5 rounded-full border border-fuchsia-500/35 text-fuchsia-200/90 hover:bg-fuchsia-500/10"
