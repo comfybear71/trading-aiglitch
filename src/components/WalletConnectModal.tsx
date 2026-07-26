@@ -10,6 +10,7 @@ import { isMobileWeb, needsPhantomMobileBrowser, openInPhantomBrowser } from "@/
 import { MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { balanceForSymbol } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { CopyWalletAddress } from "@/components/CopyWalletAddress";
 
 type Step = "choose" | "qr";
 
@@ -244,8 +245,19 @@ export function WalletConnectMenu({
       />
       <div className="absolute inset-y-0 right-0 w-full max-w-md border-l border-zinc-800 bg-[#0d0d14] shadow-2xl flex flex-col">
         <div className="px-4 py-4 border-b border-zinc-800 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-mono text-cyan-300">{trader.trunc}</p>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-mono text-cyan-300">{trader.trunc}</p>
+              <CopyWalletAddress address={trader.wallet} />
+              <a
+                href={`https://solscan.io/account/${trader.wallet}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-zinc-500 hover:text-cyan-400"
+              >
+                Solscan
+              </a>
+            </div>
             {b && (
               <p className="text-2xl font-black text-white mt-1">
                 {b.sol.toFixed(4)} SOL
@@ -402,14 +414,17 @@ export function WalletConnectButton() {
   if (trader.wallet) {
     return (
       <>
-        <button
-          type="button"
-          onClick={() => setMenuOpen(true)}
-          className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900/80 px-3 py-2 text-sm font-medium hover:border-cyan-500/40 transition-colors"
-        >
-          <span className="w-2 h-2 rounded-full bg-green-400" />
-          <span className="font-mono text-cyan-200 text-xs">{trader.trunc}</span>
-        </button>
+        <div className="inline-flex items-center rounded-xl border border-zinc-700 bg-zinc-900/80 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium hover:bg-zinc-800/80 transition-colors"
+          >
+            <span className="w-2 h-2 rounded-full bg-green-400" />
+            <span className="font-mono text-cyan-200 text-xs">{trader.trunc}</span>
+          </button>
+          <CopyWalletAddress address={trader.wallet} className="border-0 rounded-none mr-2" />
+        </div>
         <WalletConnectMenu
           open={menuOpen}
           onClose={() => setMenuOpen(false)}

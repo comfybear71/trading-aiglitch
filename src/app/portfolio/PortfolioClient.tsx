@@ -10,6 +10,7 @@ import { useOtcConfig } from "@/lib/use-otc-config";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
+import { CopyWalletAddress } from "@/components/CopyWalletAddress";
 import {
   activityLabel,
   fetchTradeActivity,
@@ -86,6 +87,7 @@ export default function PortfolioClient() {
                 ● Connected
               </span>
               <span className="text-xs font-mono text-cyan-300">{trader.trunc}</span>
+              <CopyWalletAddress address={trader.wallet} />
             </div>
             <p className="text-3xl font-black text-white mt-2">
               {pricesLoading ? "…" : fmtUsd(netUsd)}
