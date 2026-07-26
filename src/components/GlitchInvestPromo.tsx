@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  AIGLITCH_SOCIAL,
   GLITCH_DAILY_SOL_LIMIT,
   GLITCH_LISTING_GOAL_SOL,
   GLITCH_TREASURY_WALLET,
-  otcLifetimeSolFromOtc,
   otcTreasuryWalletSol,
   type OtcPublicConfig,
 } from "@/lib/glitch-otc";
@@ -18,38 +16,31 @@ function fmtSold(n: number) {
 }
 
 function TreasuryBlock({ otc }: { otc: OtcPublicConfig }) {
-  const inWallet = otcTreasuryWalletSol(otc);
-  const lifetime = otcLifetimeSolFromOtc(otc);
-  const pct = Math.min(100, (lifetime / GLITCH_LISTING_GOAL_SOL) * 100);
-  const inWalletUsd = inWallet * (otc.sol_price_usd || 0);
+  const treasurySol = otcTreasuryWalletSol(otc);
+  const pct = Math.min(100, (treasurySol / GLITCH_LISTING_GOAL_SOL) * 100);
+  const treasuryUsd = treasurySol * (otc.sol_price_usd || 0);
 
   return (
     <div className="rounded-xl border border-green-500/20 bg-black/40 p-4">
-      <p className="text-[10px] uppercase tracking-widest text-green-400/90 font-bold">
-        Treasury wallet (on-chain)
-      </p>
+      <p className="text-[10px] uppercase tracking-widest text-green-400/90 font-bold">Treasury (on-chain)</p>
       <div className="flex flex-wrap items-end gap-x-3 gap-y-1 mt-2">
         <span className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
-          {inWallet.toFixed(3)} SOL
+          {treasurySol.toFixed(3)} SOL
         </span>
-        {inWalletUsd > 0 && (
-          <span className="text-sm text-zinc-500 pb-1">≈ ${inWalletUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+        {treasuryUsd > 0 && (
+          <span className="text-sm text-zinc-500 pb-1">≈ ${treasuryUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
         )}
+        <span className="text-xs text-zinc-600 pb-1">goal {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL</span>
       </div>
-      <p className="text-[10px] text-zinc-500 mt-2">
-        Lifetime SOL from §GLITCH OTC buys:{" "}
-        <span className="text-zinc-300 font-mono">{lifetime.toFixed(2)} SOL</span> · goal{" "}
-        {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL (fundraising progress)
-      </p>
       <div className="h-2.5 bg-zinc-900 rounded-full overflow-hidden mt-3 ring-1 ring-zinc-800">
         <div
           className="h-full bg-gradient-to-r from-green-500 via-emerald-400 to-cyan-400 rounded-full transition-all duration-700"
-          style={{ width: `${Math.max(pct, lifetime > 0 ? 2 : 0)}%` }}
+          style={{ width: `${Math.max(pct, treasurySol > 0 ? 2 : 0)}%` }}
         />
       </div>
       <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
-        {pct.toFixed(2)}% of the {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL listing goal (lifetime purchases).
-        Wallet balance can differ if treasury SOL is deployed for ops or liquidity.
+        {pct.toFixed(2)}% toward Raydium / Jupiter listing — SOL in this wallet (§GLITCH buys + treasury funding).
+        Matches Phantom / Solscan.
       </p>
       <a
         href={`https://solscan.io/account/${GLITCH_TREASURY_WALLET}`}
@@ -75,9 +66,8 @@ export function GlitchInvestPromo({
   variant?: Variant;
 }) {
   if (variant === "compact") {
-    const inWallet = otc ? otcTreasuryWalletSol(otc) : 0;
-    const lifetime = otc ? otcLifetimeSolFromOtc(otc) : 0;
-    const pct = Math.min(100, (lifetime / GLITCH_LISTING_GOAL_SOL) * 100);
+    const treasurySol = otc ? otcTreasuryWalletSol(otc) : 0;
+    const pct = Math.min(100, (treasurySol / GLITCH_LISTING_GOAL_SOL) * 100);
     return (
       <a
         href={GLITCH_EXCHANGE_URL}
@@ -92,12 +82,9 @@ export function GlitchInvestPromo({
               {loading
                 ? "…"
                 : otc
-                  ? `$${otc.price_usd.toFixed(2)} · ${inWallet.toFixed(2)} SOL in treasury`
+                  ? `$${otc.price_usd.toFixed(2)} · ${treasurySol.toFixed(2)} SOL treasury`
                   : "Invest with SOL"}
             </p>
-            {!loading && otc && lifetime > 0 && (
-              <p className="text-[10px] text-zinc-500 mt-0.5">{lifetime.toFixed(1)} SOL lifetime OTC</p>
-            )}
           </div>
           <span className="text-[10px] font-bold text-cyan-300 shrink-0">Invest →</span>
         </div>
@@ -183,17 +170,6 @@ export function GlitchInvestPromo({
             >
               Buy §GLITCH — invest now
             </a>
-            <p className="text-[10px] text-zinc-600">
-              Same flow as{" "}
-              <a href={GLITCH_EXCHANGE_URL} className="text-purple-400 hover:underline" target="_blank" rel="noopener noreferrer">
-                aiglitch.app/exchange
-              </a>
-              . Share the round — we amplify on{" "}
-              <a href={AIGLITCH_SOCIAL.x} className="text-cyan-500/80 hover:underline" target="_blank" rel="noopener noreferrer">
-                X
-              </a>{" "}
-              and across AIG!itch channels.
-            </p>
           </div>
 
           <TreasuryBlock otc={otc} />
