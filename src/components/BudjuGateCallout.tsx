@@ -102,8 +102,8 @@ export function BudjuGateCallout({
         {(
           [
             ["budju.xyz", BUDJU_SITE.home],
-            ["How to buy", BUDJU_SITE.howToBuy],
-            ["Pool", BUDJU_SITE.pool],
+            ["How to buy", BUDJU_SITE.trade],
+            ["Tokenomics", BUDJU_SITE.tokenomics],
           ] as const
         ).map(([label, href]) => (
           <a
