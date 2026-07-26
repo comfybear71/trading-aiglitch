@@ -109,9 +109,11 @@ export default function PortfolioClient() {
               href={
                 chipFilter === "GLITCH"
                   ? GLITCH_EXCHANGE_PATH
-                  : chipFilter
-                    ? `/swap?sell=${encodeURIComponent(chipFilter)}`
-                    : "/swap"
+                  : !trader.eligible
+                    ? "/swap?sell=SOL&buy=BUDJU"
+                    : chipFilter
+                      ? `/swap?sell=${encodeURIComponent(chipFilter)}`
+                      : "/swap"
               }
               {...(chipFilter === "GLITCH" ? {} : {})}
               className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-cyan-600/80 text-xs font-bold text-white"
@@ -129,8 +131,12 @@ export default function PortfolioClient() {
         </div>
         {!trader.eligible && (
           <p className="text-amber-500/90 text-xs mt-3 border-t border-zinc-800 pt-3">
-            Swap locked — need {(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} $BUDJU
-            on-chain.
+            Full swap locked until {(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} $BUDJU
+            on-chain. You have {fmtAmount(trader.eligibility?.budju_balance ?? 0, 0)} —{" "}
+            <Link href="/swap?sell=SOL&buy=BUDJU" className="text-cyan-400 hover:underline font-bold">
+              buy $BUDJU with SOL
+            </Link>{" "}
+            to unlock.
           </p>
         )}
       </div>

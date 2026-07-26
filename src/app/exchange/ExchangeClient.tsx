@@ -7,7 +7,7 @@ import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { OpenInPhantomButton, MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
-import { GLITCH_DAILY_SOL_LIMIT } from "@/lib/glitch-otc";
+import { GLITCH_DAILY_SOL_LIMIT, otcLifetimeSolFromOtc, otcTreasuryWalletSol } from "@/lib/glitch-otc";
 import { executeOtcGlitchPurchase } from "@/lib/otc-buy";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
@@ -176,7 +176,10 @@ export default function ExchangeClient() {
         )}
       </div>
 
-      <GlitchExchangeStory treasurySol={otc?.treasury_sol ?? 0} />
+      <GlitchExchangeStory
+        treasuryWalletSol={otc ? otcTreasuryWalletSol(otc) : 0}
+        lifetimeOtcSol={otc ? otcLifetimeSolFromOtc(otc) : 0}
+      />
 
       <p className="text-[10px] text-zinc-600 text-center">
         Jupiter swaps (SOL / USDC / BUDJU) live on{" "}

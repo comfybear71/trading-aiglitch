@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { useOtcConfig } from "@/lib/use-otc-config";
+import { otcLifetimeSolFromOtc, otcTreasuryWalletSol } from "@/lib/glitch-otc";
 
 type Hint = "buy" | "sell" | "generic";
 
 export function GlitchOtcCallout({ hint = "generic" }: { hint?: Hint }) {
   const { otc } = useOtcConfig();
-  const raised = otc?.treasury_sol ?? 0;
+  const inWallet = otc ? otcTreasuryWalletSol(otc) : 0;
+  const lifetime = otc ? otcLifetimeSolFromOtc(otc) : 0;
   const lead =
     hint === "sell"
       ? "§GLITCH sales are not open on Swap or Jupiter."
@@ -21,7 +23,8 @@ export function GlitchOtcCallout({ hint = "generic" }: { hint?: Hint }) {
       <p className="text-sm font-bold text-purple-200">{lead}</p>
       {otc && (
         <p className="text-[10px] text-green-400/90 font-mono">
-          Treasury {raised.toFixed(2)} SOL raised · ${otc.price_usd.toFixed(2)} now
+          Treasury {inWallet.toFixed(3)} SOL now · {lifetime.toFixed(2)} SOL lifetime OTC · ${otc.price_usd.toFixed(2)}{" "}
+          now
         </p>
       )}
       <p className="text-[11px] text-zinc-400 leading-relaxed">

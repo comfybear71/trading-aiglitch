@@ -106,12 +106,24 @@ export default function SwapClient() {
     setStoredQuote(null);
   };
 
-  const outputOptions = useMemo(
-    () => JUPITER_SWAP_TOKENS.filter((t) => t.symbol !== inputSymbol),
-    [inputSymbol],
-  );
+  const budjuUnlockOnly = !!trader.wallet && !trader.eligible;
+  const budjuUnlockPair =
+    budjuUnlockOnly && outputSymbol === "BUDJU" && inputSymbol !== "BUDJU";
+  const canUseSwap = !!trader.wallet && (trader.eligible || budjuUnlockPair);
+
+  const outputOptions = useMemo(() => {
+    const base = JUPITER_SWAP_TOKENS.filter((t) => t.symbol !== inputSymbol);
+    if (budjuUnlockOnly) return base.filter((t) => t.symbol === "BUDJU");
+    return base;
+  }, [inputSymbol, budjuUnlockOnly]);
+
+  const inputOptions = useMemo(() => {
+    if (!budjuUnlockOnly) return JUPITER_SWAP_TOKENS.map((t) => t.symbol);
+    return ["SOL", "USDC"];
+  }, [budjuUnlockOnly]);
 
   const flip = () => {
+    if (budjuUnlockOnly) return;
     setInputSymbol(outputSymbol);
     setOutputSymbol(inputSymbol);
     setAmount("");
@@ -120,8 +132,14 @@ export default function SwapClient() {
   };
 
   useEffect(() => {
+    if (!budjuUnlockOnly) return;
+    if (outputSymbol !== "BUDJU") setOutputSymbol("BUDJU");
+    if (inputSymbol === "BUDJU") setInputSymbol("SOL");
+  }, [budjuUnlockOnly, inputSymbol, outputSymbol]);
+
+  useEffect(() => {
     if (swapMode !== "market") return;
-    if (!trader.wallet || !trader.eligible) return;
+    if (!canUseSwap) return;
     const atomic = toAtomic(amount, inputToken.decimals);
     if (atomic === "0") {
       setParsedQuote(null);
@@ -177,11 +195,12 @@ export default function SwapClient() {
     outputSymbol,
     trader.wallet,
     trader.eligible,
+    canUseSwap,
     swapMode,
   ]);
 
   const runSwap = async () => {
-    if (!trader.wallet || !trader.eligible) return;
+    if (!trader.wallet || !canUseSwap) return;
     setBusy(true);
     setStatus(null);
     try {
@@ -271,17 +290,18 @@ export default function SwapClient() {
     );
   }
 
-  if (!trader.eligible) {
-    return (
-      <GatePanel
-        title="Swap locked"
-        message={`You have ${fmtCompact(trader.eligibility?.budju_balance ?? 0)} $BUDJU. Need ${(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} to unlock swaps.`}
-      />
-    );
-  }
-
   const swapColumn = (
     <>
+      {budjuUnlockOnly && (
+        <div className="rounded-xl border border-amber-500/35 bg-amber-950/25 p-3 text-xs text-amber-100/95 space-y-2">
+          <p className="font-bold text-amber-200">BUDJU gate — buy $BUDJU to unlock full Swap</p>
+          <p className="text-zinc-400 leading-relaxed">
+            You have {fmtCompact(trader.eligibility?.budju_balance ?? 0)} $BUDJU. Need{" "}
+            {(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} for all pairs. While below the gate you
+            can still swap <span className="text-zinc-200">SOL or USDC → $BUDJU</span> on Jupiter below.
+          </p>
+        </div>
+      )}
       {glitchHint && (
         <GlitchOtcCallout hint={glitchHint === "sell" ? "sell" : "buy"} />
       )}
@@ -348,7 +368,7 @@ export default function SwapClient() {
             setParsedQuote(null);
             setStoredQuote(null);
           }}
-          symbolOptions={JUPITER_SWAP_TOKENS.map((t) => t.symbol)}
+          symbolOptions={inputOptions}
           amount={amount}
           onAmountChange={setAmount}
           usdHint={fmtUsd(usdValue(Number(amount) || 0, inputSymbol, prices))}
@@ -368,7 +388,8 @@ export default function SwapClient() {
           <button
             type="button"
             onClick={flip}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-500/50 hover:text-cyan-300 z-10"
+            disabled={budjuUnlockOnly}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-500/50 hover:text-cyan-300 z-10 disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="Flip tokens"
           >
             ↕

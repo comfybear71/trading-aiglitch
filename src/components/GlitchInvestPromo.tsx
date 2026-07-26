@@ -5,6 +5,8 @@ import {
   GLITCH_DAILY_SOL_LIMIT,
   GLITCH_LISTING_GOAL_SOL,
   GLITCH_TREASURY_WALLET,
+  otcLifetimeSolFromOtc,
+  otcTreasuryWalletSol,
   type OtcPublicConfig,
 } from "@/lib/glitch-otc";
 import { GLITCH_EXCHANGE_URL } from "@/lib/trade-tokens";
@@ -16,33 +18,38 @@ function fmtSold(n: number) {
 }
 
 function TreasuryBlock({ otc }: { otc: OtcPublicConfig }) {
-  const raised = otc.treasury_sol ?? otc.stats.total_sol_received ?? 0;
-  const pct = Math.min(100, (raised / GLITCH_LISTING_GOAL_SOL) * 100);
-  const raisedUsd = raised * (otc.sol_price_usd || 0);
+  const inWallet = otcTreasuryWalletSol(otc);
+  const lifetime = otcLifetimeSolFromOtc(otc);
+  const pct = Math.min(100, (lifetime / GLITCH_LISTING_GOAL_SOL) * 100);
+  const inWalletUsd = inWallet * (otc.sol_price_usd || 0);
 
   return (
     <div className="rounded-xl border border-green-500/20 bg-black/40 p-4">
       <p className="text-[10px] uppercase tracking-widest text-green-400/90 font-bold">
-        Treasury raised (on-chain buys)
+        Treasury wallet (on-chain)
       </p>
       <div className="flex flex-wrap items-end gap-x-3 gap-y-1 mt-2">
         <span className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
-          {raised.toFixed(2)} SOL
+          {inWallet.toFixed(3)} SOL
         </span>
-        {raisedUsd > 0 && (
-          <span className="text-sm text-zinc-500 pb-1">≈ ${raisedUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+        {inWalletUsd > 0 && (
+          <span className="text-sm text-zinc-500 pb-1">≈ ${inWalletUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
         )}
-        <span className="text-xs text-zinc-600 pb-1">goal {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL</span>
       </div>
+      <p className="text-[10px] text-zinc-500 mt-2">
+        Lifetime SOL from §GLITCH OTC buys:{" "}
+        <span className="text-zinc-300 font-mono">{lifetime.toFixed(2)} SOL</span> · goal{" "}
+        {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL (fundraising progress)
+      </p>
       <div className="h-2.5 bg-zinc-900 rounded-full overflow-hidden mt-3 ring-1 ring-zinc-800">
         <div
           className="h-full bg-gradient-to-r from-green-500 via-emerald-400 to-cyan-400 rounded-full transition-all duration-700"
-          style={{ width: `${Math.max(pct, raised > 0 ? 2 : 0)}%` }}
+          style={{ width: `${Math.max(pct, lifetime > 0 ? 2 : 0)}%` }}
         />
       </div>
       <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
-        {pct.toFixed(1)}% toward Raydium / Jupiter listing — stack SOL first so bots cannot drain thin pools. Funds
-        listings, marketing, and platform growth across AIG!itch socials.
+        {pct.toFixed(2)}% of the {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL listing goal (lifetime purchases).
+        Wallet balance can differ if treasury SOL is deployed for ops or liquidity.
       </p>
       <a
         href={`https://solscan.io/account/${GLITCH_TREASURY_WALLET}`}
@@ -68,8 +75,9 @@ export function GlitchInvestPromo({
   variant?: Variant;
 }) {
   if (variant === "compact") {
-    const raised = otc?.treasury_sol ?? 0;
-    const pct = Math.min(100, (raised / GLITCH_LISTING_GOAL_SOL) * 100);
+    const inWallet = otc ? otcTreasuryWalletSol(otc) : 0;
+    const lifetime = otc ? otcLifetimeSolFromOtc(otc) : 0;
+    const pct = Math.min(100, (lifetime / GLITCH_LISTING_GOAL_SOL) * 100);
     return (
       <a
         href={GLITCH_EXCHANGE_URL}
@@ -81,8 +89,15 @@ export function GlitchInvestPromo({
           <div>
             <p className="text-[10px] font-bold text-purple-300 uppercase tracking-wide">§GLITCH fundraise</p>
             <p className="text-sm font-black text-white mt-0.5">
-              {loading ? "…" : otc ? `$${otc.price_usd.toFixed(2)} · ${raised.toFixed(1)} SOL raised` : "Invest with SOL"}
+              {loading
+                ? "…"
+                : otc
+                  ? `$${otc.price_usd.toFixed(2)} · ${inWallet.toFixed(2)} SOL in treasury`
+                  : "Invest with SOL"}
             </p>
+            {!loading && otc && lifetime > 0 && (
+              <p className="text-[10px] text-zinc-500 mt-0.5">{lifetime.toFixed(1)} SOL lifetime OTC</p>
+            )}
           </div>
           <span className="text-[10px] font-bold text-cyan-300 shrink-0">Invest →</span>
         </div>
