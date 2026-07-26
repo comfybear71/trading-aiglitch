@@ -8,7 +8,9 @@
 |------|--------|
 | **Price step** | +**$0.01** for every **10,000** §GLITCH sold |
 | **Buy** | SOL → treasury; treasury → buyer (atomic tx via `/api/otc-swap`) |
-| **Sell** | Not open on trade app or Jupiter (investment phase) |
+| **Pay with** | **SOL only** on exchange (not USDC direct on OTC) |
+| **Per tx** | 100 – 1,000,000 §GLITCH (`min_purchase` / `max_purchase` from API) |
+| **Per wallet / 24h** | **0.5 SOL** max (`OTC.dailySolLimit` on API) |
 | **Treasury** | `7SGf93WGk7VpSmreARzNujPbEpyABq2Em9YvaCirWi56` |
 | **5,000 SOL goal** | Stack treasury before Raydium/Jupiter listing — thin pools get drained by bots; SOL also funds listings and promotion |
 
@@ -17,8 +19,8 @@
 | Surface | Behavior |
 |---------|----------|
 | **Swap** | Jupiter: SOL · USDC · BUDJU only. URL `?buy=GLITCH` shows OTC callout + link to exchange (no Jupiter quote). |
-| **Markets** | §GLITCH panel from `GET /api/otc-swap?action=config`; $BUDJU external reference card |
-| **Portfolio** | §GLITCH row: **Invest (OTC)** → aiglitch.app/exchange |
+| **Markets** | §GLITCH **GlitchInvestPromo** hero: treasury bar, stats, limits, invest CTA |
+| **Portfolio** | Compact fundraise strip → exchange |
 
 API proxy: `/api/otc-swap` → api.aiglitch.app (see `next.config.ts`).
 

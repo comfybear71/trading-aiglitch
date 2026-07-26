@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 import { HoldingsChips } from "@/components/HoldingsChips";
+import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
+import { useOtcConfig } from "@/lib/use-otc-config";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import {
@@ -33,6 +35,7 @@ export default function PortfolioClient() {
   const [tab, setTab] = useState<"positions" | "activity">("positions");
   const [activityRefresh, setActivityRefresh] = useState(0);
   const [recentActivity, setRecentActivity] = useState<TradeActivityItem[]>([]);
+  const { otc, loading: otcLoading } = useOtcConfig();
   const b = trader.eligibility?.balances;
 
   const loadRecentActivity = useCallback(async () => {
@@ -73,6 +76,7 @@ export default function PortfolioClient() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
+      <GlitchInvestPromo otc={otc} loading={otcLoading} variant="compact" />
       <div className="rounded-2xl border border-zinc-800 bg-[#12121a] p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

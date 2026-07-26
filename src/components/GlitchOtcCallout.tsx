@@ -1,10 +1,13 @@
 "use client";
 
 import { GLITCH_EXCHANGE_URL } from "@/lib/trade-tokens";
+import { useOtcConfig } from "@/lib/use-otc-config";
 
 type Hint = "buy" | "sell" | "generic";
 
 export function GlitchOtcCallout({ hint = "generic" }: { hint?: Hint }) {
+  const { otc } = useOtcConfig();
+  const raised = otc?.treasury_sol ?? 0;
   const lead =
     hint === "sell"
       ? "§GLITCH sales are not open on Swap or Jupiter."
@@ -15,6 +18,11 @@ export function GlitchOtcCallout({ hint = "generic" }: { hint?: Hint }) {
   return (
     <div className="rounded-xl border border-purple-500/30 bg-purple-950/20 p-4 space-y-2">
       <p className="text-sm font-bold text-purple-200">{lead}</p>
+      {otc && (
+        <p className="text-[10px] text-green-400/90 font-mono">
+          Treasury {raised.toFixed(2)} SOL raised · ${otc.price_usd.toFixed(2)} now
+        </p>
+      )}
       <p className="text-[11px] text-zinc-400 leading-relaxed">
         We control the market on-chain (same rules as{" "}
         <a href={GLITCH_EXCHANGE_URL} className="text-purple-400 hover:underline" target="_blank" rel="noopener noreferrer">
