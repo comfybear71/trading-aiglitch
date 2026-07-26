@@ -32,20 +32,22 @@ export async function phantomSignAndSubmit(tx: VersionedTransaction): Promise<st
 
   await phantom.connect({ onlyIfTrusted: true }).catch(() => phantom.connect());
 
-  const signTx = phantom.signTransaction;
-  if (typeof signTx === "function") {
+  // Prefer Phantom's send path first — Blowfish often blocks sign-only + external broadcast on new domains.
+  try {
+    const { signature } = await phantom.signAndSendTransaction(tx, { skipPreflight: false });
+    if (signature) return signature;
+  } catch (sendErr) {
+    const signTx = phantom.signTransaction;
+    if (typeof signTx !== "function") {
+      throw new Error(formatPhantomWalletError(sendErr));
+    }
     try {
       const signed = await signTx.call(phantom, tx);
       return await submitViaApi(signed.serialize());
-    } catch (e) {
-      throw new Error(formatPhantomWalletError(e));
+    } catch (signErr) {
+      throw new Error(formatPhantomWalletError(signErr ?? sendErr));
     }
   }
 
-  try {
-    const { signature } = await phantom.signAndSendTransaction(tx);
-    return signature;
-  } catch (e) {
-    throw new Error(formatPhantomWalletError(e));
-  }
+  throw new Error("Phantom did not return a signature.");
 }

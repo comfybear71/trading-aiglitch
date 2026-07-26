@@ -75,8 +75,9 @@ export function formatPhantomWalletError(e: unknown): string {
   }
   if (/unexpected error/i.test(raw)) {
     return (
-      "Phantom blocked or closed the request. If you saw a red security warning, only continue if you trust trade.aiglitch.app " +
-      "(Confirm or Proceed anyway in Phantom). New domains often show a yellow warning — that is normal."
+      "Phantom closed or blocked signing (no on-chain tx). If you saw red/yellow warnings: Proceed anyway → " +
+      "Confirm (unsafe) → check “I understand…” → tap “Yes, confirm (unsafe)” at the bottom. " +
+      "Do not tap Close on the “Are you sure?” screen. New sites often need Phantom’s domain review."
     );
   }
   if (/request blocked|could be malicious|blocked this request/i.test(raw)) {
