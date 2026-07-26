@@ -17,6 +17,7 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Trade",
     items: [
       { slug: "markets", label: "Markets", icon: "\u{1F4CA}", section: "trade" },
+      { slug: "exchange", label: "Buy §GLITCH", icon: "\u{1F4B0}", section: "trade" },
       { slug: "swap", label: "Swap", icon: "\u{21C4}", section: "trade" },
       { slug: "nft", label: "NFT", icon: "\u{1F3A8}", section: "trade" },
     ],
