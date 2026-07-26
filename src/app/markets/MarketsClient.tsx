@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
-import { BudjuTraderStatusSlim } from "@/components/BudjuGateCallout";
+import { BudjuMarketsPromo } from "@/components/BudjuMarketsPromo";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
@@ -138,21 +138,21 @@ export default function MarketsClient() {
   return (
     <div className="max-w-5xl mx-auto space-y-5">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-        <BudjuTraderStatusSlim
+        <BudjuMarketsPromo
           walletConnected={!!trader.wallet}
           eligible={trader.eligible}
           budjuBalance={trader.eligibility?.budju_balance ?? 0}
           budjuRequired={trader.eligibility?.budju_required}
           onRefresh={trader.wallet ? () => void refreshBalances() : undefined}
           refreshing={balanceRefreshing}
-          className="min-h-[148px]"
+          className="min-h-[280px]"
         />
         <GlitchInvestPromo
           otc={otc}
           loading={otcLoading}
           refreshing={otcRefreshing}
           variant="compact"
-          className="min-h-[148px]"
+          className="min-h-[280px]"
         />
       </div>
 
