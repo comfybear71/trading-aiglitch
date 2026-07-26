@@ -139,15 +139,24 @@ export default function PortfolioClient() {
             {fmtAmount(trader.eligibility?.budju_balance ?? 0, 0)}.{" "}
             <Link href="/swap?sell=SOL&buy=BUDJU" className="text-fuchsia-300 hover:text-white font-bold underline">
               Buy on Swap
-            </Link>{" "}
-            or{" "}
+            </Link>
+            ,{" "}
             <a
-              href={BUDJU_SITE.home}
+              href={BUDJU_SITE.trade}
               target="_blank"
               rel="noopener noreferrer"
               className="text-fuchsia-300 hover:text-white font-bold underline"
             >
-              budju.xyz
+              How to buy
+            </a>
+            , or{" "}
+            <a
+              href={BUDJU_SITE.tokenomics}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fuchsia-300 hover:text-white font-bold underline"
+            >
+              Tokenomics
             </a>
             .
           </p>

@@ -34,7 +34,7 @@ function BudjuPanelShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function BudjuLinkPills() {
+function BudjuLinkPills({ showBuyOnSwap = true }: { showBuyOnSwap?: boolean }) {
   return (
     <div className="flex flex-wrap gap-2 pt-1">
       {(
@@ -54,6 +54,14 @@ function BudjuLinkPills() {
           {label}
         </a>
       ))}
+      {showBuyOnSwap && (
+        <Link
+          href="/swap?sell=SOL&buy=BUDJU"
+          className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-fuchsia-600/90 text-white hover:bg-fuchsia-500 transition-colors"
+        >
+          Buy $BUDJU
+        </Link>
+      )}
     </div>
   );
 }
@@ -151,6 +159,8 @@ export function BudjuApprovedCallout({
   );
 }
 
+export { BudjuLinkPills };
+
 export function BudjuGateCallout({
   budjuBalance,
   budjuRequired = BUDJU_GATE_REQUIRED_DEFAULT,
@@ -223,42 +233,18 @@ export function BudjuGateCallout({
           Below the gate you can still swap{" "}
           <span className="text-fuchsia-200 font-medium">SOL or USDC → $BUDJU</span> here on Jupiter. Get $BUDJU on{" "}
           <a
-            href={BUDJU_SITE.home}
+            href={BUDJU_SITE.trade}
             target="_blank"
             rel="noopener noreferrer"
             className="text-fuchsia-300 hover:text-white underline"
           >
-            budju.xyz
+            How to buy
           </a>{" "}
-          or Jupiter, then tap <span className="text-fuchsia-200">Refresh balance</span>.
+          on budju.xyz or swap below, then tap <span className="text-fuchsia-200">Refresh balance</span>.
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2 pt-1">
-        {(
-          [
-            ["budju.xyz", BUDJU_SITE.home],
-            ["How to buy", BUDJU_SITE.trade],
-            ["Tokenomics", BUDJU_SITE.tokenomics],
-          ] as const
-        ).map(([label, href]) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-fuchsia-500/40 text-fuchsia-200/90 hover:bg-fuchsia-500/15 hover:text-white transition-colors"
-          >
-            {label}
-          </a>
-        ))}
-        <Link
-          href="/swap?sell=SOL&buy=BUDJU"
-          className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-fuchsia-600/90 text-white hover:bg-fuchsia-500 transition-colors"
-        >
-          Buy $BUDJU
-        </Link>
-      </div>
+      <BudjuLinkPills />
     </BudjuPanelShell>
   );
 }
