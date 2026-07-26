@@ -2,14 +2,8 @@
 
 import { GLITCH_LISTING_GOAL_SOL } from "@/lib/glitch-otc";
 
-export function GlitchExchangeStory({
-  treasuryWalletSol,
-  lifetimeOtcSol,
-}: {
-  treasuryWalletSol: number;
-  lifetimeOtcSol: number;
-}) {
-  const pct = Math.min(100, (lifetimeOtcSol / GLITCH_LISTING_GOAL_SOL) * 100);
+export function GlitchExchangeStory({ treasurySol }: { treasurySol: number }) {
+  const pct = Math.min(100, (treasurySol / GLITCH_LISTING_GOAL_SOL) * 100);
 
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-5">
@@ -54,7 +48,7 @@ export function GlitchExchangeStory({
             </span>
             <span>
               <strong className="text-zinc-200">Treasury target: {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL</strong> —
-              every purchase adds SOL to fund listings, marketing, and bot-safe liquidity.
+              SOL in the treasury wallet funds listings, marketing, and bot-safe liquidity.
             </span>
           </li>
           <li className="flex gap-3">
@@ -79,11 +73,10 @@ export function GlitchExchangeStory({
       </div>
 
       <div className="text-center rounded-xl border border-zinc-800 bg-black/40 p-4">
-        <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Treasury wallet (now)</p>
-        <p className="text-2xl font-black text-green-400 mt-1">{treasuryWalletSol.toFixed(3)} SOL</p>
-        <p className="text-xs text-zinc-600 mt-1">
-          {lifetimeOtcSol.toFixed(2)} SOL lifetime from OTC · {pct.toFixed(2)}% of{" "}
-          {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL goal
+        <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Treasury progress</p>
+        <p className="text-2xl font-black text-green-400 mt-1">{treasurySol.toFixed(3)} SOL</p>
+        <p className="text-xs text-zinc-600">
+          / {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL · {pct.toFixed(2)}%
         </p>
         <div className="h-2 bg-zinc-800 rounded-full mt-3 overflow-hidden">
           <div className="h-full bg-gradient-to-r from-green-500 to-cyan-400" style={{ width: `${pct}%` }} />
