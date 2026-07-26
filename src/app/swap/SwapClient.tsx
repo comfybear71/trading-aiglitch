@@ -31,7 +31,7 @@ import { useSwapUrlParams, type GlitchUrlHint } from "@/app/swap/SwapUrlParams";
 import { GlitchOtcCallout } from "@/components/GlitchOtcCallout";
 import Link from "next/link";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
-import { BudjuGateCallout } from "@/components/BudjuGateCallout";
+import { BudjuTraderStatus } from "@/components/BudjuGateCallout";
 
 type SwapMode = "market" | "limit" | "recurring";
 
@@ -90,7 +90,27 @@ export default function SwapClient() {
   const [routingOpen, setRoutingOpen] = useState(false);
   const [swapMode, setSwapMode] = useState<SwapMode>("market");
   const [glitchHint, setGlitchHint] = useState<GlitchUrlHint>(null);
+  const [balanceRefreshing, setBalanceRefreshing] = useState(false);
   const quoteGen = useRef(0);
+
+  const refreshBalances = async () => {
+    setBalanceRefreshing(true);
+    try {
+      await trader.refresh();
+    } finally {
+      setBalanceRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && trader.wallet) {
+        void trader.refresh();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [trader.wallet, trader.refresh]);
 
   useSwapUrlParams(setInputSymbol, setOutputSymbol, setGlitchHint);
 
@@ -293,8 +313,14 @@ export default function SwapClient() {
 
   const swapColumn = (
     <>
-      {budjuUnlockOnly && (
-        <BudjuGateCallout budjuBalance={trader.eligibility?.budju_balance ?? 0} budjuRequired={trader.eligibility?.budju_required} />
+      {trader.wallet && (
+        <BudjuTraderStatus
+          eligible={trader.eligible}
+          budjuBalance={trader.eligibility?.budju_balance ?? 0}
+          budjuRequired={trader.eligibility?.budju_required}
+          onRefresh={() => void refreshBalances()}
+          refreshing={balanceRefreshing}
+        />
       )}
       {glitchHint && (
         <GlitchOtcCallout hint={glitchHint === "sell" ? "sell" : "buy"} />

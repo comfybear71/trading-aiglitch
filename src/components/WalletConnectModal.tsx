@@ -12,6 +12,7 @@ import { balanceForSymbol } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
 import { BUDJU_SITE } from "@/lib/budju-brand";
+import { BudjuLinkPills } from "@/components/BudjuGateCallout";
 
 type Step = "choose" | "qr";
 
@@ -320,12 +321,10 @@ export function WalletConnectMenu({
             <p className="text-lg font-bold text-white">{budju.toLocaleString(undefined, { maximumFractionDigits: 3 })} BUDJU</p>
             <p className="text-[10px] text-zinc-500 mt-1">
               {trader.eligible ? (
-                "Swap & Portfolio unlocked"
-              ) : (
                 <>
-                  Need {required.toLocaleString()} —{" "}
+                  Swap & Portfolio unlocked ·{" "}
                   <a
-                    href={BUDJU_SITE.home}
+                    href={BUDJU_SITE.trade}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-fuchsia-300 hover:text-white underline"
@@ -333,8 +332,20 @@ export function WalletConnectMenu({
                     budju.xyz
                   </a>
                 </>
+              ) : (
+                <>Need {required.toLocaleString()} on this wallet</>
               )}
             </p>
+            {!trader.eligible && (
+              <div className="mt-2">
+                <BudjuLinkPills />
+              </div>
+            )}
+            {trader.eligible && (
+              <div className="mt-2">
+                <BudjuLinkPills showBuyOnSwap={false} />
+              </div>
+            )}
           </div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-600 font-semibold">Holdings</p>
           <HoldingsChips

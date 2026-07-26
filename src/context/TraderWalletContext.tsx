@@ -37,7 +37,11 @@ interface TraderWalletContextValue {
 const TraderWalletContext = createContext<TraderWalletContextValue | null>(null);
 
 async function fetchEligibility(wallet: string): Promise<TradeEligibility> {
-  const res = await fetch(`/api/trade/eligibility?wallet=${encodeURIComponent(wallet)}`);
+  const qs = new URLSearchParams({
+    wallet,
+    _: String(Date.now()),
+  });
+  const res = await fetch(`/api/trade/eligibility?${qs.toString()}`, { cache: "no-store" });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Eligibility check failed");
   return data as TradeEligibility;
