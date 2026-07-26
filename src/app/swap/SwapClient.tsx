@@ -26,8 +26,8 @@ import { TokenWarningsBadge, TokenWarningsModal } from "@/components/TokenWarnin
 import { SwapChartPanel } from "@/components/SwapChartPanel";
 import { SwapHistoryPanelKeyed } from "@/components/SwapHistoryPanel";
 import { SwapRoutingModal } from "@/components/SwapRoutingModal";
-import { RecurringOrderSettingsModal } from "@/components/RecurringOrderSettingsModal";
-import { SwapRecurringPanel } from "@/components/SwapRecurringPanel";
+import { SwapAdvancedComingSoon } from "@/components/SwapAdvancedComingSoon";
+import { useSwapUrlParams } from "@/app/swap/SwapUrlParams";
 
 type SwapMode = "market" | "limit" | "recurring";
 
@@ -85,10 +85,9 @@ export default function SwapClient() {
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [routingOpen, setRoutingOpen] = useState(false);
   const [swapMode, setSwapMode] = useState<SwapMode>("market");
-  const [recurringSettingsOpen, setRecurringSettingsOpen] = useState(false);
-  const [dcaFrequency, setDcaFrequency] = useState("1 minute");
-  const [dcaSuborders, setDcaSuborders] = useState(2);
   const quoteGen = useRef(0);
+
+  useSwapUrlParams(setInputSymbol, setOutputSymbol);
 
   const inputToken = TRADE_SWAP_TOKENS.find((t) => t.symbol === inputSymbol)!;
   const outputToken = TRADE_SWAP_TOKENS.find((t) => t.symbol === outputSymbol)!;
@@ -261,7 +260,10 @@ export default function SwapClient() {
 
   if (!trader.wallet) {
     return (
-      <GatePanel title="Swap" message="Use Connect (top right) — Phantom or QR — to swap BUDJU · GLITCH · SOL · USDC." />
+      <GatePanel
+        title="Swap"
+        message="Connect (top right): Phantom extension on desktop, or Open in Phantom app on iPhone. QR login is for signing in on iPad/PC from your phone."
+      />
     );
   }
 
@@ -288,26 +290,17 @@ export default function SwapClient() {
             key={mode}
             type="button"
             onClick={() => setSwapMode(mode)}
-            className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
-              swapMode === mode
-                ? mode === "recurring"
-                  ? "bg-lime-500/15 text-lime-300 border border-lime-500/30"
-                  : "bg-zinc-800 text-white"
-                : "text-zinc-500 hover:text-zinc-300"
+            className={`px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1.5 ${
+              swapMode === mode ? "bg-zinc-800 text-white" : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
             {label}
+            {mode !== "market" && (
+              <span className="text-[9px] font-bold uppercase text-amber-500/90">Soon</span>
+            )}
           </button>
         ))}
-        {swapMode === "recurring" ? (
-          <button
-            type="button"
-            onClick={() => setRecurringSettingsOpen(true)}
-            className="ml-auto flex items-center gap-1 px-2 py-1 rounded-lg border border-zinc-700 text-[10px] text-zinc-400 hover:border-lime-500/40 hover:text-lime-300"
-          >
-            DCA V2+ <span className="text-zinc-600">⚙</span>
-          </button>
-        ) : swapMode === "market" ? (
+        {swapMode === "market" ? (
           <span className="ml-auto flex items-center gap-1 text-[10px] text-zinc-500">
             Slippage
             {[50, 100, 200].map((bps) => (
@@ -329,58 +322,13 @@ export default function SwapClient() {
               </button>
             ))}
           </span>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="ml-auto text-[10px] text-zinc-600 px-2 py-1 border border-zinc-800 rounded-lg"
-            title="Coming with limit orders"
-          >
-            Limit V2+
-          </button>
-        )}
+        ) : null}
       </div>
 
       {swapMode === "recurring" ? (
-        <SwapRecurringPanel
-          inputSymbol={inputSymbol}
-          outputSymbol={outputSymbol}
-          amount={amount}
-          onAmountChange={setAmount}
-          payBalance={payBalance}
-          receiveBalance={receiveBalance}
-          onPayFraction={setPayFraction}
-          onInputSymbolChange={(s) => {
-            setInputSymbol(s);
-            setAmount("");
-          }}
-          onOutputSymbolChange={(s) => setOutputSymbol(s)}
-          inputOptions={TRADE_SWAP_TOKENS.map((t) => t.symbol)}
-          outputOptions={outputOptions.map((t) => t.symbol)}
-          frequency={dcaFrequency}
-          onFrequencyChange={setDcaFrequency}
-          suborders={dcaSuborders}
-          onSubordersChange={setDcaSuborders}
-          prices={prices}
-          onOpenSettings={() => setRecurringSettingsOpen(true)}
-          onOpenWarnings={setWarningModalSymbol}
-        />
+        <SwapAdvancedComingSoon kind="recurring" />
       ) : swapMode === "limit" ? (
-        <div className="rounded-2xl border border-zinc-800 bg-[#12121a] p-6 text-center space-y-3">
-          <p className="text-sm font-bold text-white">Limit orders</p>
-          <p className="text-xs text-zinc-500 leading-relaxed max-w-sm mx-auto">
-            Buy or sell when price crosses your trigger — same flow as jup.ag Limit (vault + expiry). Not wired on
-            trade.aiglitch.app yet.
-          </p>
-          <a
-            href="https://jup.ag/swap"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block text-xs text-cyan-500 hover:underline"
-          >
-            Place limits on jup.ag →
-          </a>
-        </div>
+        <SwapAdvancedComingSoon kind="limit" />
       ) : (
       <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
         <SwapSide
@@ -553,10 +501,6 @@ export default function SwapClient() {
             : "0"
         }
         steps={parsedQuote?.routeSteps ?? []}
-      />
-      <RecurringOrderSettingsModal
-        open={recurringSettingsOpen}
-        onClose={() => setRecurringSettingsOpen(false)}
       />
       {showChart ? (
         <div className="grid gap-4 lg:grid-cols-[1fr_min(420px,100%)] lg:items-start">
