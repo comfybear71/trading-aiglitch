@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { BudjuTraderStatusSlim } from "@/components/BudjuGateCallout";
 import { useTraderWallet } from "@/context/TraderWalletContext";
-import { fetchOtcConfig } from "@/lib/glitch-otc";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
 /** External DEX reference lane only — §GLITCH uses platform OTC promo above. */
