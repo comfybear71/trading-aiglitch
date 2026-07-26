@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { VersionedTransaction } from "@solana/web3.js";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
@@ -13,9 +13,11 @@ import {
   maxPayAmount,
 } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
-import { appendSendHistory, loadSendHistory, solscanTxUrl, type SendHistoryEntry } from "@/lib/send-history";
+import { TradeActivityPanel } from "@/components/TradeActivityPanel";
+import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { MagicLinkSendPanel } from "@/components/MagicLinkSendPanel";
+import { recordTradeActivity, solscanTxUrl } from "@/lib/trade-activity-api";
 
 type MainTab = "send" | "receive";
 type SendMode = "transfer" | "magic";
@@ -40,15 +42,13 @@ export default function SendClient() {
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
   const [busy, setBusy] = useState(false);
-  const [activity, setActivity] = useState<SendHistoryEntry[]>([]);
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const [chipFilter, setChipFilter] = useState<string | null>(null);
+
+  const bumpActivity = () => setActivityRefresh((k) => k + 1);
 
   const token = TRADE_SWAP_TOKENS.find((t) => t.symbol === symbol)!;
   const balance = balanceForSymbol(trader.eligibility, symbol);
-
-  useEffect(() => {
-    setActivity(loadSendHistory());
-  }, []);
 
   const setFraction = (f: number) => {
     const raw = f >= 1 ? maxPayAmount(symbol, balance) : balance * f;
@@ -89,13 +89,15 @@ export default function SendClient() {
       const tx = VersionedTransaction.deserialize(bytes);
       const signature = await phantomSignAndSubmit(tx);
 
-      appendSendHistory({
+      void recordTradeActivity({
+        wallet: trader.wallet,
+        kind: "transfer",
         signature,
         symbol,
-        amount,
-        toTrunc: truncWallet(to),
+        amountDisplay: amount,
+        detail: truncWallet(to),
       });
-      setActivity(loadSendHistory());
+      bumpActivity();
       pushToast(`Sent · ${signature.slice(0, 8)}…`, "success", solscanTxUrl(signature));
       setAmount("");
       setRecipient("");
@@ -106,14 +108,6 @@ export default function SendClient() {
     } finally {
       setBusy(false);
     }
-  };
-
-  const refreshActivity = () => setActivity(loadSendHistory());
-
-  const activityLabel = (a: SendHistoryEntry) => {
-    if (a.kind === "magic_link") return `${a.amount} ${a.symbol} · ${a.toTrunc}`;
-    if (a.kind === "magic_refund") return `Refund ${a.amount} ${a.symbol} · ${a.toTrunc}`;
-    return `${a.amount} ${a.symbol} → ${a.toTrunc}`;
   };
 
   const copyAddress = async () => {
@@ -237,7 +231,7 @@ export default function SendClient() {
               symbol={symbol}
               setSymbol={setSymbol}
               balance={balance}
-              onActivityChange={refreshActivity}
+              onActivityChange={bumpActivity}
             />
           ) : (
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
@@ -302,29 +296,13 @@ export default function SendClient() {
           </div>
           )}
 
+          <MagicLinkOpenLinks onChanged={bumpActivity} />
+
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
             <p className="px-4 py-2 text-[10px] uppercase text-zinc-500 font-semibold border-b border-zinc-800">
-              Activity (this browser)
+              Activity
             </p>
-            {activity.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-600 text-center">No sends yet.</p>
-            ) : (
-              <ul className="divide-y divide-zinc-800/80 max-h-48 overflow-y-auto">
-                {activity.map((a) => (
-                  <li key={`${a.signature}-${a.at}`} className="px-4 py-2.5 flex justify-between gap-2 text-sm">
-                    <span className="text-zinc-300 truncate">{activityLabel(a)}</span>
-                    <a
-                      href={solscanTxUrl(a.signature)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[10px] text-cyan-500 hover:underline shrink-0"
-                    >
-                      Solscan
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <TradeActivityPanel wallet={trader.wallet} refreshKey={activityRefresh} />
           </div>
         </>
       )}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTraderWallet } from "@/context/TraderWalletContext";
+import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { getPhantom } from "@/lib/phantom";
 import { balanceForSymbol } from "@/lib/trade-balance";
@@ -194,7 +195,13 @@ export function WalletConnectMenu({
 }) {
   const trader = useTraderWallet();
   const [chipFilter, setChipFilter] = useState<string | null>(null);
+  const [drawerTab, setDrawerTab] = useState<"wallet" | "activity">("wallet");
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const { prices } = useTradePrices(open && !!trader.wallet);
+
+  useEffect(() => {
+    if (open && drawerTab === "activity") setActivityRefresh((k) => k + 1);
+  }, [open, drawerTab]);
   if (!open || !trader.wallet) return null;
 
   const b = trader.eligibility?.balances;
@@ -235,12 +242,35 @@ export function WalletConnectMenu({
           </div>
         </div>
         <div className="flex border-b border-zinc-800 text-xs">
-          <span className="flex-1 py-2.5 text-center font-bold text-white border-b-2 border-cyan-400">
+          <button
+            type="button"
+            onClick={() => setDrawerTab("wallet")}
+            className={`flex-1 py-2.5 text-center font-bold ${
+              drawerTab === "wallet" ? "text-white border-b-2 border-cyan-400" : "text-zinc-500"
+            }`}
+          >
             Wallet
-          </span>
-          <span className="flex-1 py-2.5 text-center text-zinc-600">Activity</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDrawerTab("activity")}
+            className={`flex-1 py-2.5 text-center font-bold ${
+              drawerTab === "activity" ? "text-white border-b-2 border-cyan-400" : "text-zinc-500"
+            }`}
+          >
+            Activity
+          </button>
         </div>
         <div className="p-4 space-y-3 flex-1 overflow-y-auto">
+          {drawerTab === "activity" ? (
+            <TradeActivityPanel
+              wallet={trader.wallet}
+              compact
+              refreshKey={activityRefresh}
+              emptyText="Swaps, sends, and magic links appear here."
+            />
+          ) : (
+          <>
           <div className="rounded-lg bg-zinc-900/80 border border-zinc-800 p-3">
             <div className="flex justify-between text-[10px] uppercase text-zinc-500 mb-1">
               <span>Trader access</span>
@@ -289,6 +319,8 @@ export function WalletConnectMenu({
               NFT
             </Link>
           </div>
+          </>
+          )}
         </div>
         <button
           type="button"

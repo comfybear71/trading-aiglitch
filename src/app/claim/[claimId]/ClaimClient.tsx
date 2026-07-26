@@ -57,7 +57,7 @@ export function ClaimClient({ claimId }: { claimId: string }) {
       await fetch(`/api/trade/magic-link/${claimId}/claim`, {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ claimSignature: sig }),
+        body: JSON.stringify({ claimSignature: sig, recipientPublicKey: trader.wallet }),
       });
 
       pushToast(`Claimed · ${sig.slice(0, 8)}…`, "success", `https://solscan.io/tx/${sig}`);
