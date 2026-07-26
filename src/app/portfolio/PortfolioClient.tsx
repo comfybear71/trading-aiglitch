@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useTraderWallet } from "@/context/TraderWalletContext";
-import { fmtUsd, usdValue, useTradePrices, fmtGlitchUnitUsd } from "@/lib/use-trade-prices";
+import { fmtUsd, usdValue, useTradePrices, fmtGlitchUnitUsd, mergeOtcGlitchPrice } from "@/lib/use-trade-prices";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { useOtcConfig } from "@/lib/use-otc-config";
@@ -40,6 +40,7 @@ export default function PortfolioClient() {
   const [recentActivity, setRecentActivity] = useState<TradeActivityItem[]>([]);
   const { otc, loading: otcLoading } = useOtcConfig();
   const b = trader.eligibility?.balances;
+  const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
 
   const loadRecentActivity = useCallback(async () => {
     if (!trader.wallet) {
@@ -72,7 +73,7 @@ export default function PortfolioClient() {
   if (b) {
     for (const h of HOLDINGS) {
       const amt = b[h.key];
-      const v = usdValue(amt, h.symbol, prices);
+      const v = usdValue(amt, h.symbol, priceBook);
       if (v != null) netUsd += v;
     }
   }
@@ -93,7 +94,9 @@ export default function PortfolioClient() {
             <p className="text-3xl font-black text-white mt-2">
               {pricesLoading ? "…" : fmtUsd(netUsd)}
             </p>
-            <p className="text-xs text-zinc-500 mt-1">Estimated net worth (Jupiter USD prices)</p>          </div>
+            <p className="text-xs text-zinc-500 mt-1">
+              Estimated net worth (Jupiter + OTC §GLITCH price)
+            </p>          </div>
           <div className="flex gap-2 flex-wrap">
             <button
               type="button"
@@ -207,7 +210,7 @@ export default function PortfolioClient() {
         <ul className="divide-y divide-zinc-800/80">
           {HOLDINGS.filter((h) => !chipFilter || h.symbol === chipFilter).map((h) => {
             const amt = b?.[h.key] ?? 0;
-            const val = usdValue(amt, h.symbol, prices);
+            const val = usdValue(amt, h.symbol, priceBook);
             const pct = netUsd > 0 && val != null ? Math.min(100, (val / netUsd) * 100) : 0;
             return (
               <li key={h.key} className="px-4 py-3 flex items-center justify-between gap-3">
@@ -220,8 +223,8 @@ export default function PortfolioClient() {
                   </div>
                   <p className="text-xs text-zinc-500 font-mono mt-0.5">
                     {fmtAmount(amt)} {h.symbol}
-                    {h.symbol === "GLITCH" && fmtGlitchUnitUsd(prices.GLITCH) && (
-                      <span className="text-purple-400/80 ml-1">@ {fmtGlitchUnitUsd(prices.GLITCH)}</span>
+                    {h.symbol === "GLITCH" && fmtGlitchUnitUsd(priceBook.GLITCH) && (
+                      <span className="text-purple-400/80 ml-1">@ {fmtGlitchUnitUsd(priceBook.GLITCH)}</span>
                     )}
                   </p>
                   {netUsd > 0 && val != null && val > 0 && (

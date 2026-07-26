@@ -12,7 +12,9 @@ import {
   formatSwapAmount,
   maxPayAmount,
 } from "@/lib/trade-balance";
-import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { fmtUsd, usdValue, useTradePrices, mergeOtcGlitchPrice } from "@/lib/use-trade-prices";
+import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
+import { useOtcConfig } from "@/lib/use-otc-config";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import { HoldingsChips } from "@/components/HoldingsChips";
@@ -36,6 +38,8 @@ export default function SendClient() {
   const trader = useTraderWallet();
   const { pushToast } = useTradeToast();
   const { prices } = useTradePrices(!!trader.wallet);
+  const { otc, loading: otcLoading } = useOtcConfig();
+  const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
   const [mainTab, setMainTab] = useState<MainTab>("send");
   const [sendMode, setSendMode] = useState<SendMode>("transfer");
   const [symbol, setSymbol] = useState("USDC");
@@ -140,6 +144,8 @@ export default function SendClient() {
 
   return (
     <div className="max-w-lg mx-auto space-y-4">
+      <GlitchInvestPromo otc={otc} loading={otcLoading} variant="compact" />
+
       <div className="flex border-b border-zinc-800 text-sm">
         {(
           [
@@ -270,7 +276,7 @@ export default function SendClient() {
                 className="w-full bg-transparent text-right text-3xl font-semibold text-white focus:outline-none"
               />
               <p className="text-[10px] text-zinc-500 text-right mt-1">
-                {fmtUsd(usdValue(Number(amount) || 0, symbol, prices))}
+                {fmtUsd(usdValue(Number(amount) || 0, symbol, priceBook))}
               </p>
             </div>
             <div className="p-4">
