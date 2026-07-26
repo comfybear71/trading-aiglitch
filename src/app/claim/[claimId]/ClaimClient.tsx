@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
 import { phantomSignAndSubmit } from "@/lib/phantom-submit";
+import { OpenInPhantomButton, MobilePhantomHint } from "@/components/OpenInPhantomButton";
 
 type ClaimInfo = {
   claimId: string;
@@ -22,6 +23,11 @@ export function ClaimClient({ claimId }: { claimId: string }) {
   const [info, setInfo] = useState<ClaimInfo | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [mobilePhantom, setMobilePhantom] = useState(false);
+
+  useEffect(() => {
+    setMobilePhantom(needsPhantomMobileBrowser());
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -105,7 +111,16 @@ export function ClaimClient({ claimId }: { claimId: string }) {
       {awaitingDeposit ? (
         <p className="text-sm text-amber-400/90">Sender has not finished funding this link yet.</p>
       ) : !trader.wallet ? (
-        <p className="text-sm text-zinc-400">Connect wallet (top right) to claim.</p>
+        <div className="space-y-3">
+          {mobilePhantom ? (
+            <>
+              <MobilePhantomHint context="claim" />
+              <OpenInPhantomButton label="Open claim page in Phantom" />
+            </>
+          ) : (
+            <p className="text-sm text-zinc-400">Connect wallet (top right) to claim.</p>
+          )}
+        </div>
       ) : canClaim && !expired ? (
         <button
           type="button"

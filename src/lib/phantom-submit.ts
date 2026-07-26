@@ -1,6 +1,7 @@
 import type { VersionedTransaction } from "@solana/web3.js";
 
 import { formatPhantomWalletError, getPhantom } from "@/lib/phantom";
+import { needsPhantomMobileBrowser, openInPhantomBrowser } from "@/lib/phantom-mobile";
 
 function u8ToBase64(bytes: Uint8Array): string {
   let binary = "";
@@ -22,8 +23,12 @@ async function submitViaApi(signed: Uint8Array): Promise<string> {
 
 /** Connect if needed, sign in Phantom, broadcast via api.aiglitch.app (Helius RPC). */
 export async function phantomSignAndSubmit(tx: VersionedTransaction): Promise<string> {
+  if (needsPhantomMobileBrowser()) {
+    openInPhantomBrowser();
+    throw new Error("Open in Phantom to sign this transaction, then try again.");
+  }
   const phantom = getPhantom();
-  if (!phantom) throw new Error("Phantom not available");
+  if (!phantom) throw new Error("Connect Phantom to sign.");
 
   await phantom.connect({ onlyIfTrusted: true }).catch(() => phantom.connect());
 
