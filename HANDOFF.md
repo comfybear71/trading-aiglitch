@@ -18,9 +18,17 @@
 
 ---
 
-## 2026-07-26 — iPhone / Telegram: Open in Phantom
+## 2026-07-26 — Swap v1 scope (Limit/Recurring deferred)
+
+**Decision:** Market swap only on trade.aiglitch.app for v1. Limit + Recurring need Jupiter vault/trigger APIs + order DB — see `docs/trade-swap-v1.md`.
+
+**UI:** Limit/Recurring tabs show honest “Coming soon” + jup.ag link (removed fake DCA form). `/swap?sell=USDC&buy=SOL` deep links from Portfolio.
+
+---
 
 Mobile Safari and in-app browsers have no `window.solana`. Use **Open in Phantom app** (`phantom.app/ul/browse/…`) — same as aiglitch.app. Claim page + Connect modal; QR login hidden on phone (iPad/PC only).
+
+**Magic link deploy SOL:** See aiglitch-api `docs/trade-magic-link-mainnet-ops.md` (~1.7 SOL locked as program rent on `4C8fFR…`; wallet `4Jm25…` shows liquid ~1.37 SOL).
 
 ---
 

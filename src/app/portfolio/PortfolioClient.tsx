@@ -193,7 +193,7 @@ export default function PortfolioClient() {
                 <div className="text-right shrink-0">
                   <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
                   <Link
-                    href="/swap"
+                    href={`/swap?sell=${encodeURIComponent(h.symbol)}`}
                     className="text-[10px] text-cyan-500/80 hover:text-cyan-400 mt-1 inline-block"
                   >
                     Trade
