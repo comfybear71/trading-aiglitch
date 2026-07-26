@@ -29,3 +29,11 @@ Deep links: `/swap?sell=USDC&buy=SOL` (optional query params).
 3. **Ops:** rate limits, cost ledger if keeper/cron needed.
 
 Until then, market swap is the supported product on trade.aiglitch.app.
+
+## Phantom / Blowfish warnings (new domain)
+
+Users may see **“This dApp could be malicious”** or **“This domain is new”** when signing swaps. That is Blowfish simulation + domain age, not necessarily a bug in our tx.
+
+**User flow:** Proceed anyway → Confirm (unsafe) → check **I understand…** → **Yes, confirm (unsafe)** at the bottom. Closing **Are you sure?** leaves no transaction (app shows a Phantom-blocked toast).
+
+**Dev:** We prefer `signAndSendTransaction` in Phantom before fallback sign + `/api/trade/submit`. Request domain review: [Phantom form](https://docs.google.com/forms/d/1JgIxdmolgh_80xMfQKBKx9-QPC7LRdN6LHpFFW8BlKM/viewform) or Blowfish `review@blowfish.xyz`.

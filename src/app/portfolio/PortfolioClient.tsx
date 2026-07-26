@@ -101,7 +101,7 @@ export default function PortfolioClient() {
               Send
             </Link>
             <Link
-              href="/swap"
+              href={chipFilter ? `/swap?sell=${encodeURIComponent(chipFilter)}` : "/swap"}
               className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-cyan-600/80 text-xs font-bold text-white"
             >
               Swap

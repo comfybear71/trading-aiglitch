@@ -428,6 +428,11 @@ export default function SwapClient() {
 
           {quoteError && <p className="text-xs text-red-400/90 text-center">{quoteError}</p>}
 
+          <p className="text-[10px] text-zinc-600 text-center leading-snug px-1">
+            Phantom may warn on new domains (red/yellow). Complete every step through{" "}
+            <span className="text-zinc-500">Yes, confirm (unsafe)</span> — not Close.
+          </p>
+
           <button
             type="button"
             disabled={busy || quoteBusy || !parsedQuote || !hasAmount}
