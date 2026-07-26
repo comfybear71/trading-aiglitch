@@ -4,11 +4,13 @@
 
 ---
 
-## 2026-07-26 — §GLITCH OTC (not Jupiter) — in PR
+## 2026-07-26 — §GLITCH invest promo (in PR)
 
-**Branch:** `claude/glitch-otc-not-jupiter` — Remove §GLITCH from Jupiter swap tokens; OTC callout on `/swap?buy=GLITCH`; Markets OTC panel + `otc-swap` proxy; Portfolio → exchange for GLITCH. Bonding curve: +$0.01 / 10k sold; treasury `7SGf93…`. See `docs/trade-markets-glitch.md`.
+**Branch:** `claude/glitch-invest-promo` — Hero fundraise block on Markets (treasury SOL, limits, CTA); compact strip on Portfolio; `GlitchInvestPromo` + `useOtcConfig`.
 
 ---
+
+## 2026-07-26 — §GLITCH OTC (merged #18, v0.4.6)
 
 ## 2026-07-26 — Markets v2 (merged #17)
 
