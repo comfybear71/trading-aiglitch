@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-07-26 — Markets v2 (in PR)
+
+**Branch:** `claude/markets-v2` — price cards link to `/swap?sell=&buy=`, refresh, updated copy (swap live; not an order book).
+
+---
+
 ## 2026-07-26 — DB wallet activity + Portfolio pass
 
 **Ship order:** Merge **aiglitch-api** `claude/trade-wallet-activity-db` first → deploy api.aiglitch.app → then merge **trading-aiglitch** `claude/send-activity-magic-link` (or follow-up PR).
