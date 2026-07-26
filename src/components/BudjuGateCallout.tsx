@@ -13,10 +13,18 @@ function fmtFull(n: number) {
   return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
-function BudjuPanelShell({ children }: { children: React.ReactNode }) {
+function BudjuPanelShell({
+  children,
+  compact = false,
+}: {
+  children: React.ReactNode;
+  compact?: boolean;
+}) {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-fuchsia-500/45 p-4 space-y-3 shadow-[0_0_32px_-8px_rgba(217,70,239,0.35)]"
+      className={`relative overflow-hidden rounded-2xl border border-fuchsia-500/45 shadow-[0_0_32px_-8px_rgba(217,70,239,0.35)] ${
+        compact ? "p-3 space-y-2" : "p-4 space-y-3"
+      }`}
       style={{
         background: "linear-gradient(135deg, #1a0533 0%, #140820 45%, #0d0612 100%)",
       }}
@@ -279,5 +287,101 @@ export function BudjuTraderStatus({
       onRefresh={onRefresh}
       refreshing={refreshing}
     />
+  );
+}
+
+/** Compact gate strip for Markets and other dense pages — same BUDJU look as Swap. */
+export function BudjuTraderStatusSlim({
+  eligible,
+  budjuBalance,
+  budjuRequired = BUDJU_GATE_REQUIRED_DEFAULT,
+  onRefresh,
+  refreshing,
+  walletConnected,
+}: {
+  eligible: boolean;
+  budjuBalance: number;
+  budjuRequired?: number;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+  walletConnected: boolean;
+}) {
+  const pct = Math.min(100, (budjuBalance / budjuRequired) * 100);
+
+  return (
+    <BudjuPanelShell compact>
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <a
+          href={BUDJU_SITE.home}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 rounded-md bg-fuchsia-950/40 p-1 border border-fuchsia-500/30 hover:border-fuchsia-400/60"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BUDJU_SITE.logo} alt="BUDJU" className="h-6 w-auto max-w-[72px] object-contain" />
+        </a>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-black text-fuchsia-100 uppercase tracking-tight leading-none">$BUDJU</p>
+          {walletConnected ? (
+            <p className="text-[10px] text-zinc-400 mt-0.5 truncate">
+              <span className="text-fuchsia-200 font-bold">{fmtCompact(budjuBalance)}</span>
+              <span className="text-zinc-600 mx-1">·</span>
+              {eligible ? (
+                <span className="text-emerald-400 font-semibold">Approved for trading</span>
+              ) : (
+                <span>
+                  {fmtCompact(Math.max(0, budjuRequired - budjuBalance))} to gate (
+                  {budjuRequired.toLocaleString()})
+                </span>
+              )}
+            </p>
+          ) : (
+            <p className="text-[10px] text-zinc-500 mt-0.5">
+              Connect wallet (top right) to check gate · 1M required
+            </p>
+          )}
+        </div>
+        {walletConnected && onRefresh && (
+          <RefreshBalancesButton onRefresh={onRefresh} refreshing={refreshing} />
+        )}
+        {!walletConnected && (
+          <Link
+            href="/swap?sell=SOL&buy=BUDJU"
+            className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-fuchsia-600/90 text-white hover:bg-fuchsia-500 shrink-0"
+          >
+            Buy $BUDJU
+          </Link>
+        )}
+      </div>
+
+      {walletConnected && (
+        <div
+          className={`h-1.5 rounded-full bg-black/50 overflow-hidden ring-1 ${
+            eligible ? "ring-emerald-500/30" : "ring-fuchsia-500/25"
+          }`}
+        >
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              eligible
+                ? "w-full bg-gradient-to-r from-emerald-600 via-fuchsia-500 to-pink-300"
+                : "bg-gradient-to-r from-fuchsia-600 via-fuchsia-400 to-pink-300"
+            }`}
+            style={eligible ? undefined : { width: `${Math.max(pct, budjuBalance > 0 ? 4 : 0)}%` }}
+          />
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <BudjuLinkPills showBuyOnSwap={!walletConnected || !eligible} />
+        {walletConnected && eligible && (
+          <Link
+            href="/swap"
+            className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-emerald-500/40 text-emerald-200/90 hover:bg-emerald-500/10 sm:ml-auto"
+          >
+            Open Swap
+          </Link>
+        )}
+      </div>
+    </BudjuPanelShell>
   );
 }

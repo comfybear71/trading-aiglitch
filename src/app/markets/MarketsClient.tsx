@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
+import { BudjuTraderStatusSlim } from "@/components/BudjuGateCallout";
+import { useTraderWallet } from "@/context/TraderWalletContext";
 import { fetchOtcConfig } from "@/lib/glitch-otc";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
@@ -90,9 +92,24 @@ function fmtPct(n: number) {
 }
 
 export default function MarketsClient() {
+  const trader = useTraderWallet();
+  const [balanceRefreshing, setBalanceRefreshing] = useState(false);
   const { otc, loading: otcLoading, refresh: refreshOtc } = useOtcConfig();
   const [markets, setMarkets] = useState<MarketSnapshot[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const refreshBalances = useCallback(async () => {
+    setBalanceRefreshing(true);
+    try {
+      await trader.refresh();
+    } finally {
+      setBalanceRefreshing(false);
+    }
+  }, [trader]);
+
+  useEffect(() => {
+    if (trader.wallet) void trader.refresh();
+  }, [trader.wallet, trader.refresh]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -120,6 +137,15 @@ export default function MarketsClient() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-5">
+      <BudjuTraderStatusSlim
+        walletConnected={!!trader.wallet}
+        eligible={trader.eligible}
+        budjuBalance={trader.eligibility?.budju_balance ?? 0}
+        budjuRequired={trader.eligibility?.budju_required}
+        onRefresh={trader.wallet ? () => void refreshBalances() : undefined}
+        refreshing={balanceRefreshing}
+      />
+
       <GlitchInvestPromo otc={otc} loading={otcLoading} variant="hero" />
 
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 flex flex-wrap items-center justify-between gap-3">
