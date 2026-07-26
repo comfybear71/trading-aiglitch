@@ -7,6 +7,7 @@ import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { useOtcConfig } from "@/lib/use-otc-config";
+import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import {
@@ -107,14 +108,12 @@ export default function PortfolioClient() {
             <Link
               href={
                 chipFilter === "GLITCH"
-                  ? "https://aiglitch.app/exchange"
+                  ? GLITCH_EXCHANGE_PATH
                   : chipFilter
                     ? `/swap?sell=${encodeURIComponent(chipFilter)}`
                     : "/swap"
               }
-              {...(chipFilter === "GLITCH"
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
+              {...(chipFilter === "GLITCH" ? {} : {})}
               className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-cyan-600/80 text-xs font-bold text-white"
             >
               {chipFilter === "GLITCH" ? "Invest §GLITCH" : "Swap"}
@@ -206,14 +205,12 @@ export default function PortfolioClient() {
                 <div className="text-right shrink-0">
                   <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
                   {h.symbol === "GLITCH" ? (
-                    <a
-                      href="https://aiglitch.app/exchange"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      href={GLITCH_EXCHANGE_PATH}
                       className="text-[10px] text-purple-400/90 hover:text-purple-300 mt-1 inline-block"
                     >
                       Invest (OTC)
-                    </a>
+                    </Link>
                   ) : (
                     <Link
                       href={`/swap?sell=${encodeURIComponent(h.symbol)}`}

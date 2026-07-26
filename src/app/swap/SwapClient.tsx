@@ -29,6 +29,8 @@ import { SwapRoutingModal } from "@/components/SwapRoutingModal";
 import { SwapAdvancedComingSoon } from "@/components/SwapAdvancedComingSoon";
 import { useSwapUrlParams, type GlitchUrlHint } from "@/app/swap/SwapUrlParams";
 import { GlitchOtcCallout } from "@/components/GlitchOtcCallout";
+import Link from "next/link";
+import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 
 type SwapMode = "market" | "limit" | "recurring";
 
@@ -485,9 +487,9 @@ export default function SwapClient() {
 
       <p className="text-[10px] text-zinc-600 text-center">
         Jupiter swaps: SOL · USDC · $BUDJU only · §GLITCH buy/invest on{" "}
-        <a href="https://aiglitch.app/exchange" className="text-purple-400 hover:underline">
-          aiglitch.app/exchange
-        </a>
+        <Link href={GLITCH_EXCHANGE_PATH} className="text-purple-400 hover:underline">
+          Exchange
+        </Link>
       </p>
     </>
   );

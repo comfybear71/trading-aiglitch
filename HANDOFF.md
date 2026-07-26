@@ -4,9 +4,9 @@
 
 ---
 
-## 2026-07-26 — §GLITCH invest promo (in PR)
+## 2026-07-26 — §GLITCH exchange on trade.aiglitch.app (in PR)
 
-**Branch:** `claude/glitch-invest-promo` — Hero fundraise block on Markets (treasury SOL, limits, CTA); compact strip on Portfolio; `GlitchInvestPromo` + `useOtcConfig`.
+**Branch:** `claude/trade-exchange-home` — `/exchange` buy flow (OTC + Phantom), sidebar **Buy §GLITCH**, fundraise hero (includes prior invest-promo work). Canonical URL: `https://trade.aiglitch.app/exchange`. **aiglitch** PR: `/exchange` → redirect to trade.
 
 ---
 
