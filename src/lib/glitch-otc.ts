@@ -18,7 +18,9 @@ export interface OtcPublicConfig {
   min_purchase: number;
   max_purchase: number;
   treasury_wallet: string;
+  /** On-chain SOL in treasury wallet. */
   treasury_sol: number;
+  treasury_wallet_balance_sol?: number;
   stats: {
     total_swaps: number;
     total_glitch_sold: number;
@@ -30,6 +32,14 @@ export interface OtcPublicConfig {
     tier_size: number;
     increment_usd?: number;
   };
+}
+
+export function otcTreasuryWalletSol(otc: OtcPublicConfig): number {
+  return otc.treasury_wallet_balance_sol ?? otc.treasury_sol ?? 0;
+}
+
+export function otcLifetimeSolFromOtc(otc: OtcPublicConfig): number {
+  return otc.stats?.total_sol_received ?? 0;
 }
 
 export async function fetchOtcConfig(): Promise<OtcPublicConfig | null> {
