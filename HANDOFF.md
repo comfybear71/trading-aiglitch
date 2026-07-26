@@ -18,6 +18,12 @@
 
 ---
 
+## 2026-07-26 — iPhone / Telegram: Open in Phantom
+
+Mobile Safari and in-app browsers have no `window.solana`. Use **Open in Phantom app** (`phantom.app/ul/browse/…`) — same as aiglitch.app. Claim page + Connect modal; QR login hidden on phone (iPad/PC only).
+
+---
+
 ## 2026-07-25 — Send activity + mainnet cutover
 
 **Activity fix (local):** Magic Link deposits/refunds now append to the same localStorage history as Transfer; Activity panel shows under both Send modes with devnet-aware Solscan links.

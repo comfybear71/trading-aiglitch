@@ -6,6 +6,8 @@ import { useTraderWallet } from "@/context/TraderWalletContext";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { getPhantom } from "@/lib/phantom";
+import { isMobileWeb, needsPhantomMobileBrowser, openInPhantomBrowser } from "@/lib/phantom-mobile";
+import { MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { balanceForSymbol } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 
@@ -79,6 +81,7 @@ export function WalletConnectModal({
   };
 
   const phantomDetected = typeof window !== "undefined" && !!getPhantom();
+  const mobileNeedsPhantom = typeof window !== "undefined" && needsPhantomMobileBrowser();
 
   if (!open) return null;
 
@@ -127,9 +130,25 @@ export function WalletConnectModal({
         {step === "choose" && (
           <div className="p-4 space-y-4 flex-1 overflow-y-auto">
             <p className="text-xs text-zinc-500">{purpose}</p>
+            {mobileNeedsPhantom && (
+              <MobilePhantomHint context="connect" />
+            )}
             {phantomDetected && (
               <p className="text-[10px] uppercase tracking-wider text-zinc-600 font-semibold">Installed</p>
             )}
+            {mobileNeedsPhantom ? (
+              <button
+                type="button"
+                onClick={() => openInPhantomBrowser()}
+                className="w-full flex items-center gap-3 rounded-xl border border-[#ab9ff2]/50 bg-[#ab9ff2]/10 px-4 py-3 hover:border-[#ab9ff2] transition-colors text-left"
+              >
+                <span className="w-10 h-10 rounded-lg bg-[#ab9ff2]/20 flex items-center justify-center text-xl">👻</span>
+                <span className="flex-1">
+                  <span className="block text-sm font-bold text-white">Open in Phantom app</span>
+                  <span className="block text-[10px] text-zinc-500">Required on iPhone / Telegram browser</span>
+                </span>
+              </button>
+            ) : (
             <button
               type="button"
               disabled={trader.loading}
@@ -148,6 +167,8 @@ export function WalletConnectModal({
                 <span className="text-[10px] font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">Detected</span>
               )}
             </button>
+            )}
+            {!isMobileWeb() && (
             <button
               type="button"
               onClick={startQr}
@@ -159,7 +180,12 @@ export function WalletConnectModal({
                 <span className="block text-[10px] text-zinc-500">Scan with phone to sign in on this device</span>
               </span>
             </button>
-            {trader.error && <p className="text-[11px] text-red-400 text-center">{trader.error}</p>}
+            )}
+            {trader.error && (
+              <p className={`text-[11px] text-center ${trader.error.includes("Opening Phantom") ? "text-cyan-400" : "text-red-400"}`}>
+                {trader.error}
+              </p>
+            )}
           </div>
         )}
 

@@ -1,5 +1,7 @@
 /** Minimal Phantom connect — no wallet-adapter bundle. */
 
+import { isMobileWeb, openInPhantomBrowser } from "@/lib/phantom-mobile";
+
 export interface PhantomPublicKey {
   toBase58(): string;
 }
@@ -37,7 +39,15 @@ export function getPhantom(): PhantomProvider | null {
 export async function connectPhantom(): Promise<string> {
   const phantom = getPhantom();
   if (!phantom) {
-    throw new Error("Install Phantom wallet to trade on trade.aiglitch.app");
+    if (isMobileWeb()) {
+      openInPhantomBrowser();
+      throw new Error(
+        "Opening Phantom… When the page loads inside the Phantom app, tap Connect again.",
+      );
+    }
+    throw new Error(
+      "Install the Phantom browser extension on desktop, or open this site in the Phantom app on your phone.",
+    );
   }
   const { publicKey } = await phantom.connect();
   return publicKey.toBase58();
