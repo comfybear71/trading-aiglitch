@@ -1,5 +1,6 @@
 "use client";
 
+import { AiglitchBusinessModel } from "@/components/AiglitchBusinessModel";
 import { GLITCH_LISTING_GOAL_SOL } from "@/lib/glitch-otc";
 
 export function GlitchExchangeStory({ treasurySol }: { treasurySol: number }) {
@@ -71,6 +72,8 @@ export function GlitchExchangeStory({ treasurySol }: { treasurySol: number }) {
           </li>
         </ol>
       </div>
+
+      <AiglitchBusinessModel />
 
       <div className="text-center rounded-xl border border-zinc-800 bg-black/40 p-4">
         <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Treasury progress</p>
