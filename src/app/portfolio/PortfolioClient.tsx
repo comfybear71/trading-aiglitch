@@ -38,7 +38,7 @@ export default function PortfolioClient() {
   const [tab, setTab] = useState<"positions" | "activity">("positions");
   const [activityRefresh, setActivityRefresh] = useState(0);
   const [recentActivity, setRecentActivity] = useState<TradeActivityItem[]>([]);
-  const { otc, loading: otcLoading } = useOtcConfig();
+  const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
   const b = trader.eligibility?.balances;
   const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
 
@@ -80,7 +80,12 @@ export default function PortfolioClient() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
-      <GlitchInvestPromo otc={otc} loading={otcLoading} variant="compact" />
+      <GlitchInvestPromo
+        otc={otc}
+        loading={otcLoading}
+        refreshing={otcRefreshing}
+        variant="compact"
+      />
       <div className="rounded-2xl border border-zinc-800 bg-[#12121a] p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

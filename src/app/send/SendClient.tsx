@@ -38,7 +38,7 @@ export default function SendClient() {
   const trader = useTraderWallet();
   const { pushToast } = useTradeToast();
   const { prices } = useTradePrices(!!trader.wallet);
-  const { otc, loading: otcLoading } = useOtcConfig();
+  const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
   const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
   const [mainTab, setMainTab] = useState<MainTab>("send");
   const [sendMode, setSendMode] = useState<SendMode>("transfer");
@@ -144,7 +144,12 @@ export default function SendClient() {
 
   return (
     <div className="max-w-lg mx-auto space-y-4">
-      <GlitchInvestPromo otc={otc} loading={otcLoading} variant="compact" />
+      <GlitchInvestPromo
+        otc={otc}
+        loading={otcLoading}
+        refreshing={otcRefreshing}
+        variant="compact"
+      />
 
       <div className="flex border-b border-zinc-800 text-sm">
         {(

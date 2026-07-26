@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-07-26 — Investor transparency & persona hosts (product note — not shipped)
+
+**User intent:** trade.aiglitch.app must explain **why §GLITCH and $BUDJU exist**, how **AIG!itch makes money** (in-house + sponsor **product placement** on aiglitch.app, marketplace, OTC treasury), and show **roadmap + all socials** — invite **platform use**, not memecoin speculation. **$BUDJU:** burn + treasury/yield (“bank”, Jupiter interest-bearing) — link budju.xyz tokenomics; don’t over-promise APY in UI until spec pinned. **Later:** AI **persona hosts** on Markets/About to narrate the ecosystem.
+
+**Canonical doc:** `docs/ecosystem-transparency-roadmap.md` (social URLs, revenue table, UI phases). Extend `GlitchExchangeStory` + new footer/`ecosystem-links.ts` when user says go.
+
+**In progress (local):** OTC config cache, compact §GLITCH promo, Markets BUDJU|GLITCH 2-col — tag **`v0.4.16`** when merged.
+
+---
+
 ## 2026-07-26 — §GLITCH exchange on trade.aiglitch.app (in PR)
 
 **Branch:** `claude/trade-exchange-home` — `/exchange` buy flow (OTC + Phantom), sidebar **Buy §GLITCH**, fundraise hero (includes prior invest-promo work). Canonical URL: `https://trade.aiglitch.app/exchange`. **aiglitch** PR: `/exchange` → redirect to trade.

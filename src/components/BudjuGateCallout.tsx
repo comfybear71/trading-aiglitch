@@ -16,15 +16,17 @@ function fmtFull(n: number) {
 function BudjuPanelShell({
   children,
   compact = false,
+  className = "",
 }: {
   children: React.ReactNode;
   compact?: boolean;
+  className?: string;
 }) {
   return (
     <div
       className={`relative overflow-hidden rounded-2xl border border-fuchsia-500/45 shadow-[0_0_32px_-8px_rgba(217,70,239,0.35)] ${
         compact ? "p-3 space-y-2" : "p-4 space-y-3"
-      }`}
+      } ${className}`}
       style={{
         background: "linear-gradient(135deg, #1a0533 0%, #140820 45%, #0d0612 100%)",
       }}
@@ -298,6 +300,7 @@ export function BudjuTraderStatusSlim({
   onRefresh,
   refreshing,
   walletConnected,
+  className = "",
 }: {
   eligible: boolean;
   budjuBalance: number;
@@ -305,11 +308,12 @@ export function BudjuTraderStatusSlim({
   onRefresh?: () => void;
   refreshing?: boolean;
   walletConnected: boolean;
+  className?: string;
 }) {
   const pct = Math.min(100, (budjuBalance / budjuRequired) * 100);
 
   return (
-    <BudjuPanelShell compact>
+    <BudjuPanelShell compact className={`h-full ${className}`}>
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <a
           href={BUDJU_SITE.home}

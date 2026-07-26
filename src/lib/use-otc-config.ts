@@ -1,27 +1,42 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { fetchOtcConfig, type OtcPublicConfig } from "@/lib/glitch-otc";
+import { fetchOtcConfig, peekOtcConfigCache, type OtcPublicConfig } from "@/lib/glitch-otc";
 
 export function useOtcConfig(pollMs = 0) {
-  const [otc, setOtc] = useState<OtcPublicConfig | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [otc, setOtc] = useState<OtcPublicConfig | null>(() =>
+    typeof window !== "undefined" ? peekOtcConfigCache() : null,
+  );
+  const [loading, setLoading] = useState(() =>
+    typeof window !== "undefined" ? !peekOtcConfigCache() : true,
+  );
+  const [refreshing, setRefreshing] = useState(false);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async (force = true) => {
+    const hadData = !!peekOtcConfigCache() || !!otc;
+    if (!hadData) setLoading(true);
+    else setRefreshing(true);
     try {
-      setOtc(await fetchOtcConfig());
+      const next = await fetchOtcConfig({ force });
+      if (next) setOtc(next);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }, []);
+  }, [otc]);
 
   useEffect(() => {
-    void refresh();
+    const cached = peekOtcConfigCache();
+    if (cached) {
+      setOtc(cached);
+      setLoading(false);
+    }
+    void refresh(true);
     if (pollMs <= 0) return;
-    const id = window.setInterval(() => void refresh(), pollMs);
+    const id = window.setInterval(() => void refresh(true), pollMs);
     return () => window.clearInterval(id);
-  }, [refresh, pollMs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount + poll interval only
+  }, [pollMs]);
 
-  return { otc, loading, refresh };
+  return { otc, loading, refreshing, refresh: () => refresh(true) };
 }

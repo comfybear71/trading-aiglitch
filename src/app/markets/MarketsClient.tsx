@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { BudjuTraderStatusSlim } from "@/components/BudjuGateCallout";
 import { useTraderWallet } from "@/context/TraderWalletContext";
-import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
 /** External DEX reference lane only — §GLITCH uses platform OTC promo above. */
@@ -94,7 +93,8 @@ function fmtPct(n: number) {
 export default function MarketsClient() {
   const trader = useTraderWallet();
   const [balanceRefreshing, setBalanceRefreshing] = useState(false);
-  const { otc, loading: otcLoading, refresh: refreshOtc } = useOtcConfig();
+  const { otc, loading: otcLoading, refreshing: otcRefreshing, refresh: refreshOtc } =
+    useOtcConfig();
   const [markets, setMarkets] = useState<MarketSnapshot[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -136,50 +136,46 @@ export default function MarketsClient() {
   }, [refresh]);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5">
-      <BudjuTraderStatusSlim
-        walletConnected={!!trader.wallet}
-        eligible={trader.eligible}
-        budjuBalance={trader.eligibility?.budju_balance ?? 0}
-        budjuRequired={trader.eligibility?.budju_required}
-        onRefresh={trader.wallet ? () => void refreshBalances() : undefined}
-        refreshing={balanceRefreshing}
-      />
+    <div className="max-w-5xl mx-auto space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+        <BudjuTraderStatusSlim
+          walletConnected={!!trader.wallet}
+          eligible={trader.eligible}
+          budjuBalance={trader.eligibility?.budju_balance ?? 0}
+          budjuRequired={trader.eligibility?.budju_required}
+          onRefresh={trader.wallet ? () => void refreshBalances() : undefined}
+          refreshing={balanceRefreshing}
+          className="min-h-[148px]"
+        />
+        <GlitchInvestPromo
+          otc={otc}
+          loading={otcLoading}
+          refreshing={otcRefreshing}
+          variant="compact"
+          className="min-h-[148px]"
+        />
+      </div>
 
-      <GlitchInvestPromo otc={otc} loading={otcLoading} variant="hero" />
-
-      {trader.wallet && otc && (
-        <div className="rounded-xl border border-purple-500/30 bg-purple-950/15 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-bold text-white">§GLITCH</p>
-            <p className="text-xs text-zinc-500 font-mono mt-0.5">
-              {(trader.eligibility?.balances.glitch ?? 0).toLocaleString(undefined, {
-                maximumFractionDigits: 0,
-              })}{" "}
-              GLITCH
-              <span className="text-purple-400/90 ml-2">@ ${otc.price_usd.toFixed(2)} OTC</span>
+      <section className="rounded-2xl border border-zinc-800/90 bg-zinc-950/50 p-5 space-y-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400/80">
+              Markets
+            </p>
+            <h1 className="text-xl font-black text-white mt-1">Live pairs — coming soon</h1>
+            <p className="text-sm text-zinc-500 mt-1 max-w-xl">
+              This area will list every Jupiter route, charts, and limits. For now use Swap and the
+              lanes below.
             </p>
           </div>
-          <div className="text-right shrink-0">
-            <p className="text-sm font-semibold text-zinc-200">
-              $
-              {(
-                (trader.eligibility?.balances.glitch ?? 0) * otc.price_usd
-              ).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-            </p>
-            <Link
-              href={GLITCH_EXCHANGE_PATH}
-              className="text-[10px] text-purple-400/90 hover:text-purple-300 mt-0.5 inline-block"
-            >
-              Invest (OTC)
-            </Link>
+          <div className="rounded-xl border border-dashed border-zinc-700/80 bg-black/20 px-4 py-3 text-[11px] text-zinc-500 max-w-xs">
+            SOL ↔ USDC ↔ $BUDJU ↔ more — unified grid lands here next.
           </div>
         </div>
-      )}
 
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-black text-zinc-200">Trade lanes</h1>
+          <h2 className="text-base font-black text-zinc-200">Trade lanes</h2>
           <p className="text-[11px] text-zinc-500 mt-0.5">
             Jupiter: SOL · USDC · $BUDJU ·{" "}
             <Link href="/swap" className="text-cyan-500/80 hover:underline">
@@ -248,6 +244,7 @@ export default function MarketsClient() {
           Ops
         </Link>
       </p>
+      </section>
     </div>
   );
 }

@@ -83,12 +83,26 @@ function GlitchPromoStat({
   );
 }
 
+function GlitchPromoStatSkeleton() {
+  return (
+    <div className="rounded-lg bg-black/35 border border-zinc-800/90 px-2.5 py-2 min-w-[88px] flex-1 animate-pulse">
+      <div className="h-2 w-12 bg-zinc-700/80 rounded" />
+      <div className="h-5 w-16 bg-zinc-700/60 rounded mt-2" />
+      <div className="h-2 w-20 bg-zinc-800 rounded mt-2" />
+    </div>
+  );
+}
+
 function GlitchInvestPromoCompact({
   otc,
   loading,
+  refreshing,
+  className = "",
 }: {
   otc: OtcPublicConfig | null;
   loading?: boolean;
+  refreshing?: boolean;
+  className?: string;
 }) {
   const treasurySol = otc ? otcTreasuryWalletSol(otc) : 0;
   const listingPct = Math.min(100, (treasurySol / GLITCH_LISTING_GOAL_SOL) * 100);
@@ -96,7 +110,7 @@ function GlitchInvestPromoCompact({
   return (
     <Link
       href={GLITCH_EXCHANGE_PATH}
-      className="group block relative overflow-hidden rounded-2xl border border-purple-500/40 bg-gradient-to-br from-purple-950/70 via-[#0a0612] to-cyan-950/50 p-4 shadow-[0_0_28px_-10px_rgba(168,85,247,0.45)] hover:border-purple-400/55 transition-colors"
+      className={`group block relative overflow-hidden rounded-2xl border border-purple-500/40 bg-gradient-to-br from-purple-950/70 via-[#0a0612] to-cyan-950/50 p-4 shadow-[0_0_28px_-10px_rgba(168,85,247,0.45)] hover:border-purple-400/55 transition-colors h-full ${className}`}
     >
       <div className="absolute inset-0 opacity-[0.08] pointer-events-none bg-[repeating-linear-gradient(45deg,#a855f7_0,#a855f7_1px,transparent_0,transparent_50%)] bg-[length:10px_10px]" />
       <div className="relative space-y-3">
@@ -118,10 +132,21 @@ function GlitchInvestPromoCompact({
           <span className="text-[10px] font-black uppercase tracking-wide px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white shrink-0 group-hover:brightness-110">
             Buy now →
           </span>
+          {refreshing && otc && (
+            <span className="text-[9px] text-zinc-500 w-full sm:w-auto sm:ml-auto">Updating…</span>
+          )}
         </div>
 
         {loading && !otc ? (
-          <p className="text-zinc-500 text-xs">Loading live curve…</p>
+          <>
+            <div className="flex flex-wrap gap-2">
+              <GlitchPromoStatSkeleton />
+              <GlitchPromoStatSkeleton />
+              <GlitchPromoStatSkeleton />
+            </div>
+            <div className="h-2 bg-zinc-900 rounded-full animate-pulse" />
+            <p className="text-[10px] text-zinc-600">Fetching live curve & treasury from chain…</p>
+          </>
         ) : otc ? (
           <>
             <div className="flex flex-wrap gap-2">
@@ -167,14 +192,25 @@ function GlitchInvestPromoCompact({
 export function GlitchInvestPromo({
   otc,
   loading,
+  refreshing,
   variant = "hero",
+  className,
 }: {
   otc: OtcPublicConfig | null;
   loading?: boolean;
+  refreshing?: boolean;
   variant?: Variant;
+  className?: string;
 }) {
   if (variant === "compact") {
-    return <GlitchInvestPromoCompact otc={otc} loading={loading} />;
+    return (
+      <GlitchInvestPromoCompact
+        otc={otc}
+        loading={loading}
+        refreshing={refreshing}
+        className={className}
+      />
+    );
   }
 
   return (
