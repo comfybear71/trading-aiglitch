@@ -4,7 +4,8 @@ export const ECOSYSTEM_LINKS = {
   tradeApp: "https://trade.aiglitch.app",
   sponsor: "https://aiglitch.app/sponsor",
   budju: "https://www.budju.xyz/",
-  budjuTrade: "https://www.budju.xyz/trade",
+  budjuHowToBuy: "https://www.budju.xyz/how-to-buy",
+  budjuBot: "https://www.budju.xyz/trade",
   budjuTokenomics: "https://www.budju.xyz/tokenomics",
   social: {
     x: "https://x.com/spiritary",
