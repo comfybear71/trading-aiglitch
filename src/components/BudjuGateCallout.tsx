@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { BUDJU_GATE_REQUIRED_DEFAULT, BUDJU_SITE } from "@/lib/budju-brand";
 
-function fmtCompact(n: number) {
+export function fmtCompact(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -13,7 +13,7 @@ function fmtFull(n: number) {
   return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
-function BudjuPanelShell({
+export function BudjuPanelShell({
   children,
   compact = false,
   className = "",
