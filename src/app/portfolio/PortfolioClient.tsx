@@ -11,6 +11,7 @@ import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
+import { BUDJU_SITE } from "@/lib/budju-brand";
 import {
   activityLabel,
   fetchTradeActivity,
@@ -132,13 +133,23 @@ export default function PortfolioClient() {
           />
         </div>
         {!trader.eligible && (
-          <p className="text-amber-500/90 text-xs mt-3 border-t border-zinc-800 pt-3">
-            Full swap locked until {(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} $BUDJU
-            on-chain. You have {fmtAmount(trader.eligibility?.budju_balance ?? 0, 0)} —{" "}
-            <Link href="/swap?sell=SOL&buy=BUDJU" className="text-cyan-400 hover:underline font-bold">
-              buy $BUDJU with SOL
+          <p className="text-[11px] mt-3 border-t border-fuchsia-500/20 pt-3 text-zinc-400 leading-relaxed">
+            Trade unlocks at {(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()}{" "}
+            <span className="text-fuchsia-300 font-bold">$BUDJU</span> — you have{" "}
+            {fmtAmount(trader.eligibility?.budju_balance ?? 0, 0)}.{" "}
+            <Link href="/swap?sell=SOL&buy=BUDJU" className="text-fuchsia-300 hover:text-white font-bold underline">
+              Buy on Swap
             </Link>{" "}
-            to unlock.
+            or{" "}
+            <a
+              href={BUDJU_SITE.home}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fuchsia-300 hover:text-white font-bold underline"
+            >
+              budju.xyz
+            </a>
+            .
           </p>
         )}
       </div>

@@ -31,6 +31,7 @@ import { useSwapUrlParams, type GlitchUrlHint } from "@/app/swap/SwapUrlParams";
 import { GlitchOtcCallout } from "@/components/GlitchOtcCallout";
 import Link from "next/link";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
+import { BudjuGateCallout } from "@/components/BudjuGateCallout";
 
 type SwapMode = "market" | "limit" | "recurring";
 
@@ -293,14 +294,7 @@ export default function SwapClient() {
   const swapColumn = (
     <>
       {budjuUnlockOnly && (
-        <div className="rounded-xl border border-amber-500/35 bg-amber-950/25 p-3 text-xs text-amber-100/95 space-y-2">
-          <p className="font-bold text-amber-200">BUDJU gate — buy $BUDJU to unlock full Swap</p>
-          <p className="text-zinc-400 leading-relaxed">
-            You have {fmtCompact(trader.eligibility?.budju_balance ?? 0)} $BUDJU. Need{" "}
-            {(trader.eligibility?.budju_required ?? 1_000_000).toLocaleString()} for all pairs. While below the gate you
-            can still swap <span className="text-zinc-200">SOL or USDC → $BUDJU</span> on Jupiter below.
-          </p>
-        </div>
+        <BudjuGateCallout budjuBalance={trader.eligibility?.budju_balance ?? 0} budjuRequired={trader.eligibility?.budju_required} />
       )}
       {glitchHint && (
         <GlitchOtcCallout hint={glitchHint === "sell" ? "sell" : "buy"} />
