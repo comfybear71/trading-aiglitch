@@ -11,6 +11,7 @@ import { MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { balanceForSymbol } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
+import { BUDJU_SITE } from "@/lib/budju-brand";
 
 type Step = "choose" | "qr";
 
@@ -309,16 +310,30 @@ export function WalletConnectMenu({
             />
           ) : (
           <>
-          <div className="rounded-lg bg-zinc-900/80 border border-zinc-800 p-3">
-            <div className="flex justify-between text-[10px] uppercase text-zinc-500 mb-1">
-              <span>Trader access</span>
-              <span className={trader.eligible ? "text-green-400" : "text-amber-400"}>
+          <div className={`rounded-lg border p-3 ${trader.eligible ? "bg-zinc-900/80 border-zinc-800" : "bg-fuchsia-950/25 border-fuchsia-500/35"}`}>
+            <div className="flex justify-between text-[10px] uppercase mb-1">
+              <span className={trader.eligible ? "text-zinc-500" : "text-fuchsia-300/80"}>Trader access · $BUDJU</span>
+              <span className={trader.eligible ? "text-green-400" : "text-fuchsia-300"}>
                 {trader.eligible ? "Unlocked" : "Locked"}
               </span>
             </div>
             <p className="text-lg font-bold text-white">{budju.toLocaleString(undefined, { maximumFractionDigits: 3 })} BUDJU</p>
             <p className="text-[10px] text-zinc-500 mt-1">
-              {trader.eligible ? "Swap & Portfolio unlocked" : `Need ${required.toLocaleString()} BUDJU to swap`}
+              {trader.eligible ? (
+                "Swap & Portfolio unlocked"
+              ) : (
+                <>
+                  Need {required.toLocaleString()} —{" "}
+                  <a
+                    href={BUDJU_SITE.home}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-fuchsia-300 hover:text-white underline"
+                  >
+                    budju.xyz
+                  </a>
+                </>
+              )}
             </p>
           </div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-600 font-semibold">Holdings</p>
