@@ -8,7 +8,6 @@ import { phantomSignAndSubmit } from "@/lib/phantom-submit";
 import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
 import { balanceForSymbol, formatSwapAmount, maxPayAmount } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
-import { appendSendHistory } from "@/lib/send-history";
 
 function toAtomic(amount: string, decimals: number): string {
   const n = Number(amount);
@@ -78,19 +77,11 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance, onActivityChang
         }),
       });
 
-      const amountHuman = amount;
-      appendSendHistory({
-        signature: depositSig,
-        symbol,
-        amount: amountHuman,
-        toTrunc: `Magic link · ${data.claimId.slice(0, 8)}…`,
-        kind: "magic_link",
-      });
       onActivityChange?.();
 
       setClaimUrl(data.claimUrl);
       setClaimId(data.claimId);
-      setActiveLinkAmount(amountHuman);
+      setActiveLinkAmount(amount);
       pushToast("Magic link ready — share the URL", "success");
       setAmount("");
       await trader.refresh();
@@ -125,13 +116,6 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance, onActivityChang
         body: JSON.stringify({ refundSignature: sig, senderPublicKey: trader.wallet }),
       });
 
-      appendSendHistory({
-        signature: sig,
-        symbol,
-        amount: activeLinkAmount ?? "—",
-        toTrunc: `Refund · ${claimId.slice(0, 8)}…`,
-        kind: "magic_refund",
-      });
       onActivityChange?.();
 
       pushToast("Link cancelled — funds refunded", "success");

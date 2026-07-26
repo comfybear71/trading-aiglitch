@@ -21,7 +21,7 @@ import {
   parseJupiterQuote,
   type TradeQuoteFeesMeta,
 } from "@/lib/swap-quote";
-import { appendSwapHistory } from "@/lib/swap-history";
+import { recordTradeActivity } from "@/lib/trade-activity-api";
 import { TokenWarningsBadge, TokenWarningsModal } from "@/components/TokenWarningsModal";
 import { SwapChartPanel } from "@/components/SwapChartPanel";
 import { SwapHistoryPanelKeyed } from "@/components/SwapHistoryPanel";
@@ -222,12 +222,11 @@ export default function SwapClient() {
       const tx = VersionedTransaction.deserialize(bytes);
       const signature = await phantomSignAndSubmit(tx);
       const outHuman = parsedForHistory.outHuman;
-      appendSwapHistory({
+      void recordTradeActivity({
+        wallet: trader.wallet,
+        kind: "swap",
         signature,
-        sellSymbol: inputSymbol,
-        buySymbol: outputSymbol,
-        sellAmount: amount,
-        buyAmount: formatSwapAmount(outHuman, outputToken.decimals),
+        detail: `${amount} ${inputSymbol} → ${formatSwapAmount(outHuman, outputToken.decimals)} ${outputSymbol}`,
       });
       setHistoryRefreshKey((k) => k + 1);
       setStatus(`Sent · ${signature.slice(0, 8)}…`);

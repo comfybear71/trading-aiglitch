@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 import { HoldingsChips } from "@/components/HoldingsChips";
+import { TradeActivityPanel } from "@/components/TradeActivityPanel";
+import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
+import {
+  activityLabel,
+  fetchTradeActivity,
+  solscanTxUrl,
+  type TradeActivityItem,
+} from "@/lib/trade-activity-api";
 
 const HOLDINGS = [
   { key: "usdc", symbol: "USDC", label: "USDC" },
@@ -22,7 +30,27 @@ export default function PortfolioClient() {
   const trader = useTraderWallet();
   const { prices, loading: pricesLoading } = useTradePrices(!!trader.wallet);
   const [chipFilter, setChipFilter] = useState<string | null>(null);
+  const [tab, setTab] = useState<"positions" | "activity">("positions");
+  const [activityRefresh, setActivityRefresh] = useState(0);
+  const [recentActivity, setRecentActivity] = useState<TradeActivityItem[]>([]);
   const b = trader.eligibility?.balances;
+
+  const loadRecentActivity = useCallback(async () => {
+    if (!trader.wallet) {
+      setRecentActivity([]);
+      return;
+    }
+    try {
+      const all = await fetchTradeActivity(trader.wallet);
+      setRecentActivity(all.slice(0, 3));
+    } catch {
+      setRecentActivity([]);
+    }
+  }, [trader.wallet]);
+
+  useEffect(() => {
+    if (tab === "positions") void loadRecentActivity();
+  }, [tab, loadRecentActivity, activityRefresh]);
 
   if (!trader.wallet) {
     return (
@@ -57,8 +85,7 @@ export default function PortfolioClient() {
             <p className="text-3xl font-black text-white mt-2">
               {pricesLoading ? "…" : fmtUsd(netUsd)}
             </p>
-            <p className="text-xs text-zinc-500 mt-1">Estimated net worth (Jupiter USD prices)</p>
-          </div>
+            <p className="text-xs text-zinc-500 mt-1">Estimated net worth (Jupiter USD prices)</p>          </div>
           <div className="flex gap-2 flex-wrap">
             <button
               type="button"
@@ -97,12 +124,41 @@ export default function PortfolioClient() {
       </div>
 
       <div className="flex border-b border-zinc-800 text-sm">
-        <span className="px-4 py-2 font-bold text-white border-b-2 border-cyan-400">Positions</span>
-        <span className="px-4 py-2 text-zinc-600 cursor-not-allowed" title="Coming later">
+        <button
+          type="button"
+          onClick={() => setTab("positions")}
+          className={`px-4 py-2 font-bold transition-colors ${
+            tab === "positions"
+              ? "text-white border-b-2 border-cyan-400"
+              : "text-zinc-600 hover:text-zinc-300"
+          }`}
+        >
+          Positions
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("activity")}
+          className={`px-4 py-2 font-bold transition-colors ${
+            tab === "activity"
+              ? "text-white border-b-2 border-cyan-400"
+              : "text-zinc-600 hover:text-zinc-300"
+          }`}
+        >
           Activity
-        </span>
+        </button>
       </div>
 
+      {tab === "activity" ? (
+        <div className="space-y-4">
+          <MagicLinkOpenLinks onChanged={() => setActivityRefresh((k) => k + 1)} />
+          <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
+            <p className="px-4 py-2 text-[10px] uppercase text-zinc-500 font-semibold border-b border-zinc-800">
+              Wallet activity
+            </p>
+            <TradeActivityPanel wallet={trader.wallet} refreshKey={activityRefresh} />
+          </div>
+        </div>
+      ) : (
       <div className="rounded-2xl border border-zinc-800 overflow-hidden">
         <div className="px-4 py-3 border-b border-zinc-800 flex justify-between text-[10px] uppercase text-zinc-500 font-semibold">
           <span>Holdings</span>
@@ -112,20 +168,75 @@ export default function PortfolioClient() {
           {HOLDINGS.filter((h) => !chipFilter || h.symbol === chipFilter).map((h) => {
             const amt = b?.[h.key] ?? 0;
             const val = usdValue(amt, h.symbol, prices);
+            const pct = netUsd > 0 && val != null ? Math.min(100, (val / netUsd) * 100) : 0;
             return (
               <li key={h.key} className="px-4 py-3 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-bold text-white">{h.label}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-bold text-white">{h.label}</p>
+                    {netUsd > 0 && val != null && val > 0 && (
+                      <span className="text-[10px] text-zinc-500 shrink-0">{pct.toFixed(1)}%</span>
+                    )}
+                  </div>
                   <p className="text-xs text-zinc-500 font-mono mt-0.5">
                     {fmtAmount(amt)} {h.symbol}
                   </p>
+                  {netUsd > 0 && val != null && val > 0 && (
+                    <div className="mt-2 h-1 rounded-full bg-zinc-800 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-purple-500/70 to-cyan-500/70"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  )}
                 </div>
-                <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
+                <div className="text-right shrink-0">
+                  <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
+                  <Link
+                    href="/swap"
+                    className="text-[10px] text-cyan-500/80 hover:text-cyan-400 mt-1 inline-block"
+                  >
+                    Trade
+                  </Link>
+                </div>
               </li>
             );
           })}
         </ul>
       </div>
+      )}
+
+      {tab === "positions" && recentActivity.length > 0 && (
+        <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
+          <div className="px-4 py-2 flex items-center justify-between border-b border-zinc-800">
+            <p className="text-[10px] uppercase text-zinc-500 font-semibold">Recent activity</p>
+            <button
+              type="button"
+              onClick={() => setTab("activity")}
+              className="text-[10px] text-cyan-500 hover:underline"
+            >
+              View all
+            </button>
+          </div>
+          <ul className="divide-y divide-zinc-800/80">
+            {recentActivity.map((a) => (
+              <li key={a.id} className="px-4 py-2 flex justify-between gap-2 text-sm">
+                <span className="text-zinc-400 truncate">{activityLabel(a)}</span>
+                {a.signature ? (
+                  <a
+                    href={solscanTxUrl(a.signature)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-cyan-500 shrink-0"
+                  >
+                    Solscan
+                  </a>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {!trader.eligibility?.helius_enabled && (
         <p className="text-[10px] text-amber-600 text-center">

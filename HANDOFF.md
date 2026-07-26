@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-07-26 — DB wallet activity + Portfolio pass
+
+**Ship order:** Merge **aiglitch-api** `claude/trade-wallet-activity-db` first → deploy api.aiglitch.app → then merge **trading-aiglitch** `claude/send-activity-magic-link` (or follow-up PR).
+
+**API:** `trade_wallet_activity` table; `GET/POST /api/trade/activity`; magic events logged on confirm/refund/claim PUT; `GET /api/trade/magic-link/sent`; `POST …/abandon` for unfunded links.
+
+**UI:** No localStorage for send/swap history. `TradeActivityPanel` + `MagicLinkOpenLinks` on Send, Portfolio Activity tab, wallet drawer Activity. Portfolio positions: allocation %, recent activity teaser, Trade link per row.
+
+**Verify:** Transfer + swap → activity rows; magic deposit/refund/claim → rows; dismiss unfunded / cancel & refund; Portfolio + drawer Activity match.
+
+**Later:** PnL history chart; backfill old magic links from `trade_magic_claims`; eToro CFD monitor (post trade-app complete).
+
+---
+
 ## 2026-07-25 — Send activity + mainnet cutover
 
 **Activity fix (local):** Magic Link deposits/refunds now append to the same localStorage history as Transfer; Activity panel shows under both Send modes with devnet-aware Solscan links.

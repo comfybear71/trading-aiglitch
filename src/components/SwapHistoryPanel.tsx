@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { loadSwapHistory, type SwapHistoryEntry } from "@/lib/swap-history";
+import { useCallback, useEffect, useState } from "react";
+import { useTraderWallet } from "@/context/TraderWalletContext";
+import {
+  fetchTradeActivity,
+  solscanTxUrl,
+  type TradeActivityItem,
+} from "@/lib/trade-activity-api";
 
 function relTime(iso: string) {
   const d = Date.now() - new Date(iso).getTime();
@@ -14,42 +19,51 @@ function relTime(iso: string) {
 }
 
 export function SwapHistoryPanelKeyed({ refreshKey }: { refreshKey: number }) {
-  const [rows, setRows] = useState<SwapHistoryEntry[]>([]);
+  const trader = useTraderWallet();
+  const [rows, setRows] = useState<TradeActivityItem[]>([]);
+
+  const load = useCallback(async () => {
+    if (!trader.wallet) {
+      setRows([]);
+      return;
+    }
+    try {
+      const all = await fetchTradeActivity(trader.wallet);
+      setRows(all.filter((a) => a.kind === "swap"));
+    } catch {
+      setRows([]);
+    }
+  }, [trader.wallet]);
 
   useEffect(() => {
-    setRows(loadSwapHistory());
-  }, [refreshKey]);
+    void load();
+  }, [load, refreshKey]);
 
   return (
     <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
       <div className="px-4 py-2 border-b border-zinc-800 text-xs text-zinc-500 font-semibold uppercase tracking-wider">
-        Swap history (this browser)
+        Swap history
       </div>
       {rows.length === 0 ? (
         <p className="p-6 text-center text-sm text-zinc-600">No swaps recorded yet.</p>
       ) : (
         <ul className="divide-y divide-zinc-800/80 max-h-[360px] overflow-y-auto">
           {rows.map((r) => (
-            <li key={r.signature} className="px-4 py-3 flex items-center justify-between gap-2 text-sm">
+            <li key={r.id} className="px-4 py-3 flex items-center justify-between gap-2 text-sm">
               <div>
-                <p className="text-zinc-200 font-medium">
-                  {r.sellSymbol} → {r.buySymbol}
-                </p>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  {r.sellAmount} → {r.buyAmount}
-                </p>
+                <p className="text-zinc-200 font-medium">{r.detail ?? "Swap"}</p>
+                <p className="text-[10px] text-zinc-600 mt-0.5">{relTime(r.at)}</p>
               </div>
-              <div className="text-right shrink-0">
-                <p className="text-[10px] text-zinc-600">{relTime(r.at)}</p>
+              {r.signature && (
                 <a
-                  href={`https://solscan.io/tx/${r.signature}`}
+                  href={solscanTxUrl(r.signature)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] text-cyan-500 hover:underline"
+                  className="text-[10px] text-cyan-500 hover:underline shrink-0"
                 >
                   Solscan
                 </a>
-              </div>
+              )}
             </li>
           ))}
         </ul>
