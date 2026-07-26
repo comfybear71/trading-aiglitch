@@ -1,6 +1,7 @@
 "use client";
 
-import { BUDJU_MINT, GLITCH_MINT } from "@/lib/trade-tokens";
+import Link from "next/link";
+import { BUDJU_MINT, GLITCH_EXCHANGE_PATH, GLITCH_MINT } from "@/lib/trade-tokens";
 
 const DEXSCREENER: Partial<Record<string, string>> = {
   BUDJU: `https://dexscreener.com/solana/${BUDJU_MINT}`,
@@ -40,9 +41,9 @@ export function SwapChartPanel({
           <p className="text-zinc-400 mb-2">§GLITCH may have no active DEX chart.</p>
           <p>
             Use{" "}
-            <a href="https://aiglitch.app/exchange" className="text-purple-400 underline">
-              aiglitch.app/exchange
-            </a>{" "}
+            <Link href={GLITCH_EXCHANGE_PATH} className="text-purple-400 underline">
+              trade.aiglitch.app/glitch
+            </Link>{" "}
             for OTC §GLITCH, or swap via Jupiter routes when available.
           </p>
           {url && (

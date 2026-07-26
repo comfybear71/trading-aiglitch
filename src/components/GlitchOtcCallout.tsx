@@ -28,7 +28,7 @@ export function GlitchOtcCallout({ hint = "generic" }: { hint?: Hint }) {
       <p className="text-[11px] text-zinc-400 leading-relaxed">
         We control the market on-chain (same rules as{" "}
         <Link href={GLITCH_EXCHANGE_PATH} className="text-purple-400 hover:underline">
-          trade.aiglitch.app/exchange
+          trade.aiglitch.app/glitch
         </Link>
         ): price rises <span className="text-zinc-300">$0.01 for every 10,000 §GLITCH sold</span>. Purchases
         build treasury SOL for exchange listings and promotion — and to avoid thin pools that bots can drain.

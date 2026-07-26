@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useTraderWallet } from "@/context/TraderWalletContext";
-import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { fmtUsd, usdValue, useTradePrices, fmtGlitchUnitUsd } from "@/lib/use-trade-prices";
 import { HoldingsChips } from "@/components/HoldingsChips";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { useOtcConfig } from "@/lib/use-otc-config";
@@ -220,6 +220,9 @@ export default function PortfolioClient() {
                   </div>
                   <p className="text-xs text-zinc-500 font-mono mt-0.5">
                     {fmtAmount(amt)} {h.symbol}
+                    {h.symbol === "GLITCH" && fmtGlitchUnitUsd(prices.GLITCH) && (
+                      <span className="text-purple-400/80 ml-1">@ {fmtGlitchUnitUsd(prices.GLITCH)}</span>
+                    )}
                   </p>
                   {netUsd > 0 && val != null && val > 0 && (
                     <div className="mt-2 h-1 rounded-full bg-zinc-800 overflow-hidden">

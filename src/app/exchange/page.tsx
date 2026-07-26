@@ -1,5 +1,6 @@
-import ExchangeClient from "./ExchangeClient";
+import { redirect } from "next/navigation";
 
-export default function ExchangePage() {
-  return <ExchangeClient />;
+/** Legacy URL — §GLITCH OTC lives at /glitch */
+export default function ExchangeRedirectPage() {
+  redirect("/glitch");
 }

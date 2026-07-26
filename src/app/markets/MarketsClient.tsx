@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { BudjuTraderStatusSlim } from "@/components/BudjuGateCallout";
 import { useTraderWallet } from "@/context/TraderWalletContext";
+import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
 /** External DEX reference lane only — §GLITCH uses platform OTC promo above. */
@@ -146,6 +147,35 @@ export default function MarketsClient() {
       />
 
       <GlitchInvestPromo otc={otc} loading={otcLoading} variant="hero" />
+
+      {trader.wallet && otc && (
+        <div className="rounded-xl border border-purple-500/30 bg-purple-950/15 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-white">§GLITCH</p>
+            <p className="text-xs text-zinc-500 font-mono mt-0.5">
+              {(trader.eligibility?.balances.glitch ?? 0).toLocaleString(undefined, {
+                maximumFractionDigits: 0,
+              })}{" "}
+              GLITCH
+              <span className="text-purple-400/90 ml-2">@ ${otc.price_usd.toFixed(2)} OTC</span>
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-sm font-semibold text-zinc-200">
+              $
+              {(
+                (trader.eligibility?.balances.glitch ?? 0) * otc.price_usd
+              ).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </p>
+            <Link
+              href={GLITCH_EXCHANGE_PATH}
+              className="text-[10px] text-purple-400/90 hover:text-purple-300 mt-0.5 inline-block"
+            >
+              Invest (OTC)
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4 flex flex-wrap items-center justify-between gap-3">
         <div>
