@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { VersionedTransaction } from "@solana/web3.js";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { phantomSignAndSubmit } from "@/lib/phantom-submit";
-import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
+import { JUPITER_SWAP_TOKENS, TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
 import {
   balanceForSymbol,
   formatSwapAmount,
@@ -27,7 +27,8 @@ import { SwapChartPanel } from "@/components/SwapChartPanel";
 import { SwapHistoryPanelKeyed } from "@/components/SwapHistoryPanel";
 import { SwapRoutingModal } from "@/components/SwapRoutingModal";
 import { SwapAdvancedComingSoon } from "@/components/SwapAdvancedComingSoon";
-import { useSwapUrlParams } from "@/app/swap/SwapUrlParams";
+import { useSwapUrlParams, type GlitchUrlHint } from "@/app/swap/SwapUrlParams";
+import { GlitchOtcCallout } from "@/components/GlitchOtcCallout";
 
 type SwapMode = "market" | "limit" | "recurring";
 
@@ -85,9 +86,10 @@ export default function SwapClient() {
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [routingOpen, setRoutingOpen] = useState(false);
   const [swapMode, setSwapMode] = useState<SwapMode>("market");
+  const [glitchHint, setGlitchHint] = useState<GlitchUrlHint>(null);
   const quoteGen = useRef(0);
 
-  useSwapUrlParams(setInputSymbol, setOutputSymbol);
+  useSwapUrlParams(setInputSymbol, setOutputSymbol, setGlitchHint);
 
   const inputToken = TRADE_SWAP_TOKENS.find((t) => t.symbol === inputSymbol)!;
   const outputToken = TRADE_SWAP_TOKENS.find((t) => t.symbol === outputSymbol)!;
@@ -103,7 +105,7 @@ export default function SwapClient() {
   };
 
   const outputOptions = useMemo(
-    () => TRADE_SWAP_TOKENS.filter((t) => t.symbol !== inputSymbol),
+    () => JUPITER_SWAP_TOKENS.filter((t) => t.symbol !== inputSymbol),
     [inputSymbol],
   );
 
@@ -278,6 +280,9 @@ export default function SwapClient() {
 
   const swapColumn = (
     <>
+      {glitchHint && (
+        <GlitchOtcCallout hint={glitchHint === "sell" ? "sell" : "buy"} />
+      )}
       <div className="flex items-center gap-1 text-xs border-b border-zinc-800 pb-2 flex-wrap">
         {(
           [
@@ -341,7 +346,7 @@ export default function SwapClient() {
             setParsedQuote(null);
             setStoredQuote(null);
           }}
-          symbolOptions={TRADE_SWAP_TOKENS.map((t) => t.symbol)}
+          symbolOptions={JUPITER_SWAP_TOKENS.map((t) => t.symbol)}
           amount={amount}
           onAmountChange={setAmount}
           usdHint={fmtUsd(usdValue(Number(amount) || 0, inputSymbol, prices))}
@@ -479,7 +484,7 @@ export default function SwapClient() {
       </div>
 
       <p className="text-[10px] text-zinc-600 text-center">
-        Routed via Jupiter · base Solana fee ~0.000005 SOL · §GLITCH OTC on{" "}
+        Jupiter swaps: SOL · USDC · $BUDJU only · §GLITCH buy/invest on{" "}
         <a href="https://aiglitch.app/exchange" className="text-purple-400 hover:underline">
           aiglitch.app/exchange
         </a>

@@ -16,6 +16,15 @@ export const TRADE_SWAP_TOKENS = [
   { symbol: "GLITCH", mint: GLITCH_MINT, decimals: 9 },
 ] as const;
 
+/** Jupiter lane only — §GLITCH is OTC on aiglitch.app/exchange (not tradable on Jupiter). */
+export const JUPITER_SWAP_TOKENS = TRADE_SWAP_TOKENS.filter((t) => t.symbol !== "GLITCH");
+
+export const GLITCH_EXCHANGE_URL = "https://aiglitch.app/exchange";
+
+export function isJupiterSwapSymbol(symbol: string) {
+  return JUPITER_SWAP_TOKENS.some((t) => t.symbol === symbol);
+}
+
 export const TRADER_WALLET_STORAGE_KEY = "aiglitch-trade-wallet";
 
 export interface TradeEligibility {
