@@ -2,9 +2,8 @@
 export const BUDJU_SITE = {
   home: "https://www.budju.xyz/",
   logo: "https://www.budju.xyz/images/logo.svg",
-  howToBuy: "https://www.budju.xyz/",
-  pool: "https://www.budju.xyz/",
-  tokenomics: "https://www.budju.xyz/",
+  trade: "https://www.budju.xyz/trade",
+  tokenomics: "https://www.budju.xyz/tokenomics",
 } as const;
 
 /** Tailwind-friendly tokens (match budju.xyz magenta + deep purple UI). */
