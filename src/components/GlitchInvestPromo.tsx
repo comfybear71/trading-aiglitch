@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   GLITCH_DAILY_SOL_LIMIT,
   GLITCH_LISTING_GOAL_SOL,
@@ -7,7 +8,7 @@ import {
   otcTreasuryWalletSol,
   type OtcPublicConfig,
 } from "@/lib/glitch-otc";
-import { GLITCH_EXCHANGE_URL } from "@/lib/trade-tokens";
+import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 
 function fmtSold(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
@@ -69,10 +70,8 @@ export function GlitchInvestPromo({
     const treasurySol = otc ? otcTreasuryWalletSol(otc) : 0;
     const pct = Math.min(100, (treasurySol / GLITCH_LISTING_GOAL_SOL) * 100);
     return (
-      <a
-        href={GLITCH_EXCHANGE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={GLITCH_EXCHANGE_PATH}
         className="block rounded-xl border border-purple-500/35 bg-gradient-to-r from-purple-950/50 to-cyan-950/30 p-3 hover:border-purple-400/50 transition-colors"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -93,7 +92,7 @@ export function GlitchInvestPromo({
             <div className="h-full bg-cyan-500/80 rounded-full" style={{ width: `${pct}%` }} />
           </div>
         )}
-      </a>
+      </Link>
     );
   }
 
@@ -162,14 +161,12 @@ export function GlitchInvestPromo({
               </span>
             </div>
 
-            <a
-              href={GLITCH_EXCHANGE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={GLITCH_EXCHANGE_PATH}
               className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-black text-sm shadow-lg shadow-purple-900/40 hover:brightness-110 transition"
             >
               Buy §GLITCH — invest now
-            </a>
+            </Link>
           </div>
 
           <TreasuryBlock otc={otc} />

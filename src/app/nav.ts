@@ -17,7 +17,7 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Trade",
     items: [
       { slug: "markets", label: "Markets", icon: "\u{1F4CA}", section: "trade" },
-      { slug: "exchange", label: "Buy §GLITCH", icon: "\u{1F4B0}", section: "trade" },
+      { slug: "glitch", label: "Buy §GLITCH", icon: "\u{1F4B0}", section: "trade" },
       { slug: "swap", label: "Swap", icon: "\u{21C4}", section: "trade" },
       { slug: "nft", label: "NFT", icon: "\u{1F3A8}", section: "trade" },
     ],
@@ -53,5 +53,6 @@ export function navItemForSlug(slug: string): NavItem | undefined {
 /** First path segment for sidebar highlight (e.g. /nft/studio → nft). */
 export function slugFromPathname(pathname: string): string {
   const seg = pathname.split("/").filter(Boolean)[0];
+  if (seg === "exchange") return "glitch";
   return seg ?? DEFAULT_SLUG;
 }
