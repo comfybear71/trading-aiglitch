@@ -5,6 +5,9 @@ export interface CuratedMarketsResponse {
     TradeTokenRow & {
       defaultQuote: "USDC" | "SOL";
       yieldLst: boolean;
+      name?: string;
+      iconUrl?: string | null;
+      iconEmoji?: string;
     }
   >;
   otc: {

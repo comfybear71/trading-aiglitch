@@ -18,12 +18,14 @@ import {
 import { GLITCH_EXCHANGE_PATH, TRADE_CURATED_JUPITER_TOKENS } from "@/lib/trade-tokens";
 import { GLITCH_LISTING_GOAL_SOL } from "@/lib/glitch-otc";
 import { useOtcConfig } from "@/lib/use-otc-config";
+import { metaForSymbol, useTradeTokenMeta } from "@/lib/use-trade-token-meta";
 
 export default function MarketsClient() {
   const trader = useTraderWallet();
   const [balanceRefreshing, setBalanceRefreshing] = useState(false);
   const { otc, loading: otcLoading, refreshing: otcRefreshing, refresh: refreshOtc } =
     useOtcConfig();
+  const tokenMeta = useTradeTokenMeta();
   const refreshOtcRef = useRef(refreshOtc);
   refreshOtcRef.current = refreshOtc;
 
@@ -75,6 +77,9 @@ export default function MarketsClient() {
         tokens.map((t) => ({
           ...t,
           priceUsd: prices[t.symbol],
+          iconUrl: t.iconUrl,
+          iconEmoji: t.iconEmoji,
+          name: t.name,
         })),
       );
     } finally {
@@ -137,7 +142,12 @@ export default function MarketsClient() {
             </p>
           </div>
         </div>
-        <JupiterCuratedGrid tokens={curated} loading={curatedLoading} solPriceUsd={solPriceUsd} />
+        <JupiterCuratedGrid
+          tokens={curated}
+          loading={curatedLoading}
+          solPriceUsd={solPriceUsd}
+          solMeta={metaForSymbol(tokenMeta, "SOL")}
+        />
       </section>
 
       <section className="rounded-2xl border border-zinc-800/90 bg-zinc-950/50 p-5 space-y-4">
@@ -176,7 +186,7 @@ export default function MarketsClient() {
           </button>
         </div>
 
-        <MarketPairGrid markets={markets} loading={loading} skeletonCount={3} />
+        <MarketPairGrid markets={markets} loading={loading} skeletonCount={3} tokenMeta={tokenMeta} />
 
         <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/25 px-4 py-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">

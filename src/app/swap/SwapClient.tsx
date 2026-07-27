@@ -32,6 +32,8 @@ import { GlitchOtcCallout } from "@/components/GlitchOtcCallout";
 import Link from "next/link";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { BudjuTraderStatus } from "@/components/BudjuGateCallout";
+import { TokenIcon } from "@/components/TokenIcon";
+import { metaForSymbol, useTradeTokenMeta } from "@/lib/use-trade-token-meta";
 
 type SwapMode = "market" | "limit" | "recurring";
 
@@ -70,6 +72,7 @@ export default function SwapClient() {
   const trader = useTraderWallet();
   const { pushToast } = useTradeToast();
   const { prices } = useTradePrices(!!trader.wallet);
+  const tokenMeta = useTradeTokenMeta();
   const [inputSymbol, setInputSymbol] = useState("BUDJU");
   const [outputSymbol, setOutputSymbol] = useState("SOL");
   const [amount, setAmount] = useState("");
@@ -402,6 +405,7 @@ export default function SwapClient() {
           warningSlot={
             <TokenWarningsBadge symbol={inputSymbol} onOpen={() => setWarningModalSymbol(inputSymbol)} />
           }
+          tokenMeta={tokenMeta}
         />
 
         <div className="relative h-0">
@@ -447,6 +451,7 @@ export default function SwapClient() {
           warningSlot={
             <TokenWarningsBadge symbol={outputSymbol} onOpen={() => setWarningModalSymbol(outputSymbol)} />
           }
+          tokenMeta={tokenMeta}
         />
 
         <div className="p-4 pt-2 space-y-3">
@@ -580,6 +585,7 @@ function SwapSide({
   usdHint,
   subHint,
   warningSlot,
+  tokenMeta = {},
 }: {
   label: string;
   symbol: string;
@@ -593,7 +599,9 @@ function SwapSide({
   usdHint?: string | null;
   subHint?: string | null;
   warningSlot?: ReactNode;
+  tokenMeta?: Record<string, import("@/lib/trade-token-meta").TradeTokenMetaRow>;
 }) {
+  const symMeta = metaForSymbol(tokenMeta, symbol);
   return (
     <div className="p-4 bg-zinc-900/50 border-b border-zinc-800/80 last:border-b-0">
       <div className="flex items-center justify-between mb-2">
@@ -604,6 +612,12 @@ function SwapSide({
         </div>
       </div>
       <div className="flex items-center gap-3">
+        <TokenIcon
+          symbol={symbol}
+          iconUrl={symMeta?.iconUrl ?? `/tokens/${symbol.toLowerCase()}.svg`}
+          iconEmoji={symMeta?.iconEmoji}
+          size={36}
+        />
         <select
           value={symbol}
           onChange={(e) => onSymbolChange(e.target.value)}
