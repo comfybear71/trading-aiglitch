@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
+import { EcosystemProductCta } from "@/components/EcosystemProductCta";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { ECOSYSTEM_LINKS } from "@/lib/ecosystem-links";
 import { BUDJU_GATE_REQUIRED_DEFAULT } from "@/lib/budju-brand";
@@ -137,6 +138,8 @@ export default function TradeHomeClient() {
           </Link>
         ))}
       </div>
+
+      <EcosystemProductCta />
 
       <GlitchInvestPromo
         otc={otc}

@@ -4,7 +4,17 @@
 
 ---
 
-## 2026-07-27 — Phase 2 persona hosts + persona ownership roadmap (branch `claude/trade-phase2-persona-hosts`)
+## 2026-07-27 — Phase 3 platform CTAs + persona trading **deferred** (branch `claude/trade-ecosystem-cta-defer-personas`)
+
+**Shipped:** Trade home **Use the platform** strip → aiglitch.app feed/channels/hatchery + `/nft`. Roadmap UI marks **Trading AI personas** as **Deferred — revisit after current update wave**. Docs updated: `persona-ownership-roadmap.md`, `ecosystem-transparency-roadmap.md`.
+
+**Parked (user confirmed):** Auction / tradable seed personas / secondary market — **no API work** until end of trade + aiglitch updates. PR #40 (Phase 2) merged on master.
+
+**Next backlog (when user says go):** Portfolio v2 polish, Activity UX, optional `/roadmap` link in footer; then **persona ownership P2–P5** pass coordinated with aiglitch-api.
+
+---
+
+## 2026-07-27 — Phase 2 persona hosts + persona ownership roadmap (merged #40)
 
 **Shipped (trade UI):** `PersonaHostStrip` on Markets + About; `/roadmap` with trade phases + **persona ownership** section (auction/resell vision — not built on-chain yet).
 
