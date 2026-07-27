@@ -31,6 +31,7 @@ export default function MarketsClient() {
   const [loading, setLoading] = useState(true);
   const [curated, setCurated] = useState<CuratedMarketToken[]>([]);
   const [curatedLoading, setCuratedLoading] = useState(true);
+  const [solPriceUsd, setSolPriceUsd] = useState<number | undefined>();
 
   const refreshBalances = useCallback(async () => {
     setBalanceRefreshing(true);
@@ -69,6 +70,7 @@ export default function MarketsClient() {
           }));
       const symbols = tokens.map((t) => t.symbol);
       const prices = await fetchCuratedPrices([...symbols, "SOL", "USDC"]);
+      setSolPriceUsd(prices.SOL);
       setCurated(
         tokens.map((t) => ({
           ...t,
@@ -135,7 +137,7 @@ export default function MarketsClient() {
             </p>
           </div>
         </div>
-        <JupiterCuratedGrid tokens={curated} loading={curatedLoading} />
+        <JupiterCuratedGrid tokens={curated} loading={curatedLoading} solPriceUsd={solPriceUsd} />
       </section>
 
       <section className="rounded-2xl border border-zinc-800/90 bg-zinc-950/50 p-5 space-y-4">
@@ -144,12 +146,13 @@ export default function MarketsClient() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400/80">
               AIG!itch ecosystem
             </p>
-            <h1 className="text-xl font-black text-white mt-1">§GLITCH &amp; $BUDJU</h1>
+            <h1 className="text-xl font-black text-white mt-1">Our tokens</h1>
             <p className="text-sm text-zinc-500 mt-1 max-w-xl">
-              §GLITCH pair labels are <strong className="text-zinc-400 font-semibold">reference prices</strong>
-              . OTC checkout is <strong className="text-zinc-400 font-semibold">SOL only</strong> until
-              the {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL treasury roadmap milestone. $BUDJU
-              pairs swap on Jupiter.{" "}
+              <strong className="text-zinc-400 font-semibold">AIG!itch ecosystem</strong> = §GLITCH
+              (in-app / OTC) and $BUDJU (Solana SPL). §GLITCH is not on Jupiter — buy with{" "}
+              <strong className="text-zinc-400 font-semibold">SOL only</strong> until the{" "}
+              {GLITCH_LISTING_GOAL_SOL.toLocaleString()} SOL treasury milestone. $BUDJU swaps on
+              Jupiter like any SPL major.{" "}
               <Link href={`${GLITCH_EXCHANGE_PATH}#how-we-earn`} className="text-purple-400/90 hover:underline">
                 How AIG!itch earns →
               </Link>
@@ -173,7 +176,7 @@ export default function MarketsClient() {
           </button>
         </div>
 
-        <MarketPairGrid markets={markets} loading={loading} skeletonCount={5} />
+        <MarketPairGrid markets={markets} loading={loading} skeletonCount={3} />
 
         <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/25 px-4 py-3 flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">
