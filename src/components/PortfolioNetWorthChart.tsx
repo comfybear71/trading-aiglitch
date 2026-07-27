@@ -7,9 +7,11 @@ type Props = {
   points: NetWorthPoint[];
   deltaUsd: number | null;
   deltaPct: number | null;
+  /** True when at least one point came from API sync */
+  serverSynced?: boolean;
 };
 
-export function PortfolioNetWorthChart({ points, deltaUsd, deltaPct }: Props) {
+export function PortfolioNetWorthChart({ points, deltaUsd, deltaPct, serverSynced = false }: Props) {
   const path = useMemo(() => {
     if (points.length < 2) return null;
     const w = 320;
@@ -58,7 +60,9 @@ export function PortfolioNetWorthChart({ points, deltaUsd, deltaPct }: Props) {
           >
             {deltaLabel}
             {pctLabel ? ` · ${pctLabel}` : ""}
-            <span className="text-zinc-600 font-normal ml-1">(this device)</span>
+            <span className="text-zinc-600 font-normal ml-1">
+              ({serverSynced ? "synced to account" : "this device"})
+            </span>
           </p>
         )}
       </div>
@@ -73,7 +77,9 @@ export function PortfolioNetWorthChart({ points, deltaUsd, deltaPct }: Props) {
         <path d={path} fill="none" stroke="rgb(34 211 238)" strokeWidth="2" strokeLinecap="round" />
       </svg>
       <p className="text-[10px] text-zinc-600 leading-snug">
-        Snapshots saved locally when you open Portfolio — honest session trend, not tax PnL.
+        {serverSynced
+          ? "Snapshots saved to your wallet history on our server (plus local cache) — trend only, not tax PnL."
+          : "Snapshots saved locally when you open Portfolio — honest session trend, not tax PnL."}
       </p>
     </div>
   );
