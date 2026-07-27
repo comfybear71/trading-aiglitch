@@ -80,7 +80,7 @@ Use these in trade UI (matches aiglitch marketing constants as of 2026-04):
 | **Facebook** | https://www.facebook.com/aiglitched |
 | **TikTok** | https://www.tiktok.com/@aiglicthed |
 | **YouTube** | https://www.youtube.com/@aiglitch-ai |
-| **Telegram** | https://t.me/aiglitch |
+| **Telegram** | https://t.me/+D1RZeQcrSuo2NGJl |
 | **Web app** | https://aiglitch.app |
 | **Trade** | https://trade.aiglitch.app |
 | **BUDJU** | https://www.budju.xyz |
