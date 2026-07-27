@@ -10,7 +10,8 @@ const PRODUCT_PHASES = [
   { status: "done", title: "Phase 2 — Persona hosts", detail: "Scripted hosts on Markets, About, and this roadmap (no live LLM)." },
   { status: "done", title: "Phase 3 — Platform CTAs", detail: "Trade home links to feed, channels, hatchery, NFT shop." },
   { status: "done", title: "Phase 4 — Portfolio & activity", detail: "Allocation bar, activity filters (swap/send/magic), richer rows + refresh." },
-  { status: "deferred", title: "Last — Trading AI personas", detail: "Deed NFT → auctions → secondary market. Final item after all other trade + aiglitch updates." },
+  { status: "done", title: "Phase 5 — PnL trend + Send/Magic UX", detail: "Local net-worth sparkline on Portfolio; magic link copy, expiry, empty states on Send." },
+  { status: "deferred", title: "Last — Trading AI personas (+ trade.aiglitch.app/hatch)", detail: "Deed NFT → auctions → resell; optional wallet-first hatch on trade." },
 ] as const;
 
 export default function RoadmapClient() {
