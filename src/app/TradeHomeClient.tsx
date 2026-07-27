@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { ECOSYSTEM_LINKS } from "@/lib/ecosystem-links";
 import { BUDJU_GATE_REQUIRED_DEFAULT } from "@/lib/budju-brand";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
+import { pickRandomHeroPoster } from "@/lib/trade-hero-posters";
 import { useOtcConfig } from "@/lib/use-otc-config";
 
 const QUICK_ACTIONS = [
@@ -43,14 +45,21 @@ export default function TradeHomeClient() {
   const trader = useTraderWallet();
   const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
   const budjuRequired = trader.eligibility?.budju_required ?? BUDJU_GATE_REQUIRED_DEFAULT;
+  const heroPoster = useMemo(() => pickRandomHeroPoster(), []);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-4">
-      <section className="relative overflow-hidden rounded-2xl border border-zinc-800/90 bg-gradient-to-br from-[#0d0d18] via-[#0a0a12] to-purple-950/30 p-6 sm:p-8">
+      <section className="relative overflow-hidden rounded-2xl border border-zinc-800/90 p-6 sm:p-8 min-h-[220px]">
+        <div
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{ backgroundImage: `url(${heroPoster})` }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a12]/92 via-[#0d0d18]/88 to-purple-950/75" aria-hidden />
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-3xl rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative space-y-4">
+        <div className="relative z-10 space-y-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400/90">
             trade.aiglitch.app
           </p>
