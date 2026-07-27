@@ -66,6 +66,9 @@ export default function AboutClient() {
         <Link href="/roadmap" className="px-3 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-purple-500/40">
           Roadmap
         </Link>
+        <Link href="/swap" className="px-3 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-cyan-500/40">
+          Swap
+        </Link>
       </div>
     </div>
   );
