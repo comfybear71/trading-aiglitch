@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import { TokenIcon } from "@/components/TokenIcon";
 import {
   fmtMarketPct,
   fmtMarketUsd,
@@ -9,25 +8,38 @@ import {
   pairActions,
   type MarketSnapshot,
 } from "@/lib/market-pairs";
-
+import { metaForSymbol } from "@/lib/use-trade-token-meta";
+import type { TradeTokenMetaRow } from "@/lib/trade-token-meta";
 function PairSkeleton() {
   return (
     <li className="px-4 py-3 h-16 bg-zinc-900/40 animate-pulse border-b border-zinc-800/80 last:border-0" />
   );
 }
 
-function MarketPairRow({ m }: { m: MarketSnapshot }) {
+function MarketPairRow({
+  m,
+  tokenMeta,
+}: {
+  m: MarketSnapshot;
+  tokenMeta: Record<string, TradeTokenMetaRow>;
+}) {
   const actions = pairActions(m.base, m.quote);
   const glitchUi = glitchPairUiMeta(m.base, m.quote);
   const primary = actions.find((a) => a.variant === "primary") ?? actions[0];
   const isGlitch = m.base === "GLITCH" || m.quote === "GLITCH";
   const routeLabel = isGlitch ? "OTC · SOL checkout only" : "Jupiter / Raydium · SPL";
+  const baseMeta = metaForSymbol(tokenMeta, m.base);
 
   return (
     <li className="px-4 py-3 flex flex-wrap items-center gap-3 gap-y-2 hover:bg-purple-950/10 transition-colors">
-      <div className="min-w-[160px] flex-1">
+      <TokenIcon
+        symbol={m.base}
+        iconUrl={baseMeta?.iconUrl ?? `/tokens/${m.base.toLowerCase()}.svg`}
+        iconEmoji={baseMeta?.iconEmoji ?? m.baseIcon}
+        size={32}
+      />
+      <div className="min-w-[140px] flex-1">
         <p className="text-sm font-black text-white flex items-center gap-1.5">
-          {m.baseIcon && <span aria-hidden>{m.baseIcon}</span>}
           <span>{m.label}</span>
         </p>
         <p className="text-[10px] text-zinc-500 mt-0.5">
@@ -80,10 +92,12 @@ export function MarketPairGrid({
   markets,
   loading,
   skeletonCount = 3,
+  tokenMeta = {},
 }: {
   markets: MarketSnapshot[];
   loading: boolean;
   skeletonCount?: number;
+  tokenMeta?: Record<string, TradeTokenMetaRow>;
 }) {
   if (loading && markets.length === 0) {
     return (
@@ -98,7 +112,7 @@ export function MarketPairGrid({
   return (
     <ul className="rounded-xl border border-zinc-800/90 divide-y divide-zinc-800/80 overflow-hidden bg-zinc-950/30">
       {markets.map((m) => (
-        <MarketPairRow key={m.pairId} m={m} />
+        <MarketPairRow key={m.pairId} m={m} tokenMeta={tokenMeta} />
       ))}
     </ul>
   );
