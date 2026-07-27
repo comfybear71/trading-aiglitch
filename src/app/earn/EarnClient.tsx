@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { PersonaHostStrip } from "@/components/PersonaHostStrip";
 import { fetchCuratedPrices } from "@/lib/curated-markets-client";
 import {
   JUPITER_EARN_DOCS_URL,
@@ -53,8 +52,6 @@ export default function EarnClient() {
           on-chain.
         </p>
       </section>
-
-      <PersonaHostStrip />
 
       <section className="space-y-3">
         <h2 className="text-sm font-black text-white uppercase tracking-wide">Curated LSTs</h2>

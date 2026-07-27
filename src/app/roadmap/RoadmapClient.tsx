@@ -19,9 +19,9 @@ const PRODUCT_PHASES = [
   },
   {
     status: "done",
-    title: "Phase 7 — Jupiter Perps (v1)",
+    title: "Phase 7 — AIG!itch Perps (v1)",
     detail:
-      "/perps: 1M $BUDJU gate + risk ack + link/embed to jup.ag/perps. Native in-app perps deferred. NFA; liquidation risk.",
+      "/perps: 1M $BUDJU gate + risk ack + early-access registration. Native perps UI on trade.aiglitch.app in development (no Jupiter redirect as primary UX). NFA; liquidation risk.",
   },
   { status: "deferred", title: "Last — Trading AI personas (+ trade.aiglitch.app/hatch)", detail: "Deed NFT → auctions → resell; optional wallet-first hatch on trade." },
 ] as const;
