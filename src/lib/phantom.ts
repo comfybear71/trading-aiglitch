@@ -63,6 +63,18 @@ export function truncWallet(addr: string) {
   return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
 }
 
+/** Sign a legacy Transaction via Phantom (marketplace NFT mint flow). */
+export async function signPhantomTransaction(transaction: unknown): Promise<VersionedTransactionLike> {
+  const phantom = getPhantom();
+  if (!phantom?.publicKey) {
+    throw new Error("Connect Phantom first.");
+  }
+  if (!phantom.signTransaction) {
+    throw new Error("Phantom signTransaction is not available in this browser.");
+  }
+  return phantom.signTransaction(transaction);
+}
+
 /** Phantom / Blowfish often return opaque "Unexpected error" when the user closes a block dialog. */
 export function formatPhantomWalletError(e: unknown): string {
   let raw = "";
