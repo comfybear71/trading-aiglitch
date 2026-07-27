@@ -28,7 +28,7 @@ export const TRADE_CORE_TOKENS: TradeTokenRow[] = [
 export const TRADE_CURATED_JUPITER_TOKENS: TradeTokenRow[] = [
   {
     symbol: "JUP",
-    mint: "JUPyiwrYJFskUPkHLfU6WH9tFQ12GYCZqFFoBoF7qK",
+    mint: "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
     decimals: 6,
     defaultQuote: "USDC",
   },
