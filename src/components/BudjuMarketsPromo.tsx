@@ -130,6 +130,19 @@ export function BudjuMarketsPromo({
           budju.xyz board ·{" "}
           <span className="text-zinc-400">{budjuRequired.toLocaleString()} for AIG!itch Trade here</span>
         </p>
+        <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed border-t border-fuchsia-500/15 pt-2">
+          <span className="text-fuchsia-200/90 font-semibold">Burn + treasury:</span> supply can shrink via burn;
+          treasury may hold yield-bearing positions on Jupiter — mechanics on{" "}
+          <a
+            href={BUDJU_SITE.tokenomics}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-fuchsia-300/90 hover:underline"
+          >
+            budju.xyz tokenomics
+          </a>
+          . We do not quote APY on this site.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2">

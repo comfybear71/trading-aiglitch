@@ -45,6 +45,9 @@ export function EcosystemFooter() {
         <Link href={`${GLITCH_EXCHANGE_PATH}#how-we-earn`} className="hover:text-zinc-300">
           How we earn
         </Link>
+        <Link href="/about" className="hover:text-zinc-300">
+          About / transparency
+        </Link>
       </div>
 
       <p className="text-[10px] text-zinc-600 leading-relaxed max-w-3xl">
