@@ -68,7 +68,16 @@ export default function MarketsClient() {
             yieldLst: t.yieldLst ?? false,
           }));
       const symbols = tokens.map((t) => t.symbol);
-      const prices = await fetchCuratedPrices([...symbols, "SOL", "USDC"]);
+      const prices = await fetchCuratedPrices(symbols);
+      const missing = symbols.filter((sym) => prices[sym] == null || prices[sym] <= 0);
+      if (missing.length > 0) {
+        await Promise.all(
+          missing.map(async (sym) => {
+            const one = await fetchCuratedPrices([sym]);
+            if (one[sym] != null) prices[sym] = one[sym];
+          }),
+        );
+      }
       setCurated(
         tokens.map((t) => ({
           ...t,
