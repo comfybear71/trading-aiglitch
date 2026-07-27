@@ -8,9 +8,8 @@ import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 const PRODUCT_PHASES = [
   { status: "done", title: "Phase 1 — Transparency", detail: "About page, revenue accordion, footer socials, BUDJU burn/treasury copy on Markets." },
   { status: "done", title: "Phase 2 — Persona hosts", detail: "Scripted hosts on Markets, About, and this roadmap (no live LLM)." },
-  { status: "planned", title: "Phase 3 — Persona deed NFT (hatched)", detail: "Transferable NFT linked to your hatched bestie; wallet transfer updates owner." },
-  { status: "planned", title: "Phase 4 — Auctions", detail: "Curated persona slots; bid in §GLITCH/SOL; owner + perks on settle." },
-  { status: "planned", title: "Phase 5 — Secondary market", detail: "Resell persona deeds; platform fee + royalties." },
+  { status: "done", title: "Phase 3 — Platform CTAs", detail: "Trade home links to feed, channels, hatchery, NFT shop." },
+  { status: "deferred", title: "Trading AI personas (P2–P5)", detail: "Deed NFT → auctions → secondary market for hatched/seed personas. Revisit after current trade + aiglitch updates." },
 ] as const;
 
 export default function RoadmapClient() {
@@ -39,10 +38,12 @@ export default function RoadmapClient() {
                 className={`shrink-0 text-[9px] font-black uppercase px-2 py-0.5 rounded-full h-fit ${
                   p.status === "done"
                     ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                    : "bg-zinc-800 text-zinc-500 border border-zinc-700"
+                    : p.status === "deferred"
+                      ? "bg-amber-500/10 text-amber-400/90 border border-amber-500/30"
+                      : "bg-zinc-800 text-zinc-500 border border-zinc-700"
                 }`}
               >
-                {p.status === "done" ? "Shipped" : "Planned"}
+                {p.status === "done" ? "Shipped" : p.status === "deferred" ? "Deferred" : "Planned"}
               </span>
               <div>
                 <p className="font-bold text-zinc-200">{p.title}</p>
@@ -54,7 +55,12 @@ export default function RoadmapClient() {
       </section>
 
       <section id="persona-ownership" className="scroll-mt-6 rounded-2xl border border-cyan-500/25 bg-cyan-950/10 p-5 space-y-3">
-        <h2 className="text-lg font-black text-cyan-100">Persona ownership (product vision)</h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-lg font-black text-cyan-100">Trading AI personas (your vision)</h2>
+          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+            Deferred — revisit end of update wave
+          </span>
+        </div>
         <p className="text-sm text-zinc-400 leading-relaxed">
           <strong className="text-zinc-300">Already today:</strong> with Phantom you can{" "}
           <strong className="text-zinc-300">hatch your own AI bestie</strong> on aiglitch.app (~1,000 §GLITCH) — hatching
@@ -62,9 +68,11 @@ export default function RoadmapClient() {
           in the database.
         </p>
         <p className="text-sm text-zinc-400 leading-relaxed">
-          <strong className="text-zinc-300">Not yet:</strong> auctioning seed cast personas (<code className="text-[11px]">glitch-XXX</code>
-          ), full secondary-market resell, or transferring a persona&apos;s trading wallet to a buyer. That needs deed NFTs,
-          auction settlement, and clear rules so platform crons and persona bots stay safe.
+          <strong className="text-zinc-300">Target experience (discussed 2026-07-27):</strong> personas can be{" "}
+          <strong className="text-zinc-300">auctioned</strong> to a Phantom wallet; the buyer gets perks (Telegram, hatching
+          assets, identity) and can <strong className="text-zinc-300">resell</strong> on a secondary market. Seed cast (
+          <code className="text-[11px]">glitch-XXX</code>) and full tradability need deed NFTs + auction settlement + ops
+          rules — not started yet.
         </p>
         <p className="text-[11px] text-zinc-500">
           Full feasibility write-up:{" "}

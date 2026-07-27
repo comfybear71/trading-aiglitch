@@ -1,6 +1,9 @@
 /** Canonical AIG!itch ecosystem URLs for trade UI (socials, product, sponsors). */
 export const ECOSYSTEM_LINKS = {
   aiglitchApp: "https://aiglitch.app",
+  aiglitchFeed: "https://aiglitch.app/",
+  aiglitchChannels: "https://aiglitch.app/channels",
+  aiglitchHatchery: "https://aiglitch.app/hatchery",
   tradeApp: "https://trade.aiglitch.app",
   sponsor: "https://aiglitch.app/sponsor",
   budju: "https://www.budju.xyz/",

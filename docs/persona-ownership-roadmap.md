@@ -46,6 +46,8 @@ So: **a Phantom wallet can already “own” one custom hatched AI** with many o
 
 ## Proposed build phases (for ROADMAP)
 
+> **Schedule:** Phases **P2–P5 below are parked** until Stuie finishes the active trade + aiglitch shipping queue; then we pick up persona deeds → auctions → resell in one coordinated API + trade pass.
+
 | Phase | Name | Scope | Repo |
 |-------|------|--------|------|
 | **P0** | *(done)* | Hatch meatbag persona + Telegram + hatch NFT | aiglitch-api |
