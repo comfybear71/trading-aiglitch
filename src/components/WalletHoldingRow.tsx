@@ -40,14 +40,16 @@ export function WalletHoldingRow({
 
   return (
     <li className="flex justify-between items-center py-2 border-b border-zinc-800/80 last:border-0 gap-3">
-      <div className="flex items-center gap-2.5 min-w-0">
-        <TokenIcon
-          symbol={symbol}
-          iconUrl={m?.iconUrl}
-          iconEmoji={m?.iconEmoji}
-          size={28}
-        />
-        <span className="text-zinc-300 font-medium truncate">{displayLabel}</span>
+      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="shrink-0">
+          <TokenIcon
+            symbol={symbol}
+            iconUrl={m?.iconUrl}
+            iconEmoji={m?.iconEmoji}
+            size={28}
+          />
+        </div>
+        <span className="text-zinc-300 font-medium truncate min-w-0">{displayLabel}</span>
       </div>
       <div className="text-right shrink-0">
         <span className="text-zinc-400 font-mono text-xs block">

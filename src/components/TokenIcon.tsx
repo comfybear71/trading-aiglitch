@@ -17,7 +17,7 @@ export function TokenIcon({
 }) {
   const [broken, setBroken] = useState(false);
   const showImg = iconUrl && !broken;
-  const box = `shrink-0 rounded-full overflow-hidden bg-zinc-800/80 flex items-center justify-center ${className}`;
+  const box = `shrink-0 flex-none rounded-full overflow-hidden bg-zinc-800/80 flex items-center justify-center ${className}`;
   const style = { width: size, height: size };
 
   if (showImg) {
