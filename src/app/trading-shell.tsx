@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  DEFAULT_SLUG,
   NAV_SECTIONS,
   OPS_NAV,
+  navItemHref,
   slugFromPathname,
 } from "./nav";
 import { useTraderWallet } from "@/context/TraderWalletContext";
@@ -58,7 +58,10 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const homeHref = `/${DEFAULT_SLUG}`;
+  const homeHref = "/";
+
+  const headerTitle =
+    slug === "home" ? "Home" : slug.replace(/-/g, " ");
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-zinc-100 flex flex-col md:flex-row">
@@ -88,7 +91,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
                 {section.items.map((item) => (
                   <NavLink
                     key={item.slug}
-                    href={`/${item.slug}`}
+                    href={navItemHref(item)}
                     label={item.label}
                     active={slug === item.slug}
                   />
@@ -163,7 +166,7 @@ export function TradingShell({ children }: { children: React.ReactNode }) {
               Trade
             </Link>
             <span className="text-xs text-zinc-500 capitalize truncate hidden sm:inline">
-              {slug.replace(/-/g, " ")}
+              {headerTitle}
             </span>
           </div>
           <WalletConnectButton />
