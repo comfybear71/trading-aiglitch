@@ -305,7 +305,8 @@ export function WalletConnectMenu({
           {drawerTab === "activity" ? (
             <TradeActivityPanel
               wallet={trader.wallet}
-              compact
+              drawer
+              showToolbar
               refreshKey={activityRefresh}
               emptyText="Swaps, sends, and magic links appear here."
             />
@@ -381,6 +382,12 @@ export function WalletConnectMenu({
             </Link>
             <Link href="/nft" onClick={onClose} className="text-center py-2 rounded-lg bg-zinc-800/80 text-[10px] text-zinc-300 hover:bg-purple-500/20">
               NFT
+            </Link>
+            <Link href="/about" onClick={onClose} className="text-center py-2 rounded-lg bg-zinc-800/80 text-[10px] text-zinc-300 hover:bg-zinc-800">
+              About
+            </Link>
+            <Link href="/roadmap" onClick={onClose} className="text-center py-2 rounded-lg bg-zinc-800/80 text-[10px] text-zinc-300 hover:bg-purple-500/15">
+              Roadmap
             </Link>
           </div>
           </>

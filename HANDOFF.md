@@ -4,7 +4,17 @@
 
 ---
 
-## 2026-07-27 — Phase 4 portfolio + activity (branch `claude/trade-portfolio-activity-v2`)
+## 2026-07-27 — Phases 1–5 complete; polish wave B (in progress)
+
+**Shipped (user confirmed):** Hatchery grid (**aiglitch** #329), Phase 5 (**trading-aiglitch** v0.4.31). Tags/housekeeping done by user.
+
+**B — small polish (order):** (1) wallet drawer activity filters ✓ branch `claude/trade-wallet-drawer-activity`; (2) roadmap links Markets/home/drawer; (3) server net-worth history = **aiglitch-api** later.
+
+**Last product item:** Trading AI personas + optional `trade.aiglitch.app/hatch` — see `docs/persona-ownership-roadmap.md`.
+
+---
+
+## 2026-07-27 — Phase 5 PnL sparkline + Send magic UX (merged v0.4.31)
 
 **Shipped:** Portfolio allocation bar + legend; Activity tab filters (All/Swaps/Sends/Magic), kind badges, relative time, refresh. Roadmap Phase 4 marked done; **Trading AI personas** explicitly **last** on roadmap.
 

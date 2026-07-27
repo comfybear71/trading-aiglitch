@@ -68,7 +68,9 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 | **Done (Phase 2)** | **Persona hosts** on Markets + About + **`/roadmap`** | `PersonaHostStrip` — scripted, no LLM. |
 | **Done (Phase 3)** | **Platform CTAs** on trade home | Feed, channels, hatchery, NFT shop — `EcosystemProductCta`. |
 | **Done (Phase 4)** | **Portfolio & activity UX** | Allocation bar, activity filters, badges, refresh — `PortfolioClient`, `TradeActivityPanel`. |
-| **Last (deferred)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. **Final** item after rest of update wave. |
+| **Done (Phase 5)** | **PnL trend + Send/Magic UX** | Local net-worth sparkline; magic link copy/expiry; roadmap Phase 5. |
+| **Polish (optional)** | Drawer activity parity, roadmap CTAs | No API; see HANDOFF B-list. |
+| **Last (deferred)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. **Final** item. |
 | ~~Later~~ | ~~Persona CTA into aiglitch.app~~ | Covered by Phase 3 home CTAs. |
 
 ---
