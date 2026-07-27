@@ -60,9 +60,10 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 
 | Phase | Feature | Notes |
 |-------|---------|--------|
-| **Now** | OTC stats, treasury verify link, BUDJU gate, Markets BUDJU \| §GLITCH header | Investor hooks without fake “markets” grid. |
-| **Next** | **Social strip + roadmap block** — all official links in one component (footer + `/glitch`). | Single constant `AIGLITCH_SOCIAL` / `ECOSYSTEM_LINKS` — extend beyond X-only in `glitch-otc.ts`. |
-| **Next** | **“Business model” section** on `/glitch` (and slim link from Markets) | Plain language: ads, marketplace, OTC treasury; no guaranteed returns. |
+| **Now** | OTC stats, treasury verify link, BUDJU gate, Markets BUDJU \| §GLITCH header | Shipped. |
+| **Done (2026-07-27)** | **Social strip + footer** — `ecosystem-links.ts` + `EcosystemFooter` | Telegram + all socials. |
+| **Done (2026-07-27)** | **Business model** accordion on `/glitch`, **`/about`**, Markets links | `AiglitchBusinessModel`, `AboutClient`. |
+| **Done (2026-07-27)** | **BUDJU burn/treasury** one-liner on Markets | `BudjuMarketsPromo` → tokenomics link. |
 | **Later** | **AI persona hosts** on Markets or `/about` | Rotating persona clip/avatar + short scripted intro (“What is AIG!itch?”, “Why §GLITCH?”, “Why $BUDJU?”) — content from API or static persona IDs; **not** live LLM on first version unless cost-bounded. |
 | **Later** | Dedicated **`/roadmap` or `/about`** | Full transparency page: revenue, utility, risks, links, treasury wallets, tag releases. |
 | **Later** | Persona **CTA** into aiglitch.app / glitch-app download | Deep links to feed, channels, marketplace. |
