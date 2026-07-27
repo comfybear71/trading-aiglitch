@@ -1,6 +1,8 @@
-/** Jupiter Perps — trading happens on Jupiter; Phase 7 v1 is gate + risk ack + link/embed. */
+/** Jupiter routing/prices for trade lane; perps v1 = gate + early access on our UI. */
 export const JUPITER_PERPS_URL = "https://jup.ag/perps";
-export const JUPITER_PERPS_DOCS_URL = "https://station.jup.ag/docs";
+export const JUPITER_API_DOCS_URL = "https://station.jup.ag/docs";
+/** @deprecated use JUPITER_API_DOCS_URL */
+export const JUPITER_PERPS_DOCS_URL = JUPITER_API_DOCS_URL;
 
 export const PERPS_RISK_ACK_STORAGE_KEY = "aiglitch-trade-perps-risk-v1";
 

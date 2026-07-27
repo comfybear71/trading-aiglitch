@@ -6,7 +6,7 @@ import { BudjuTraderStatusSlim } from "@/components/BudjuGateCallout";
 import { WalletConnectModal } from "@/components/WalletConnectModal";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { BUDJU_GATE_REQUIRED_DEFAULT, BUDJU_SITE } from "@/lib/budju-brand";
-import { readPerpsRiskAck, writePerpsRiskAck } from "@/lib/jupiter-perps";
+import { JUPITER_API_DOCS_URL, readPerpsRiskAck, writePerpsRiskAck } from "@/lib/jupiter-perps";
 
 export default function PerpsClient() {
   const trader = useTraderWallet();
@@ -51,6 +51,19 @@ export default function PerpsClient() {
           <p className="text-xs text-zinc-500 leading-relaxed">
             Same <strong className="text-zinc-400 font-semibold">1M $BUDJU</strong> gate as full Jupiter swaps. Perps UI
             ships here when routing + risk controls are ready — this page registers gate-cleared wallets for early access.
+          </p>
+          <p className="text-[10px] text-zinc-600 leading-relaxed">
+            Transparency: live prices, quotes, and swap routes on trade today come from{" "}
+            <a
+              href={JUPITER_API_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-500/80 hover:underline"
+            >
+              Jupiter&apos;s API
+            </a>{" "}
+            (same as Swap and Markets). Native perps here will use Jupiter infrastructure for routing and market data
+            where applicable — you stay on AIG!itch Trade for the UI and wallet flow.
           </p>
         </header>
 
@@ -121,7 +134,8 @@ export default function PerpsClient() {
           <p className="text-sm font-bold text-emerald-100">Registered — native perps UI coming on this site</p>
           <p className="text-xs text-zinc-500 leading-relaxed">
             You cleared the $BUDJU gate and risk ack. We are building the trading surface here (charts, size, leverage
-            controls) with real mainnet execution — not sending you to Jupiter as the primary experience.
+            controls) with real mainnet execution — Jupiter supplies quotes and routing behind the scenes, like Swap
+            today.
           </p>
           <div className="flex flex-wrap gap-2 pt-1">
             <Link
