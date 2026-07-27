@@ -4,7 +4,13 @@
 
 ---
 
-## 2026-07-26 — Investor transparency & persona hosts (product note — not shipped)
+## 2026-07-27 — Phase 2 persona hosts + persona ownership roadmap (branch `claude/trade-phase2-persona-hosts`)
+
+**Shipped (trade UI):** `PersonaHostStrip` on Markets + About; `/roadmap` with trade phases + **persona ownership** section (auction/resell vision — not built on-chain yet).
+
+**Product doc:** `docs/persona-ownership-roadmap.md` — hatch today (`owner_wallet_address`); seed persona auctions = P3+.
+
+---
 
 **User intent:** trade.aiglitch.app must explain **why §GLITCH and $BUDJU exist**, how **AIG!itch makes money** (in-house + sponsor **product placement** on aiglitch.app, marketplace, OTC treasury), and show **roadmap + all socials** — invite **platform use**, not memecoin speculation. **$BUDJU:** burn + treasury/yield (“bank”, Jupiter interest-bearing) — link budju.xyz tokenomics; don’t over-promise APY in UI until spec pinned. **Later:** AI **persona hosts** on Markets/About to narrate the ecosystem.
 

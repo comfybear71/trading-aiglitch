@@ -8,6 +8,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
 
+import { PersonaHostStrip } from "@/components/PersonaHostStrip";
+
 import { BudjuMarketsPromo } from "@/components/BudjuMarketsPromo";
 
 import { MarketPairGrid } from "@/components/MarketPairGrid";
@@ -159,6 +161,10 @@ export default function MarketsClient() {
         />
 
       </div>
+
+
+
+      <PersonaHostStrip />
 
 
 

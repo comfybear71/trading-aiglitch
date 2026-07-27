@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { GlitchExchangeStory } from "@/components/GlitchExchangeStory";
+import { PersonaHostStrip } from "@/components/PersonaHostStrip";
 import { ECOSYSTEM_LINKS } from "@/lib/ecosystem-links";
 import { otcTreasuryWalletSol } from "@/lib/glitch-otc";
 import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
@@ -48,6 +49,8 @@ export default function AboutClient() {
         </a>
       </section>
 
+      <PersonaHostStrip />
+
       <GlitchExchangeStory treasurySol={treasurySol} businessModelDefaultOpen />
 
       <div className="flex flex-wrap gap-2 text-[11px]">
@@ -59,6 +62,9 @@ export default function AboutClient() {
         </Link>
         <Link href="/nft" className="px-3 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-purple-500/40">
           NFT marketplace
+        </Link>
+        <Link href="/roadmap" className="px-3 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-purple-500/40">
+          Roadmap
         </Link>
         <Link href="/swap" className="px-3 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-cyan-500/40">
           Swap
