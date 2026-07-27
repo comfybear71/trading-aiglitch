@@ -13,17 +13,19 @@ import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
 import { BUDJU_SITE } from "@/lib/budju-brand";
 import {
+  activityKindMeta,
   activityLabel,
   fetchTradeActivity,
+  formatActivityWhen,
   solscanTxUrl,
   type TradeActivityItem,
 } from "@/lib/trade-activity-api";
 
 const HOLDINGS = [
-  { key: "usdc", symbol: "USDC", label: "USDC" },
-  { key: "sol", symbol: "SOL", label: "SOL" },
-  { key: "budju", symbol: "BUDJU", label: "$BUDJU" },
-  { key: "glitch", symbol: "GLITCH", label: "§GLITCH" },
+  { key: "usdc", symbol: "USDC", label: "USDC", bar: "bg-emerald-500/80" },
+  { key: "sol", symbol: "SOL", label: "SOL", bar: "bg-violet-500/80" },
+  { key: "budju", symbol: "BUDJU", label: "$BUDJU", bar: "bg-fuchsia-500/80" },
+  { key: "glitch", symbol: "GLITCH", label: "§GLITCH", bar: "bg-cyan-500/80" },
 ] as const;
 
 function fmtAmount(n: number, max = 6) {
@@ -101,7 +103,8 @@ export default function PortfolioClient() {
             </p>
             <p className="text-xs text-zinc-500 mt-1">
               Estimated net worth (Jupiter + OTC §GLITCH price)
-            </p>          </div>
+            </p>
+          </div>
           <div className="flex gap-2 flex-wrap">
             <button
               type="button"
@@ -133,6 +136,38 @@ export default function PortfolioClient() {
             </Link>
           </div>
         </div>
+        {netUsd > 0 && b && (
+          <div className="mt-4 space-y-2">
+            <div className="flex h-2 rounded-full overflow-hidden gap-px bg-zinc-800">
+              {HOLDINGS.map((h) => {
+                const val = usdValue(b[h.key], h.symbol, priceBook) ?? 0;
+                const pct = Math.max(0, (val / netUsd) * 100);
+                if (pct < 0.5) return null;
+                return (
+                  <div
+                    key={h.key}
+                    className={`${h.bar} min-w-[2px]`}
+                    style={{ width: `${pct}%` }}
+                    title={`${h.label} ${pct.toFixed(1)}%`}
+                  />
+                );
+              })}
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-zinc-500">
+              {HOLDINGS.map((h) => {
+                const val = usdValue(b[h.key], h.symbol, priceBook) ?? 0;
+                const pct = netUsd > 0 ? (val / netUsd) * 100 : 0;
+                if (pct < 0.5) return null;
+                return (
+                  <span key={h.key} className="inline-flex items-center gap-1">
+                    <span className={`w-1.5 h-1.5 rounded-full ${h.bar}`} aria-hidden />
+                    {h.label} {pct.toFixed(0)}%
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <div className="mt-4">
           <HoldingsChips
             activeSymbol={chipFilter}
@@ -200,10 +235,12 @@ export default function PortfolioClient() {
         <div className="space-y-4">
           <MagicLinkOpenLinks onChanged={() => setActivityRefresh((k) => k + 1)} />
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
-            <p className="px-4 py-2 text-[10px] uppercase text-zinc-500 font-semibold border-b border-zinc-800">
-              Wallet activity
-            </p>
-            <TradeActivityPanel wallet={trader.wallet} refreshKey={activityRefresh} />
+            <TradeActivityPanel
+              wallet={trader.wallet}
+              refreshKey={activityRefresh}
+              showToolbar
+              emptyText="Swaps, sends, and magic-link events appear here after you trade."
+            />
           </div>
         </div>
       ) : (
@@ -279,9 +316,15 @@ export default function PortfolioClient() {
             </button>
           </div>
           <ul className="divide-y divide-zinc-800/80">
-            {recentActivity.map((a) => (
+            {recentActivity.map((a) => {
+              const meta = activityKindMeta(a.kind);
+              return (
               <li key={a.id} className="px-4 py-2 flex justify-between gap-2 text-sm">
-                <span className="text-zinc-400 truncate">{activityLabel(a)}</span>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-bold uppercase text-zinc-600 mr-1">{meta.label}</span>
+                  <span className="text-zinc-400 truncate">{activityLabel(a)}</span>
+                  <span className="text-[10px] text-zinc-600 ml-1">{formatActivityWhen(a.at)}</span>
+                </div>
                 {a.signature ? (
                   <a
                     href={solscanTxUrl(a.signature)}
@@ -293,10 +336,26 @@ export default function PortfolioClient() {
                   </a>
                 ) : null}
               </li>
-            ))}
+            );
+            })}
           </ul>
         </div>
       )}
+
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px]">
+        <Link href="/markets" className="text-zinc-500 hover:text-cyan-400">
+          Markets
+        </Link>
+        <Link href="/nft" className="text-zinc-500 hover:text-purple-400">
+          NFT shop
+        </Link>
+        <Link href="/about" className="text-zinc-500 hover:text-zinc-300">
+          Transparency
+        </Link>
+        <Link href="/roadmap" className="text-zinc-500 hover:text-purple-300">
+          Roadmap
+        </Link>
+      </div>
 
       {!trader.eligibility?.helius_enabled && (
         <p className="text-[10px] text-amber-600 text-center">

@@ -9,6 +9,45 @@ export type TradeActivityItem = {
   at: string;
 };
 
+export type ActivityFilter = "all" | "swap" | "send" | "magic";
+
+export function activityMatchesFilter(kind: string, filter: ActivityFilter): boolean {
+  if (filter === "all") return true;
+  if (filter === "swap") return kind === "swap";
+  if (filter === "send") return kind === "transfer";
+  if (filter === "magic") return kind.startsWith("magic_");
+  return true;
+}
+
+export function activityKindMeta(kind: string): { label: string; badgeClass: string } {
+  switch (kind) {
+    case "swap":
+      return { label: "Swap", badgeClass: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30" };
+    case "transfer":
+      return { label: "Send", badgeClass: "bg-lime-500/15 text-lime-300 border-lime-500/30" };
+    case "magic_deposit":
+      return { label: "Magic", badgeClass: "bg-purple-500/15 text-purple-300 border-purple-500/30" };
+    case "magic_refund":
+      return { label: "Refund", badgeClass: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+    case "magic_claim":
+      return { label: "Claim", badgeClass: "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30" };
+    default:
+      return { label: kind, badgeClass: "bg-zinc-800 text-zinc-400 border-zinc-700" };
+  }
+}
+
+export function formatActivityWhen(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return "";
+  const sec = Math.floor((Date.now() - t) / 1000);
+  if (sec < 60) return "Just now";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 48) return `${hr}h ago`;
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
 export function solscanTxUrl(signature: string): string {
   const cluster =
     process.env.NEXT_PUBLIC_SOLANA_NETWORK === "devnet" ? "?cluster=devnet" : "";

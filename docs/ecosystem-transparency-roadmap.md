@@ -67,7 +67,8 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 | **Done (2026-07-27)** | **`/about` transparency hub** | Revenue, §GLITCH story, treasury bar. |
 | **Done (Phase 2)** | **Persona hosts** on Markets + About + **`/roadmap`** | `PersonaHostStrip` — scripted, no LLM. |
 | **Done (Phase 3)** | **Platform CTAs** on trade home | Feed, channels, hatchery, NFT shop — `EcosystemProductCta`. |
-| **Deferred (end of update wave)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. Hatch today on aiglitch.app; seed auctions + secondary market **after** current trade/aiglitch shipping queue. |
+| **Done (Phase 4)** | **Portfolio & activity UX** | Allocation bar, activity filters, badges, refresh — `PortfolioClient`, `TradeActivityPanel`. |
+| **Last (deferred)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. **Final** item after rest of update wave. |
 | ~~Later~~ | ~~Persona CTA into aiglitch.app~~ | Covered by Phase 3 home CTAs. |
 
 ---

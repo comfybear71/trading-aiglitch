@@ -4,7 +4,15 @@
 
 ---
 
-## 2026-07-27 — Phase 3 platform CTAs + persona trading **deferred** (branch `claude/trade-ecosystem-cta-defer-personas`)
+## 2026-07-27 — Phase 4 portfolio + activity (branch `claude/trade-portfolio-activity-v2`)
+
+**Shipped:** Portfolio allocation bar + legend; Activity tab filters (All/Swaps/Sends/Magic), kind badges, relative time, refresh. Roadmap Phase 4 marked done; **Trading AI personas** explicitly **last** on roadmap.
+
+**Next:** Remaining trade polish (PnL chart later per HANDOFF); then **persona trading** when update wave complete.
+
+---
+
+## 2026-07-27 — Phase 3 platform CTAs + persona trading **deferred** (merged, v0.4.29)
 
 **Shipped:** Trade home **Use the platform** strip → aiglitch.app feed/channels/hatchery + `/nft`. Roadmap UI marks **Trading AI personas** as **Deferred — revisit after current update wave**. Docs updated: `persona-ownership-roadmap.md`, `ecosystem-transparency-roadmap.md`.
 
