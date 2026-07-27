@@ -11,6 +11,13 @@ const PRODUCT_PHASES = [
   { status: "done", title: "Phase 3 — Platform CTAs", detail: "Trade home links to feed, channels, hatchery, NFT shop." },
   { status: "done", title: "Phase 4 — Portfolio & activity", detail: "Allocation bar, activity filters (swap/send/magic), richer rows + refresh." },
   { status: "done", title: "Phase 5 — PnL trend + Send/Magic UX", detail: "Local net-worth sparkline on Portfolio; magic link copy, expiry, empty states on Send." },
+  { status: "planned", title: "Phase 6 — Jupiter Earn / LST yield", detail: "Swap LSTs on Markets today; deposit/withdraw via Jupiter Earn/Lend when spec + copy are pinned (no APY promises in UI)." },
+  {
+    status: "planned",
+    title: "Phase 7 — Jupiter Perps (advanced / high risk)",
+    detail:
+      "Leverage trading via Jupiter perps — same tone as $BUDJU: platform + entertainment + DeFi, not “get rich.” Not financial advice; liquidation risk. Likely 1M $BUDJU gate + risk acknowledgement; v1 may link/embed Jupiter before native build.",
+  },
   { status: "deferred", title: "Last — Trading AI personas (+ trade.aiglitch.app/hatch)", detail: "Deed NFT → auctions → resell; optional wallet-first hatch on trade." },
 ] as const;
 
@@ -54,6 +61,21 @@ export default function RoadmapClient() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="rounded-2xl border border-amber-500/20 bg-amber-950/10 p-5 space-y-2">
+        <h2 className="text-sm font-black text-amber-200/90 uppercase tracking-wide">Advanced trading (high risk)</h2>
+        <p className="text-sm text-zinc-400 leading-relaxed">
+          <strong className="text-zinc-300">$BUDJU</strong> and future{" "}
+          <strong className="text-zinc-300">Jupiter perps</strong> are for traders who understand meme + leverage
+          risk. We promote{" "}
+          <strong className="text-zinc-300">using the AIG!itch platform</strong> (feed, channels, app) — not guaranteed
+          returns. Perps can liquidate your margin; not financial advice.
+        </p>
+        <p className="text-[11px] text-zinc-500">
+          Phases 6–7 on the list above: yield LSTs / Earn first, then perps (link or embed, then native if it earns its
+          keep).
+        </p>
       </section>
 
       <section id="persona-ownership" className="scroll-mt-6 rounded-2xl border border-cyan-500/25 bg-cyan-950/10 p-5 space-y-3">

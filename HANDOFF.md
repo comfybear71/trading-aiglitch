@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-07-27 — Roadmap: Jupiter Earn (Phase 6) + Perps high-risk (Phase 7)
+
+**Branch:** `claude/trade-roadmap-jupiter-perps` — `/roadmap` UI + `docs/ecosystem-transparency-roadmap.md`. Tone aligned with $BUDJU: entertainment + DeFi, NFA, liquidation risk.
+
+**Open:** Merge **aiglitch-api** `claude/trade-prices-jup-ray-fallback` if JUP/RAY still blank on Markets.
+
+---
+
 ## 2026-07-27 — Markets Jupiter majors + §GLITCH SOL-only clarity
 
 **Branch:** `claude/trade-markets-jupiter-curated` — merge **after** aiglitch-api same branch deploy.

@@ -26,7 +26,7 @@ These flows live in **aiglitch-api** / legacy aiglitch; trade site should **expl
 | **Sponsor / GLITCH economy** | Sponsors hold §GLITCH balances; daily burn on active campaigns; in-house promos at configurable frequency. | Links ad sales to **token sink** and campaign lifecycle. |
 | **Community round (OTC)** | SOL → treasury wallet; bonding curve (+$0.01 / 10k sold). | **Capital raise for listing, liquidity, ops** — already shown on `/glitch` with verifiable on-chain treasury. |
 
-**Future (document when live):** trading fees on Jupiter routes, persona-bot treasury ops (`/ops`), paid sponsor tiers on MasterHQ, app/IAP if any.
+**Future (document when live):** trading fees on Jupiter routes, **Jupiter Perps (leverage, high-risk)**, Jupiter Earn/Lend deposits, persona-bot treasury ops (`/ops`), paid sponsor tiers on MasterHQ, app/IAP if any.
 
 ---
 
@@ -69,7 +69,10 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 | **Done (Phase 3)** | **Platform CTAs** on trade home | Feed, channels, hatchery, NFT shop — `EcosystemProductCta`. |
 | **Done (Phase 4)** | **Portfolio & activity UX** | Allocation bar, activity filters, badges, refresh — `PortfolioClient`, `TradeActivityPanel`. |
 | **Done (Phase 5)** | **PnL trend + Send/Magic UX** | Local net-worth sparkline; magic link copy/expiry; roadmap Phase 5. |
-| **Polish (optional)** | Drawer activity parity, roadmap CTAs | No API; see HANDOFF B-list. |
+| **Done (2026-07-27)** | **Curated Jupiter majors + LST row** | Markets grid; §GLITCH SOL-only OTC clarity; 1M $BUDJU gate on swaps. |
+| **Planned (Phase 6)** | **Jupiter Earn / LST yield** | Swap LSTs shipped; Earn/Lend deposit UI after spec — verify APY on-chain before UI numbers. |
+| **Planned (Phase 7)** | **Jupiter Perps (high risk)** | Leverage via Jupiter; disclaimers + liquidation copy; same tone as $BUDJU (entertainment + DeFi, not hype). Gate + ack TBD; v1 link/embed OK. |
+| **Polish (optional)** | Drawer activity parity, JUP/RAY price fallbacks | See HANDOFF; API `claude/trade-prices-jup-ray-fallback`. |
 | **Last (deferred)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. **Final** item. |
 | ~~Later~~ | ~~Persona CTA into aiglitch.app~~ | Covered by Phase 3 home CTAs. |
 
@@ -100,6 +103,7 @@ Use these in trade UI (matches aiglitch marketing constants as of 2026-04):
 
 - No “guaranteed profit” or APY without live, verifiable source.
 - Distinguish **§GLITCH OTC (buy-only today)** vs **future DEX** vs **$BUDJU on Jupiter**.
+- **$BUDJU (meme + gate)** and **Jupiter perps (leverage)** — high-risk lanes: not financial advice; users can lose funds (including liquidation on perps). Copy = platform use + entertainment + DeFi, not “get rich.”
 - Ad/sponsor revenue = **platform revenue**, not automatic token dividends unless a future program is announced on-chain.
 - Persona trading / bots: **experimental / entertainment** unless licensed otherwise.
 
