@@ -15,8 +15,11 @@ import { PortfolioNetWorthChart } from "@/components/PortfolioNetWorthChart";
 import { BUDJU_SITE } from "@/lib/budju-brand";
 import {
   appendNetWorthSnapshot,
+  fetchServerNetWorthHistory,
   loadNetWorthHistory,
+  mergeNetWorthHistories,
   netWorthDelta,
+  postServerNetWorthSnapshot,
   type NetWorthPoint,
 } from "@/lib/portfolio-networth-history";
 import {
@@ -48,6 +51,7 @@ export default function PortfolioClient() {
   const [activityRefresh, setActivityRefresh] = useState(0);
   const [recentActivity, setRecentActivity] = useState<TradeActivityItem[]>([]);
   const [nwHistory, setNwHistory] = useState<NetWorthPoint[]>([]);
+  const [nwServerSynced, setNwServerSynced] = useState(false);
   const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
   const b = trader.eligibility?.balances;
   const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
@@ -73,22 +77,50 @@ export default function PortfolioClient() {
   }, [tab, loadRecentActivity, activityRefresh]);
 
   useEffect(() => {
+    if (!trader.wallet) {
+      setNwHistory([]);
+      setNwServerSynced(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const local = loadNetWorthHistory(trader.wallet!);
+      let server: NetWorthPoint[] = [];
+      try {
+        server = await fetchServerNetWorthHistory(trader.wallet!);
+      } catch {
+        server = [];
+      }
+      if (cancelled) return;
+      setNwServerSynced(server.length > 0);
+      setNwHistory(mergeNetWorthHistories(local, server));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [trader.wallet]);
+
+  useEffect(() => {
     if (!trader.wallet || pricesLoading) return;
     let net = 0;
-    const b = trader.eligibility?.balances;
-    if (b) {
+    const bal = trader.eligibility?.balances;
+    if (bal) {
       for (const h of HOLDINGS) {
-        const v = usdValue(b[h.key], h.symbol, priceBook);
+        const v = usdValue(bal[h.key], h.symbol, priceBook);
         if (v != null) net += v;
       }
     }
-    const hist = appendNetWorthSnapshot(trader.wallet, net);
-    setNwHistory(hist);
+    const local = appendNetWorthSnapshot(trader.wallet, net);
+    void postServerNetWorthSnapshot(trader.wallet, net).then(async () => {
+      try {
+        const server = await fetchServerNetWorthHistory(trader.wallet!);
+        setNwServerSynced(server.length > 0);
+        setNwHistory(mergeNetWorthHistories(local, server));
+      } catch {
+        setNwHistory(local);
+      }
+    });
   }, [trader.wallet, pricesLoading, balanceKey, priceBook]);
-
-  useEffect(() => {
-    if (trader.wallet) setNwHistory(loadNetWorthHistory(trader.wallet));
-  }, [trader.wallet]);
 
   if (!trader.wallet) {
     return (
@@ -240,6 +272,7 @@ export default function PortfolioClient() {
         points={nwHistory}
         deltaUsd={nwDelta.usd}
         deltaPct={nwDelta.pct}
+        serverSynced={nwServerSynced}
       />
 
       <div className="flex border-b border-zinc-800 text-sm">

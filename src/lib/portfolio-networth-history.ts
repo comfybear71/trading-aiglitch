@@ -36,6 +36,37 @@ export function appendNetWorthSnapshot(wallet: string, usd: number): NetWorthPoi
   return next;
 }
 
+export function mergeNetWorthHistories(...lists: NetWorthPoint[][]): NetWorthPoint[] {
+  const byMinute = new Map<number, NetWorthPoint>();
+  for (const list of lists) {
+    for (const p of list) {
+      if (!Number.isFinite(p.usd) || p.usd < 0) continue;
+      const bucket = Math.floor(p.t / 60_000);
+      const existing = byMinute.get(bucket);
+      if (!existing || p.t >= existing.t) byMinute.set(bucket, p);
+    }
+  }
+  return [...byMinute.values()].sort((a, b) => a.t - b.t).slice(-MAX_POINTS);
+}
+
+export async function fetchServerNetWorthHistory(wallet: string): Promise<NetWorthPoint[]> {
+  const res = await fetch(`/api/trade/networth?wallet=${encodeURIComponent(wallet)}&limit=48`);
+  const data = await res.json();
+  if (!res.ok) return [];
+  const points = (data.points ?? []) as { at: string; usd: number }[];
+  return points
+    .map((p) => ({ t: new Date(p.at).getTime(), usd: Number(p.usd) }))
+    .filter((p) => Number.isFinite(p.t) && Number.isFinite(p.usd));
+}
+
+export async function postServerNetWorthSnapshot(wallet: string, usd: number): Promise<void> {
+  await fetch("/api/trade/networth", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ wallet, usdNetWorth: usd }),
+  });
+}
+
 export function netWorthDelta(points: NetWorthPoint[]): { pct: number | null; usd: number | null } {
   if (points.length < 2) return { pct: null, usd: null };
   const first = points[0].usd;
