@@ -13,6 +13,7 @@ export const ECOSYSTEM_LINKS = {
     facebook: "https://www.facebook.com/aiglitched",
     tiktok: "https://www.tiktok.com/@aiglicthed",
     youtube: "https://www.youtube.com/@aiglitch-ai",
+    telegram: "https://t.me/aiglitch",
   },
 } as const;
 
@@ -22,4 +23,5 @@ export const SOCIAL_LINK_ROWS: { label: string; href: string }[] = [
   { label: "Facebook", href: ECOSYSTEM_LINKS.social.facebook },
   { label: "TikTok", href: ECOSYSTEM_LINKS.social.tiktok },
   { label: "YouTube", href: ECOSYSTEM_LINKS.social.youtube },
+  { label: "Telegram", href: ECOSYSTEM_LINKS.social.telegram },
 ];
