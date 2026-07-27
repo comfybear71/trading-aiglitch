@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-07-27 — Phase 6 v1: `/earn` LST hub
+
+**Branch:** `claude/trade-phase-6-earn` — sidebar **Earn**, `/earn` page (jupSOL/mSOL swap deep links + Jupiter Earn external), Markets/LST copy + roadmap Phase 6 marked shipped (v1). In-app Jupiter deposit UI still deferred. No APY in UI.
+
+**Also on branch:** RAY mint sync with aiglitch-api (`4k3Dyj…rkX6R`) if not already on master.
+
+---
+
 ## 2026-07-27 — Roadmap: Jupiter Earn (Phase 6) + Perps high-risk (Phase 7)
 
 **Branch:** `claude/trade-roadmap-jupiter-perps` — `/roadmap` UI + `docs/ecosystem-transparency-roadmap.md`. Tone aligned with $BUDJU: entertainment + DeFi, NFA, liquidation risk.

@@ -70,7 +70,7 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 | **Done (Phase 4)** | **Portfolio & activity UX** | Allocation bar, activity filters, badges, refresh — `PortfolioClient`, `TradeActivityPanel`. |
 | **Done (Phase 5)** | **PnL trend + Send/Magic UX** | Local net-worth sparkline; magic link copy/expiry; roadmap Phase 5. |
 | **Done (2026-07-27)** | **Curated Jupiter majors + LST row** | Markets grid; §GLITCH SOL-only OTC clarity; 1M $BUDJU gate on swaps. |
-| **Planned (Phase 6)** | **Jupiter Earn / LST yield** | Swap LSTs shipped; Earn/Lend deposit UI after spec — verify APY on-chain before UI numbers. |
+| **Done (Phase 6 v1)** | **Jupiter Earn / LST yield** | `/earn` hub + Markets LST swaps; Jupiter Earn via jup.ag link. In-app deposit UI after spec — no APY in UI until verified on-chain. |
 | **Planned (Phase 7)** | **Jupiter Perps (high risk)** | Leverage via Jupiter; disclaimers + liquidation copy; same tone as $BUDJU (entertainment + DeFi, not hype). Gate + ack TBD; v1 link/embed OK. |
 | **Polish (optional)** | Drawer activity parity, JUP/RAY price fallbacks | See HANDOFF; API `claude/trade-prices-jup-ray-fallback`. |
 | **Last (deferred)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. **Final** item. |

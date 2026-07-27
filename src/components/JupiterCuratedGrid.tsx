@@ -75,7 +75,8 @@ export function JupiterCuratedGrid({
             />
             <div className="min-w-[120px] flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-black text-white">{t.symbol}</p>                {t.yieldLst ? (
+                <p className="text-sm font-black text-white">{t.symbol}</p>
+                {t.yieldLst ? (
                   <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-500/40 text-amber-300/90">
                     Yield LST
                   </span>
@@ -83,7 +84,16 @@ export function JupiterCuratedGrid({
               </div>
               <p className="text-[10px] text-zinc-500">
                 Jupiter · vs {quote}
-                {t.yieldLst ? " · swap in/out (Earn UI later)" : " · 1M $BUDJU gate"}
+                {t.yieldLst ? (
+                  <>
+                    {" · swap in/out · "}
+                    <Link href="/earn" className="text-amber-400/90 hover:underline">
+                      Earn hub
+                    </Link>
+                  </>
+                ) : (
+                  " · 1M $BUDJU gate"
+                )}
               </p>
             </div>
             <p className="text-base font-black text-white tabular-nums sm:w-28 sm:text-right">
