@@ -392,14 +392,15 @@ export default function PortfolioClient() {
             const m = metaForSymbol(tokenMeta, h.symbol);
             return (
               <li key={h.key} className="px-4 py-3 flex items-center justify-between gap-3">
-                <div className="min-w-0 flex-1 flex gap-3">
-                  <TokenIcon
-                    symbol={h.symbol}
-                    iconUrl={m?.iconUrl}
-                    iconEmoji={m?.iconEmoji}
-                    size={32}
-                    className="mt-0.5"
-                  />
+                <div className="flex gap-3 min-w-0 flex-1 items-start">
+                  <div className="shrink-0 pt-0.5">
+                    <TokenIcon
+                      symbol={h.symbol}
+                      iconUrl={m?.iconUrl}
+                      iconEmoji={m?.iconEmoji}
+                      size={32}
+                    />
+                  </div>
                   <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-bold text-white">{h.label}</p>
@@ -451,15 +452,16 @@ export default function PortfolioClient() {
               const m = metaForSymbol(tokenMeta, r.symbol);
               return (
                 <li key={r.mint} className="px-4 py-3 flex items-center justify-between gap-3 bg-zinc-950/20">
-                  <div className="min-w-0 flex-1 flex gap-3">
-                    <TokenIcon
-                      symbol={r.symbol}
-                      iconUrl={m?.iconUrl}
-                      iconEmoji={m?.iconEmoji}
-                      size={32}
-                      className="mt-0.5"
-                    />
-                    <div className="min-w-0">
+                  <div className="flex gap-3 min-w-0 flex-1 items-start">
+                    <div className="shrink-0 pt-0.5">
+                      <TokenIcon
+                        symbol={r.symbol}
+                        iconUrl={m?.iconUrl}
+                        iconEmoji={m?.iconEmoji}
+                        size={32}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-white">{r.symbol}</p>
                       <p className="text-xs text-zinc-500 font-mono mt-0.5">
                         {fmtAmount(r.amount, curatedDecimals.get(r.symbol) ?? 6)}{" "}
