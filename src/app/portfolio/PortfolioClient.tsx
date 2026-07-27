@@ -11,7 +11,14 @@ import { GLITCH_EXCHANGE_PATH } from "@/lib/trade-tokens";
 import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
+import { PortfolioNetWorthChart } from "@/components/PortfolioNetWorthChart";
 import { BUDJU_SITE } from "@/lib/budju-brand";
+import {
+  appendNetWorthSnapshot,
+  loadNetWorthHistory,
+  netWorthDelta,
+  type NetWorthPoint,
+} from "@/lib/portfolio-networth-history";
 import {
   activityKindMeta,
   activityLabel,
@@ -40,9 +47,13 @@ export default function PortfolioClient() {
   const [tab, setTab] = useState<"positions" | "activity">("positions");
   const [activityRefresh, setActivityRefresh] = useState(0);
   const [recentActivity, setRecentActivity] = useState<TradeActivityItem[]>([]);
+  const [nwHistory, setNwHistory] = useState<NetWorthPoint[]>([]);
   const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
   const b = trader.eligibility?.balances;
   const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
+  const balanceKey = b
+    ? [b.sol, b.usdc, b.budju, b.glitch, otc?.price_usd ?? ""].join("|")
+    : "";
 
   const loadRecentActivity = useCallback(async () => {
     if (!trader.wallet) {
@@ -60,6 +71,24 @@ export default function PortfolioClient() {
   useEffect(() => {
     if (tab === "positions") void loadRecentActivity();
   }, [tab, loadRecentActivity, activityRefresh]);
+
+  useEffect(() => {
+    if (!trader.wallet || pricesLoading) return;
+    let net = 0;
+    const b = trader.eligibility?.balances;
+    if (b) {
+      for (const h of HOLDINGS) {
+        const v = usdValue(b[h.key], h.symbol, priceBook);
+        if (v != null) net += v;
+      }
+    }
+    const hist = appendNetWorthSnapshot(trader.wallet, net);
+    setNwHistory(hist);
+  }, [trader.wallet, pricesLoading, balanceKey, priceBook]);
+
+  useEffect(() => {
+    if (trader.wallet) setNwHistory(loadNetWorthHistory(trader.wallet));
+  }, [trader.wallet]);
 
   if (!trader.wallet) {
     return (
@@ -79,6 +108,7 @@ export default function PortfolioClient() {
       if (v != null) netUsd += v;
     }
   }
+  const nwDelta = netWorthDelta(nwHistory.length ? nwHistory : loadNetWorthHistory(trader.wallet ?? ""));
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
@@ -205,6 +235,12 @@ export default function PortfolioClient() {
           </p>
         )}
       </div>
+
+      <PortfolioNetWorthChart
+        points={nwHistory}
+        deltaUsd={nwDelta.usd}
+        deltaPct={nwDelta.pct}
+      />
 
       <div className="flex border-b border-zinc-800 text-sm">
         <button

@@ -238,12 +238,18 @@ export default function SendClient() {
           </div>
 
           {sendMode === "magic" ? (
+            <>
+              <p className="text-[11px] text-zinc-500 leading-relaxed px-1">
+                Create a claim URL — recipient opens the link and signs with Phantom to receive tokens. You can
+                dismiss unfunded links or cancel &amp; refund funded ones below.
+              </p>
             <MagicLinkSendPanel
               symbol={symbol}
               setSymbol={setSymbol}
               balance={balance}
               onActivityChange={bumpActivity}
             />
+            </>
           ) : (
           <div className="rounded-2xl border border-zinc-800 bg-[#12121a] overflow-hidden">
             <p className="px-4 pt-4 text-xs text-zinc-500">Send money to any wallet address.</p>
@@ -313,7 +319,7 @@ export default function SendClient() {
             <p className="px-4 py-2 text-[10px] uppercase text-zinc-500 font-semibold border-b border-zinc-800">
               Activity
             </p>
-            <TradeActivityPanel wallet={trader.wallet} refreshKey={activityRefresh} />
+            <TradeActivityPanel wallet={trader.wallet} refreshKey={activityRefresh} showToolbar />
           </div>
         </>
       )}
