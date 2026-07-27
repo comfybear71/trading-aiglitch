@@ -61,19 +61,20 @@ export async function fetchTradeActivity(wallet: string): Promise<TradeActivityI
   return (data.activities ?? []) as TradeActivityItem[];
 }
 
-export async function recordTradeActivity(payload: {
-  wallet: string;
-  kind: "transfer" | "swap";
-  signature: string;
-  symbol?: string;
-  amountDisplay?: string;
-  detail?: string;
-}): Promise<void> {
-  await fetch("/api/trade/activity", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+export function activityInvolvesSymbol(a: TradeActivityItem, symbol: string): boolean {
+  const sym = symbol.toUpperCase();
+  if (a.symbol?.toUpperCase() === sym) return true;
+  const detail = a.detail?.toUpperCase() ?? "";
+  if (detail.includes(sym)) return true;
+  const swapMatch = a.detail?.trim().match(/^([\d.,]+)\s+(\S+)\s*(?:->|→)\s*([\d.,]+)\s+(\S+)/);
+  if (swapMatch) {
+    if (swapMatch[2].toUpperCase() === sym || swapMatch[4].toUpperCase() === sym) return true;
+  }
+  return false;
+}
+
+export function activityInvolvesGlitch(a: TradeActivityItem): boolean {
+  return activityInvolvesSymbol(a, "GLITCH");
 }
 
 export function activityLabel(a: TradeActivityItem): string {
@@ -91,6 +92,21 @@ export function activityLabel(a: TradeActivityItem): string {
     default:
       return amt && a.detail ? `${amt} → ${a.detail}` : amt || a.detail || "Transfer";
   }
+}
+
+export async function recordTradeActivity(payload: {
+  wallet: string;
+  kind: "transfer" | "swap";
+  signature: string;
+  symbol?: string;
+  amountDisplay?: string;
+  detail?: string;
+}): Promise<void> {
+  await fetch("/api/trade/activity", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 }
 
 export type SentMagicClaim = {

@@ -301,6 +301,7 @@ export function BudjuTraderStatusSlim({
   refreshing,
   walletConnected,
   className = "",
+  perpsGate = false,
 }: {
   eligible: boolean;
   budjuBalance: number;
@@ -309,12 +310,15 @@ export function BudjuTraderStatusSlim({
   refreshing?: boolean;
   walletConnected: boolean;
   className?: string;
+  /** Perps hero: no link pills; whole card opens Swap. */
+  perpsGate?: boolean;
 }) {
   const pct = Math.min(100, (budjuBalance / budjuRequired) * 100);
 
-  return (
-    <BudjuPanelShell compact className={`h-full ${className}`}>
+  const inner = (
+    <>
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        {!perpsGate ? (
         <a
           href={BUDJU_SITE.home}
           target="_blank"
@@ -324,6 +328,12 @@ export function BudjuTraderStatusSlim({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={BUDJU_SITE.logo} alt="BUDJU" className="h-6 w-auto max-w-[72px] object-contain" />
         </a>
+        ) : (
+        <span className="shrink-0 rounded-md bg-fuchsia-950/40 p-1 border border-fuchsia-500/30">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BUDJU_SITE.logo} alt="BUDJU" className="h-5 w-auto max-w-[64px] object-contain" />
+        </span>
+        )}
         <div className="min-w-0 flex-1">
           <p className="text-xs font-black text-fuchsia-100 uppercase tracking-tight leading-none">$BUDJU</p>
           {walletConnected ? (
@@ -346,12 +356,20 @@ export function BudjuTraderStatusSlim({
           )}
         </div>
         {walletConnected && onRefresh && (
-          <RefreshBalancesButton onRefresh={onRefresh} refreshing={refreshing} />
+          <span
+            className="shrink-0"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            role="presentation"
+          >
+            <RefreshBalancesButton onRefresh={onRefresh} refreshing={refreshing} />
+          </span>
         )}
         {!walletConnected && (
           <Link
             href="/swap?sell=SOL&buy=BUDJU"
             className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-fuchsia-600/90 text-white hover:bg-fuchsia-500 shrink-0"
+            onClick={(e) => e.stopPropagation()}
           >
             Buy $BUDJU
           </Link>
@@ -360,7 +378,7 @@ export function BudjuTraderStatusSlim({
 
       {walletConnected && (
         <div
-          className={`h-1.5 rounded-full bg-black/50 overflow-hidden ring-1 ${
+          className={`h-1 rounded-full bg-black/50 overflow-hidden ring-1 ${
             eligible ? "ring-emerald-500/30" : "ring-fuchsia-500/25"
           }`}
         >
@@ -375,17 +393,42 @@ export function BudjuTraderStatusSlim({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <BudjuLinkPills showBuyOnSwap={!walletConnected || !eligible} />
-        {walletConnected && eligible && (
-          <Link
-            href="/swap"
-            className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-emerald-500/40 text-emerald-200/90 hover:bg-emerald-500/10 sm:ml-auto"
-          >
-            Open Swap
-          </Link>
-        )}
-      </div>
+      {!perpsGate && (
+        <div className="flex flex-wrap items-center gap-2">
+          <BudjuLinkPills showBuyOnSwap={!walletConnected || !eligible} />
+          {walletConnected && eligible && (
+            <Link
+              href="/swap"
+              className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-emerald-500/40 text-emerald-200/90 hover:bg-emerald-500/10 sm:ml-auto"
+            >
+              Open Swap
+            </Link>
+          )}
+        </div>
+      )}
+
+      {perpsGate && walletConnected && (
+        <p className="text-[9px] text-zinc-500 uppercase tracking-wide">Tap to open Swap</p>
+      )}
+    </>
+  );
+
+  if (perpsGate && walletConnected) {
+    return (
+      <Link
+        href="/swap"
+        className={`block rounded-2xl transition-transform hover:scale-[1.01] focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400/60 ${className}`}
+      >
+        <BudjuPanelShell compact className="h-full cursor-pointer">
+          {inner}
+        </BudjuPanelShell>
+      </Link>
+    );
+  }
+
+  return (
+    <BudjuPanelShell compact className={`h-full ${className}`}>
+      {inner}
     </BudjuPanelShell>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { SwapActivityLine } from "@/components/SwapActivityLine";
 import {
   activityKindMeta,
   activityLabel,
@@ -155,7 +156,11 @@ export function TradeActivityPanel({
       )}
       <ul
         className={`divide-y divide-zinc-800/80 overflow-y-auto ${
-          compact ? "max-h-40" : drawer ? "max-h-[min(50vh,16rem)]" : "max-h-[28rem]"
+          compact
+            ? "max-h-40"
+            : drawer
+              ? "max-h-[min(55vh,18rem)] md:max-h-[min(70vh,32rem)]"
+              : "max-h-[28rem] md:max-h-[min(70vh,36rem)]"
         }`}
       >
         {visible.map((a) => {
@@ -171,7 +176,11 @@ export function TradeActivityPanel({
                   </span>
                   <span className="text-[10px] text-zinc-600">{formatActivityWhen(a.at)}</span>
                 </div>
-                <span className="text-zinc-300 block truncate">{activityLabel(a)}</span>
+                {a.kind === "swap" && a.detail ? (
+                  <SwapActivityLine detail={a.detail} fallback={activityLabel(a)} />
+                ) : (
+                  <span className="text-zinc-300 block truncate">{activityLabel(a)}</span>
+                )}
               </div>
               {a.signature ? (
                 <a

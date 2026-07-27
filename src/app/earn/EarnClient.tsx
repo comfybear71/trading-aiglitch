@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { TokenIcon } from "@/components/TokenIcon";
+import { useTraderWallet } from "@/context/TraderWalletContext";
 import { fetchCuratedPrices } from "@/lib/curated-markets-client";
 import {
   JUPITER_EARN_DOCS_URL,
@@ -9,8 +11,15 @@ import {
   TRADE_YIELD_LSTS,
 } from "@/lib/earn-lsts";
 import { fmtMarketUsd, swapHref } from "@/lib/market-pairs";
+import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
+import { metaForSymbol, useTradeTokenMeta } from "@/lib/use-trade-token-meta";
+import { amountForSymbol } from "@/lib/wallet-token-balances";
+import { fmtTokenAmount } from "@/components/WalletHoldingRow";
 
 export default function EarnClient() {
+  const trader = useTraderWallet();
+  const tokenMeta = useTradeTokenMeta();
+  const { rows: walletRows, reload } = useWalletTokenBalances(trader.wallet);
   const [prices, setPrices] = useState<Record<string, number | undefined>>({});
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +37,10 @@ export default function EarnClient() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (trader.wallet) void reload();
+  }, [trader.wallet, reload]);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-10">
@@ -61,10 +74,19 @@ export default function EarnClient() {
             const solPrice = prices.SOL;
             const hrefIn = swapHref("SOL", lst.symbol);
             const hrefOut = swapHref(lst.symbol, "SOL");
+            const balance = trader.wallet ? amountForSymbol(walletRows, lst.symbol) : 0;
+            const m = metaForSymbol(tokenMeta, lst.symbol);
             return (
               <li key={lst.symbol} className="p-4 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 flex gap-3">
+                    <TokenIcon
+                      symbol={lst.symbol}
+                      iconUrl={m?.iconUrl}
+                      iconEmoji={m?.iconEmoji}
+                      size={36}
+                    />
+                    <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-lg font-black text-white">{lst.symbol}</p>
                       <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-500/40 text-amber-300/90">
@@ -72,6 +94,14 @@ export default function EarnClient() {
                       </span>
                     </div>
                     <p className="text-xs text-zinc-500 mt-1 leading-relaxed">{lst.summary}</p>
+                    {trader.wallet && balance > 0 ? (
+                      <p className="text-[11px] text-cyan-300/90 font-mono mt-1.5">
+                        Your wallet: {fmtTokenAmount(balance, 6)} {lst.symbol}
+                      </p>
+                    ) : trader.wallet ? (
+                      <p className="text-[11px] text-zinc-600 mt-1.5">Your wallet: 0 {lst.symbol}</p>
+                    ) : null}
+                    </div>
                   </div>
                   <p className="text-base font-black text-white tabular-nums shrink-0">
                     {loading ? "…" : price != null && price > 0 ? fmtMarketUsd(price) : "—"}
