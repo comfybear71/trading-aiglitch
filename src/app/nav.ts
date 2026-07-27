@@ -4,6 +4,8 @@ export interface NavItem {
   icon: string;
   /** Shown in sidebar section header context */
   section?: "trade" | "manage";
+  /** Override link (default `/${slug}`). Home uses `/`. */
+  href?: string;
 }
 
 export interface NavSection {
@@ -16,6 +18,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Trade",
     items: [
+      { slug: "home", label: "Home", icon: "\u{1F3E0}", section: "trade", href: "/" },
       { slug: "markets", label: "Markets", icon: "\u{1F4CA}", section: "trade" },
       { slug: "glitch", label: "Buy §GLITCH", icon: "\u{1F4B0}", section: "trade" },
       { slug: "swap", label: "Swap", icon: "\u{21C4}", section: "trade" },
@@ -39,9 +42,16 @@ export const OPS_NAV: NavItem = {
 
 export const ALL_PUBLIC_SLUGS = NAV_SECTIONS.flatMap((s) => s.items.map((i) => i.slug));
 
-export const DEFAULT_SLUG = "markets";
+export const DEFAULT_SLUG = "home";
+
+export function navItemHref(item: NavItem): string {
+  return item.href ?? `/${item.slug}`;
+}
 
 export function navItemForSlug(slug: string): NavItem | undefined {
+  if (slug === "home") {
+    return NAV_SECTIONS[0]?.items.find((i) => i.slug === "home");
+  }
   for (const section of NAV_SECTIONS) {
     const found = section.items.find((item) => item.slug === slug);
     if (found) return found;
@@ -52,7 +62,9 @@ export function navItemForSlug(slug: string): NavItem | undefined {
 
 /** First path segment for sidebar highlight (e.g. /nft/studio → nft). */
 export function slugFromPathname(pathname: string): string {
-  const seg = pathname.split("/").filter(Boolean)[0];
+  const trimmed = pathname.replace(/\/$/, "") || "/";
+  if (trimmed === "/") return "home";
+  const seg = trimmed.split("/").filter(Boolean)[0];
   if (seg === "exchange") return "glitch";
-  return seg ?? DEFAULT_SLUG;
+  return seg ?? "home";
 }

@@ -4,8 +4,9 @@ import { ClientLayout } from "./client-layout";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://trade.aiglitch.app"),
-  title: "AIG!itch Trading",
-  description: "Trading and NFT tooling for the AIG!itch platform.",
+  title: "AIG!itch Trade — Home",
+  description:
+    "Trade hub for AIG!itch: Jupiter swaps, §GLITCH OTC, live markets, and portfolio on trade.aiglitch.app.",
   robots: { index: false, follow: false },
 };
 
