@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-07-27 — Perps page polish (native-first layout)
+
+**Branch:** `claude/trade-perps-page-polish` — remove Meet a Host; 60/40 hero + `BudjuTraderStatusSlim`; drop Jupiter embed/CTAs; early-access registration; compact NFA in footer row.
+
+---
+
 ## 2026-07-27 — Phase 7 v1: `/perps` Jupiter link + gate + risk ack
 
 **Branch:** `claude/trade-phase-7-perps` — sidebar **Perps**, `/perps` page (1M $BUDJU gate, checkbox ack in localStorage, Open Jupiter + optional embed). Roadmap Phase 7 shipped (v1). No API changes.

@@ -71,7 +71,7 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 | **Done (Phase 5)** | **PnL trend + Send/Magic UX** | Local net-worth sparkline; magic link copy/expiry; roadmap Phase 5. |
 | **Done (2026-07-27)** | **Curated Jupiter majors + LST row** | Markets grid; §GLITCH SOL-only OTC clarity; 1M $BUDJU gate on swaps. |
 | **Done (Phase 6 v1)** | **Jupiter Earn / LST yield** | `/earn` hub + Markets LST swaps; Jupiter Earn via jup.ag link. In-app deposit UI after spec — no APY in UI until verified on-chain. |
-| **Done (Phase 7 v1)** | **Jupiter Perps (high risk)** | `/perps`: 1M $BUDJU gate, risk acknowledgement, link/embed jup.ag/perps. Native perps UI deferred. NFA + liquidation copy. |
+| **Done (Phase 7 v1)** | **AIG!itch Perps (high risk)** | `/perps`: BUDJU gate + risk ack + early access; native UI on trade site in dev (not Jupiter as primary). NFA + liquidation copy. |
 | **Polish (optional)** | Drawer activity parity, JUP/RAY price fallbacks | See HANDOFF; API `claude/trade-prices-jup-ray-fallback`. |
 | **Last (deferred)** | **Trading AI personas** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. **Final** item. |
 | ~~Later~~ | ~~Persona CTA into aiglitch.app~~ | Covered by Phase 3 home CTAs. |
