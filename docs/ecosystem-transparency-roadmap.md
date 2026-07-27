@@ -64,8 +64,9 @@ Document with links to official BUDJU materials; verify numbers on-chain before 
 | **Done (2026-07-27)** | **Social strip + footer** — `ecosystem-links.ts` + `EcosystemFooter` | Telegram + all socials. |
 | **Done (2026-07-27)** | **Business model** accordion on `/glitch`, **`/about`**, Markets links | `AiglitchBusinessModel`, `AboutClient`. |
 | **Done (2026-07-27)** | **BUDJU burn/treasury** one-liner on Markets | `BudjuMarketsPromo` → tokenomics link. |
-| **Later** | **AI persona hosts** on Markets or `/about` | Rotating persona clip/avatar + short scripted intro (“What is AIG!itch?”, “Why §GLITCH?”, “Why $BUDJU?”) — content from API or static persona IDs; **not** live LLM on first version unless cost-bounded. |
-| **Later** | Dedicated **`/roadmap` or `/about`** | Full transparency page: revenue, utility, risks, links, treasury wallets, tag releases. |
+| **Done (2026-07-27)** | **`/about` transparency hub** | Revenue, §GLITCH story, treasury bar. |
+| **Done (Phase 2)** | **Persona hosts** on Markets + About + **`/roadmap`** | `PersonaHostStrip` — scripted, no LLM. |
+| **Planned (product)** | **Persona ownership** — auction, deed NFT, resell | See `docs/persona-ownership-roadmap.md`. Hatch today; seed auction later. |
 | **Later** | Persona **CTA** into aiglitch.app / glitch-app download | Deep links to feed, channels, marketplace. |
 
 ---

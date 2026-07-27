@@ -48,6 +48,9 @@ export function EcosystemFooter() {
         <Link href="/about" className="hover:text-zinc-300">
           About / transparency
         </Link>
+        <Link href="/roadmap" className="hover:text-zinc-300">
+          Roadmap
+        </Link>
       </div>
 
       <p className="text-[10px] text-zinc-600 leading-relaxed max-w-3xl">
