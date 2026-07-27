@@ -1,4 +1,5 @@
 import { GLITCH_EXCHANGE_PATH, isJupiterSwapSymbol } from "@/lib/trade-tokens";
+import { GLITCH_LISTING_GOAL_SOL as GOAL } from "@/lib/glitch-otc";
 
 export type PairMeta = { id: string; label: string; base: string; quote: string };
 
@@ -29,6 +30,11 @@ export interface PairAction {
   variant: "primary" | "secondary";
 }
 
+export interface GlitchPairUiMeta {
+  subtitle: string;
+  featuredOtc?: boolean;
+}
+
 const FALLBACK_PAIRS: PairMeta[] = [
   { id: "GLITCH_USDC", label: "§GLITCH/USDC", base: "GLITCH", quote: "USDC" },
   { id: "GLITCH_SOL", label: "§GLITCH/SOL", base: "GLITCH", quote: "SOL" },
@@ -47,22 +53,32 @@ export function pairAccent(base: string, quote: string): PairAccent {
   return "cyan";
 }
 
-export function pairActions(base: string, quote: string): PairAction[] {
+/** §GLITCH pair cards show reference quotes; OTC checkout is SOL-only until treasury goal. */
+export function glitchPairUiMeta(base: string, quote: string): GlitchPairUiMeta | null {
   const hasGlitch = base === "GLITCH" || quote === "GLITCH";
-  if (hasGlitch) {
+  if (!hasGlitch) return null;
+  const goal = GOAL;
+  if (base === "GLITCH" && quote === "SOL") {
+    return {
+      featuredOtc: true,
+      subtitle: `Checkout: SOL only · treasury goal ${goal.toLocaleString()} SOL`,
+    };
+  }
+  return {
+    subtitle: `Reference price · buy §GLITCH with SOL only (${goal.toLocaleString()} SOL roadmap)`,
+  };
+}
+
+export function pairActions(base: string, quote: string): PairAction[] {
+  const glitchMeta = glitchPairUiMeta(base, quote);
+  if (glitchMeta) {
     const actions: PairAction[] = [
-      { href: GLITCH_EXCHANGE_PATH, label: "Buy §GLITCH (OTC)", variant: "primary" },
+      { href: GLITCH_EXCHANGE_PATH, label: "Buy with SOL", variant: "primary" },
     ];
     if (base === "BUDJU" || quote === "BUDJU") {
       actions.push({
         href: swapHref("BUDJU", "USDC"),
-        label: "Swap $BUDJU",
-        variant: "secondary",
-      });
-    } else if (base === "SOL" || quote === "SOL") {
-      actions.push({
-        href: swapHref("SOL", "USDC"),
-        label: "Swap SOL",
+        label: "Swap $BUDJU (not §GLITCH)",
         variant: "secondary",
       });
     }

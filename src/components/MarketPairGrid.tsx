@@ -6,6 +6,7 @@ import {
   fmtMarketPct,
   fmtMarketUsd,
   fmtMarketVol,
+  glitchPairUiMeta,
   pairActions,
   type MarketSnapshot,
 } from "@/lib/market-pairs";
@@ -23,6 +24,7 @@ function PairSkeleton() {
 
 function MarketPairCard({ m }: { m: MarketSnapshot }) {
   const actions = pairActions(m.base, m.quote);
+  const glitchUi = glitchPairUiMeta(m.base, m.quote);
   const primary = actions.find((a) => a.variant === "primary") ?? actions[0];
   const secondary = actions.find((a) => a.variant === "secondary");
 
@@ -39,8 +41,20 @@ function MarketPairCard({ m }: { m: MarketSnapshot }) {
           <p className="text-[10px] text-zinc-500 mt-0.5 capitalize">
             {m.dexName ? `${m.dexName} · ` : ""}
             {m.dataSource}
-            {m.base === "GLITCH" || m.quote === "GLITCH" ? " · OTC for §GLITCH" : ""}
+            {glitchUi
+              ? glitchUi.featuredOtc
+                ? " · OTC checkout (SOL)"
+                : " · reference · OTC SOL only"
+              : ""}
           </p>
+          {glitchUi ? (
+            <p className="text-[10px] text-purple-300/70 mt-1 leading-snug">{glitchUi.subtitle}</p>
+          ) : null}
+          {glitchUi?.featuredOtc ? (
+            <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-purple-500/50 text-purple-200/90">
+              Featured OTC
+            </span>
+          ) : null}
         </div>
         {!m.error && (
           <span

@@ -5,7 +5,7 @@ import { VersionedTransaction } from "@solana/web3.js";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
 import { phantomSignAndSubmit } from "@/lib/phantom-submit";
-import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
+import { TRADE_SEND_TOKENS, getTradeToken } from "@/lib/trade-tokens";
 import { balanceForSymbol, formatSwapAmount, maxPayAmount } from "@/lib/trade-balance";
 import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
 
@@ -33,7 +33,7 @@ export function MagicLinkSendPanel({ symbol, setSymbol, balance, onActivityChang
   /** Amount locked in active link (for refund activity row). */
   const [activeLinkAmount, setActiveLinkAmount] = useState<string | null>(null);
 
-  const token = TRADE_SWAP_TOKENS.find((t) => t.symbol === symbol)!;
+  const token = getTradeToken(symbol);
 
   const setFraction = (f: number) => {
     const raw = f >= 1 ? maxPayAmount(symbol, balance) : balance * f;

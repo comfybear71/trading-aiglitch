@@ -6,7 +6,7 @@ import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
 import { truncWallet } from "@/lib/phantom";
 import { phantomSignAndSubmit } from "@/lib/phantom-submit";
-import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
+import { JUPITER_SWAP_TOKENS, getTradeToken, TRADE_SEND_TOKENS } from "@/lib/trade-tokens";
 import {
   balanceForSymbol,
   formatSwapAmount,
@@ -51,7 +51,7 @@ export default function SendClient() {
 
   const bumpActivity = () => setActivityRefresh((k) => k + 1);
 
-  const token = TRADE_SWAP_TOKENS.find((t) => t.symbol === symbol)!;
+  const token = getTradeToken(symbol);
   const balance = balanceForSymbol(trader.eligibility, symbol);
 
   const setFraction = (f: number) => {
@@ -260,7 +260,7 @@ export default function SendClient() {
                   onChange={(e) => setSymbol(e.target.value)}
                   className="bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm font-bold text-white"
                 >
-                  {TRADE_SWAP_TOKENS.map((t) => (
+                  {TRADE_SEND_TOKENS.map((t) => (
                     <option key={t.symbol} value={t.symbol}>
                       {t.symbol}
                     </option>

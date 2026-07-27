@@ -2,12 +2,16 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { JUPITER_SWAP_TOKENS, isJupiterSwapSymbol } from "@/lib/trade-tokens";
+import {
+  JUPITER_SWAP_TOKENS,
+  isJupiterSwapSymbol,
+  normalizeTradeSymbol,
+} from "@/lib/trade-tokens";
 
 function normJupiter(raw: string | null): string | null {
   if (!raw) return null;
-  const s = raw.trim().toUpperCase();
-  return isJupiterSwapSymbol(s) ? s : null;
+  const norm = normalizeTradeSymbol(raw);
+  return isJupiterSwapSymbol(norm) ? norm : null;
 }
 
 export type GlitchUrlHint = null | "buy" | "sell";
@@ -21,16 +25,18 @@ export function useSwapUrlParams(
   const params = useSearchParams();
 
   useEffect(() => {
-    const rawSell = (params.get("sell") ?? params.get("from"))?.trim().toUpperCase() ?? null;
-    const rawBuy = (params.get("buy") ?? params.get("to"))?.trim().toUpperCase() ?? null;
+    const rawSell = params.get("sell") ?? params.get("from");
+    const rawBuy = params.get("buy") ?? params.get("to");
+    const sellUpper = rawSell?.trim().toUpperCase() ?? null;
+    const buyUpper = rawBuy?.trim().toUpperCase() ?? null;
 
     let hint: GlitchUrlHint = null;
-    if (rawSell === "GLITCH") hint = "sell";
-    else if (rawBuy === "GLITCH") hint = "buy";
+    if (sellUpper === "GLITCH") hint = "sell";
+    else if (buyUpper === "GLITCH") hint = "buy";
     setGlitchHint?.(hint);
 
-    const sell = normJupiter(params.get("sell")) ?? normJupiter(params.get("from"));
-    const buy = normJupiter(params.get("buy")) ?? normJupiter(params.get("to"));
+    const sell = normJupiter(rawSell) ?? normJupiter(params.get("from"));
+    const buy = normJupiter(rawBuy) ?? normJupiter(params.get("to"));
 
     if (sell) setInputSymbol(sell);
     if (buy && buy !== sell) setOutputSymbol(buy);
