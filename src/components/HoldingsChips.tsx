@@ -1,8 +1,8 @@
 "use client";
 
-import { TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
+import { TRADE_SEND_TOKENS } from "@/lib/trade-tokens";
 
-const CHIP_SYMBOLS = TRADE_SWAP_TOKENS.map((t) => t.symbol);
+const CHIP_SYMBOLS = TRADE_SEND_TOKENS.map((t) => t.symbol);
 
 export function HoldingsChips({
   activeSymbol,

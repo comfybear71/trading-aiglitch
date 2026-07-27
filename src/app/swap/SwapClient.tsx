@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { VersionedTransaction } from "@solana/web3.js";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { phantomSignAndSubmit } from "@/lib/phantom-submit";
-import { JUPITER_SWAP_TOKENS, TRADE_SWAP_TOKENS } from "@/lib/trade-tokens";
+import { JUPITER_SWAP_TOKENS, getTradeToken } from "@/lib/trade-tokens";
 import {
   balanceForSymbol,
   formatSwapAmount,
@@ -114,8 +114,8 @@ export default function SwapClient() {
 
   useSwapUrlParams(setInputSymbol, setOutputSymbol, setGlitchHint);
 
-  const inputToken = TRADE_SWAP_TOKENS.find((t) => t.symbol === inputSymbol)!;
-  const outputToken = TRADE_SWAP_TOKENS.find((t) => t.symbol === outputSymbol)!;
+  const inputToken = getTradeToken(inputSymbol);
+  const outputToken = getTradeToken(outputSymbol);
   const payBalance = balanceForSymbol(trader.eligibility, inputSymbol);
   const receiveBalance = balanceForSymbol(trader.eligibility, outputSymbol);
   const maxPrioritySol = feesMeta?.maxPriorityFeeSol ?? DEFAULT_MAX_PRIORITY_FEE_SOL;
@@ -663,11 +663,16 @@ function Pill({
 }
 
 function TokenHintCard({ symbol }: { symbol: string }) {
-  const token = TRADE_SWAP_TOKENS.find((t) => t.symbol === symbol);
+  let mintPreview = "—";
+  try {
+    mintPreview = getTradeToken(symbol).mint.slice(0, 8) + "…";
+  } catch {
+    /* unknown */
+  }
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
       <p className="text-sm font-bold text-white">{symbol}</p>
-      <p className="text-[10px] text-zinc-600 mt-1 font-mono truncate">{token?.mint.slice(0, 8)}…</p>
+      <p className="text-[10px] text-zinc-600 mt-1 font-mono truncate">{mintPreview}</p>
       <p className="text-[10px] text-zinc-500 mt-2">AIG!itch trade lane · price chart later</p>
     </div>
   );

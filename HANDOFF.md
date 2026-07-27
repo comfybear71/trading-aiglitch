@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-07-27 — Markets Jupiter majors + §GLITCH SOL-only clarity
+
+**Branch:** `claude/trade-markets-jupiter-curated` — merge **after** aiglitch-api same branch deploy.
+
+**Includes:** Jupiter curated grid (7 tokens + SOL/USDC row); §GLITCH cards = reference prices, **Buy with SOL**; LST yield badges; swap picker extended. Send stays core tokens only.
+
+---
+
+## 2026-07-27 — B3 server net-worth history (two PRs — API first)
+
+**Order:** Merge **aiglitch-api** `claude/trade-networth-snapshots` → deploy api → then **trading-aiglitch** `claude/trade-portfolio-networth-api`.
+
+**User verified:** v0.4.32 polish (drawer filters, roadmap links). BUDJU gate: ~72k on test wallet — need 1M for full swap unlock (expected).
+
+---
+
 ## 2026-07-27 — Phases 1–5 complete; polish wave B (in progress)
 
 **Shipped (user confirmed):** Hatchery grid (**aiglitch** #329), Phase 5 (**trading-aiglitch** v0.4.31). Tags/housekeeping done by user.
