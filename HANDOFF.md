@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-07-27 — Phase 7 v1: `/perps` Jupiter link + gate + risk ack
+
+**Branch:** `claude/trade-phase-7-perps` — sidebar **Perps**, `/perps` page (1M $BUDJU gate, checkbox ack in localStorage, Open Jupiter + optional embed). Roadmap Phase 7 shipped (v1). No API changes.
+
+---
+
 ## 2026-07-27 — Phase 6 v1: `/earn` LST hub
 
 **Branch:** `claude/trade-phase-6-earn` — sidebar **Earn**, `/earn` page (jupSOL/mSOL swap deep links + Jupiter Earn external), Markets/LST copy + roadmap Phase 6 marked shipped (v1). In-app Jupiter deposit UI still deferred. No APY in UI.

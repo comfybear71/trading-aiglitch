@@ -18,10 +18,10 @@ const PRODUCT_PHASES = [
       "/earn hub: jupSOL & mSOL swap links + Jupiter Earn external deposits. In-app lend UI deferred; no APY in UI until verified on-chain.",
   },
   {
-    status: "planned",
-    title: "Phase 7 — Jupiter Perps (advanced / high risk)",
+    status: "done",
+    title: "Phase 7 — Jupiter Perps (v1)",
     detail:
-      "Leverage trading via Jupiter perps — same tone as $BUDJU: platform + entertainment + DeFi, not “get rich.” Not financial advice; liquidation risk. Likely 1M $BUDJU gate + risk acknowledgement; v1 may link/embed Jupiter before native build.",
+      "/perps: 1M $BUDJU gate + risk ack + link/embed to jup.ag/perps. Native in-app perps deferred. NFA; liquidation risk.",
   },
   { status: "deferred", title: "Last — Trading AI personas (+ trade.aiglitch.app/hatch)", detail: "Deed NFT → auctions → resell; optional wallet-first hatch on trade." },
 ] as const;
@@ -78,7 +78,11 @@ export default function RoadmapClient() {
           returns. Perps can liquidate your margin; not financial advice.
         </p>
         <p className="text-[11px] text-zinc-500">
-          Phase 6 v1 (Earn hub) shipped; Phase 7 perps next (link or embed, then native if it earns its keep).
+          Phase 7 v1 shipped on{" "}
+          <Link href="/perps" className="text-red-300/90 hover:underline">
+            /perps
+          </Link>
+          . Native build only if it earns its keep; persona ownership remains deferred last.
         </p>
       </section>
 
