@@ -12,7 +12,17 @@ import { TradeActivityPanel } from "@/components/TradeActivityPanel";
 import { MagicLinkOpenLinks } from "@/components/MagicLinkOpenLinks";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
 import { PortfolioNetWorthChart } from "@/components/PortfolioNetWorthChart";
+import { TokenIcon } from "@/components/TokenIcon";
+import { SwapActivityLine } from "@/components/SwapActivityLine";
 import { BUDJU_SITE } from "@/lib/budju-brand";
+import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
+import { useTradeTokenMeta, metaForSymbol } from "@/lib/use-trade-token-meta";
+import {
+  amountForSymbol,
+  isMeaningfulBalance,
+  WALLET_CORE_SYMBOLS,
+} from "@/lib/wallet-token-balances";
+import { TRADE_CURATED_JUPITER_TOKENS } from "@/lib/trade-tokens";
 import {
   appendNetWorthSnapshot,
   fetchServerNetWorthHistory,
@@ -53,6 +63,8 @@ export default function PortfolioClient() {
   const [nwHistory, setNwHistory] = useState<NetWorthPoint[]>([]);
   const [nwServerSynced, setNwServerSynced] = useState(false);
   const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
+  const tokenMeta = useTradeTokenMeta();
+  const { rows: walletRows, reload: reloadWalletRows } = useWalletTokenBalances(trader.wallet);
   const b = trader.eligibility?.balances;
   const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
   const balanceKey = b
@@ -142,6 +154,25 @@ export default function PortfolioClient() {
   }
   const nwDelta = netWorthDelta(nwHistory.length ? nwHistory : loadNetWorthHistory(trader.wallet ?? ""));
 
+  const curatedDecimals = new Map(TRADE_CURATED_JUPITER_TOKENS.map((t) => [t.symbol, t.decimals]));
+  const extraHoldings =
+    walletRows?.filter(
+      (r) =>
+        !WALLET_CORE_SYMBOLS.includes(r.symbol as (typeof WALLET_CORE_SYMBOLS)[number]) &&
+        isMeaningfulBalance(r.symbol, r.amount),
+    ) ?? [];
+
+  const holdingAmount = (key: (typeof HOLDINGS)[number]["key"], symbol: string) => {
+    if (walletRows) return amountForSymbol(walletRows, symbol);
+    return b?.[key] ?? 0;
+  };
+
+  const refreshAll = () => {
+    void trader.refresh();
+    void reloadWalletRows();
+    setActivityRefresh((k) => k + 1);
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <GlitchInvestPromo
@@ -170,7 +201,7 @@ export default function PortfolioClient() {
           <div className="flex gap-2 flex-wrap">
             <button
               type="button"
-              onClick={() => trader.refresh()}
+              onClick={refreshAll}
               className="px-3 py-1.5 rounded-lg border border-zinc-700 text-xs text-zinc-400 hover:text-cyan-300"
             >
               Refresh
@@ -320,12 +351,21 @@ export default function PortfolioClient() {
         </div>
         <ul className="divide-y divide-zinc-800/80">
           {HOLDINGS.filter((h) => !chipFilter || h.symbol === chipFilter).map((h) => {
-            const amt = b?.[h.key] ?? 0;
+            const amt = holdingAmount(h.key, h.symbol);
             const val = usdValue(amt, h.symbol, priceBook);
             const pct = netUsd > 0 && val != null ? Math.min(100, (val / netUsd) * 100) : 0;
+            const m = metaForSymbol(tokenMeta, h.symbol);
             return (
               <li key={h.key} className="px-4 py-3 flex items-center justify-between gap-3">
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 flex gap-3">
+                  <TokenIcon
+                    symbol={h.symbol}
+                    iconUrl={m?.iconUrl}
+                    iconEmoji={m?.iconEmoji}
+                    size={32}
+                    className="mt-0.5"
+                  />
+                  <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-bold text-white">{h.label}</p>
                     {netUsd > 0 && val != null && val > 0 && (
@@ -346,6 +386,7 @@ export default function PortfolioClient() {
                       />
                     </div>
                   )}
+                  </div>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
@@ -368,6 +409,41 @@ export default function PortfolioClient() {
               </li>
             );
           })}
+          {extraHoldings
+            .filter((r) => !chipFilter || chipFilter === r.symbol)
+            .map((r) => {
+              const val = usdValue(r.amount, r.symbol, priceBook);
+              const m = metaForSymbol(tokenMeta, r.symbol);
+              return (
+                <li key={r.mint} className="px-4 py-3 flex items-center justify-between gap-3 bg-zinc-950/20">
+                  <div className="min-w-0 flex-1 flex gap-3">
+                    <TokenIcon
+                      symbol={r.symbol}
+                      iconUrl={m?.iconUrl}
+                      iconEmoji={m?.iconEmoji}
+                      size={32}
+                      className="mt-0.5"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white">{r.symbol}</p>
+                      <p className="text-xs text-zinc-500 font-mono mt-0.5">
+                        {fmtAmount(r.amount, curatedDecimals.get(r.symbol) ?? 6)}{" "}
+                        {r.symbol}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm text-zinc-300">{fmtUsd(val)}</p>
+                    <Link
+                      href={`/swap?sell=${encodeURIComponent(r.symbol)}`}
+                      className="text-[10px] text-cyan-500/80 hover:text-cyan-400 mt-1 inline-block"
+                    >
+                      Trade
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
         </ul>
       </div>
       )}
@@ -391,7 +467,11 @@ export default function PortfolioClient() {
               <li key={a.id} className="px-4 py-2 flex justify-between gap-2 text-sm">
                 <div className="min-w-0">
                   <span className="text-[9px] font-bold uppercase text-zinc-600 mr-1">{meta.label}</span>
-                  <span className="text-zinc-400 truncate">{activityLabel(a)}</span>
+                  {a.kind === "swap" && a.detail ? (
+                    <SwapActivityLine detail={a.detail} fallback={activityLabel(a)} />
+                  ) : (
+                    <span className="text-zinc-400 truncate">{activityLabel(a)}</span>
+                  )}
                   <span className="text-[10px] text-zinc-600 ml-1">{formatActivityWhen(a.at)}</span>
                 </div>
                 {a.signature ? (

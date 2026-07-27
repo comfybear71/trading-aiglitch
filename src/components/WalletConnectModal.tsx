@@ -9,7 +9,16 @@ import { getPhantom } from "@/lib/phantom";
 import { isMobileWeb, needsPhantomMobileBrowser, openInPhantomBrowser } from "@/lib/phantom-mobile";
 import { MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { balanceForSymbol } from "@/lib/trade-balance";
-import { fmtUsd, usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { WalletHoldingRow } from "@/components/WalletHoldingRow";
+import { useTradeTokenMeta } from "@/lib/use-trade-token-meta";
+import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
+import {
+  amountForSymbol,
+  isMeaningfulBalance,
+  WALLET_CORE_SYMBOLS,
+} from "@/lib/wallet-token-balances";
+import { TRADE_CURATED_JUPITER_TOKENS } from "@/lib/trade-tokens";
 import { CopyWalletAddress } from "@/components/CopyWalletAddress";
 import { BUDJU_SITE } from "@/lib/budju-brand";
 import { BudjuLinkPills } from "@/components/BudjuGateCallout";
@@ -227,6 +236,15 @@ export function WalletConnectMenu({
   const [drawerTab, setDrawerTab] = useState<"wallet" | "activity">("wallet");
   const [activityRefresh, setActivityRefresh] = useState(0);
   const { prices } = useTradePrices(open && !!trader.wallet);
+  const tokenMeta = useTradeTokenMeta();
+  const { rows: walletRows, reload: reloadWalletRows } = useWalletTokenBalances(
+    open ? trader.wallet : null,
+  );
+
+  const refreshAll = () => {
+    void trader.refresh();
+    void reloadWalletRows();
+  };
 
   useEffect(() => {
     if (open && drawerTab === "activity") setActivityRefresh((k) => k + 1);
@@ -236,6 +254,22 @@ export function WalletConnectMenu({
   const b = trader.eligibility?.balances;
   const required = trader.eligibility?.budju_required ?? 1_000_000;
   const budju = balanceForSymbol(trader.eligibility, "BUDJU");
+
+  const coreHoldings: { symbol: string; key: "usdc" | "sol" | "budju" | "glitch"; decimals: number; compact?: boolean }[] = [
+    { symbol: "USDC", key: "usdc", decimals: 3 },
+    { symbol: "SOL", key: "sol", decimals: 4 },
+    { symbol: "BUDJU", key: "budju", decimals: 2, compact: true },
+    { symbol: "GLITCH", key: "glitch", decimals: 0 },
+  ];
+
+  const extraHoldings =
+    walletRows?.filter(
+      (r) =>
+        !WALLET_CORE_SYMBOLS.includes(r.symbol as (typeof WALLET_CORE_SYMBOLS)[number]) &&
+        isMeaningfulBalance(r.symbol, r.amount),
+    ) ?? [];
+
+  const curatedDecimals = new Map(TRADE_CURATED_JUPITER_TOKENS.map((t) => [t.symbol, t.decimals]));
 
   return (
     <div className="fixed inset-0 z-50" role="presentation">
@@ -270,7 +304,7 @@ export function WalletConnectMenu({
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => trader.refresh()}
+              onClick={refreshAll}
               className="text-zinc-500 hover:text-cyan-400 text-sm"
               aria-label="Refresh balances"
             >
@@ -355,19 +389,36 @@ export function WalletConnectMenu({
             onSelect={(s) => setChipFilter((prev) => (prev === s ? null : s))}
           />
           {b && (
-            <ul className="space-y-2 text-sm">
-              {(!chipFilter || chipFilter === "USDC") && (
-                <HoldingRow symbol="USDC" amount={b.usdc} decimals={3} usd={usdValue(b.usdc, "USDC", prices)} />
-              )}
-              {(!chipFilter || chipFilter === "SOL") && (
-                <HoldingRow symbol="SOL" amount={b.sol} decimals={4} usd={usdValue(b.sol, "SOL", prices)} />
-              )}
-              {(!chipFilter || chipFilter === "BUDJU") && (
-                <HoldingRow symbol="BUDJU" amount={b.budju} decimals={2} compact usd={usdValue(b.budju, "BUDJU", prices)} />
-              )}
-              {(!chipFilter || chipFilter === "GLITCH") && (
-                <HoldingRow symbol="GLITCH" amount={b.glitch} decimals={0} usd={usdValue(b.glitch, "GLITCH", prices)} />
-              )}
+            <ul className="space-y-0 text-sm">
+              {coreHoldings
+                .filter((h) => !chipFilter || chipFilter === h.symbol)
+                .map((h) => {
+                  const amt =
+                    walletRows != null ? amountForSymbol(walletRows, h.symbol) : (b[h.key] ?? 0);
+                  return (
+                    <WalletHoldingRow
+                      key={h.symbol}
+                      symbol={h.symbol}
+                      amount={amt}
+                      decimals={h.decimals}
+                      compact={h.compact}
+                      usd={usdValue(amt, h.symbol, prices)}
+                      meta={tokenMeta}
+                    />
+                  );
+                })}
+              {extraHoldings
+                .filter((r) => !chipFilter || chipFilter === r.symbol)
+                .map((r) => (
+                  <WalletHoldingRow
+                    key={r.mint}
+                    symbol={r.symbol}
+                    amount={r.amount}
+                    decimals={curatedDecimals.get(r.symbol) ?? r.decimals}
+                    usd={usdValue(r.amount, r.symbol, prices)}
+                    meta={tokenMeta}
+                  />
+                ))}
             </ul>
           )}
           <div className="grid grid-cols-2 gap-1 pt-2">
@@ -405,37 +456,6 @@ export function WalletConnectMenu({
         </button>
       </div>
     </div>
-  );
-}
-
-function HoldingRow({
-  symbol,
-  amount,
-  decimals,
-  compact,
-  usd,
-}: {
-  symbol: string;
-  amount: number;
-  decimals: number;
-  compact?: boolean;
-  usd?: number | null;
-}) {
-  const display = compact && amount >= 1_000_000
-    ? `${(amount / 1_000_000).toFixed(2)}M`
-    : amount.toLocaleString(undefined, { maximumFractionDigits: decimals });
-  return (
-    <li className="flex justify-between items-center py-2 border-b border-zinc-800/80 last:border-0 gap-3">
-      <span className="text-zinc-300 font-medium">{symbol}</span>
-      <div className="text-right">
-        <span className="text-zinc-400 font-mono text-xs block">
-          {display} {symbol}
-        </span>
-        {usd != null && Number.isFinite(usd) && (
-          <span className="text-[10px] text-zinc-500">{fmtUsd(usd)}</span>
-        )}
-      </div>
-    </li>
   );
 }
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { GlitchExchangeStory } from "@/components/GlitchExchangeStory";
 import { GlitchInvestPromo } from "@/components/GlitchInvestPromo";
+import { GlitchTransactionHistory } from "@/components/GlitchTransactionHistory";
 import { OpenInPhantomButton, MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { useTraderWallet } from "@/context/TraderWalletContext";
 import { useTradeToast } from "@/context/TradeToastContext";
@@ -18,6 +19,7 @@ export default function ExchangeClient() {
   const [solAmount, setSolAmount] = useState("");
   const [busy, setBusy] = useState(false);
   const [lastTx, setLastTx] = useState<string | null>(null);
+  const [historyRefresh, setHistoryRefresh] = useState(0);
 
   const solBal = trader.eligibility?.balances.sol ?? 0;
   const glitchBal = trader.eligibility?.balances.glitch ?? 0;
@@ -55,6 +57,7 @@ export default function ExchangeClient() {
       setLastTx(txSignature);
       setSolAmount("");
       pushToast(`Bought ${glitchOut.toLocaleString()} §GLITCH`, "success", `https://solscan.io/tx/${txSignature}`);
+      setHistoryRefresh((k) => k + 1);
       await refresh();
       await trader.refresh();
     } catch (e) {
@@ -175,6 +178,8 @@ export default function ExchangeClient() {
           </>
         )}
       </div>
+
+      <GlitchTransactionHistory wallet={trader.wallet} refreshKey={historyRefresh} />
 
       <GlitchExchangeStory treasurySol={otc ? otcTreasuryWalletSol(otc) : 0} />
 

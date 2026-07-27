@@ -74,6 +74,7 @@ export default function PerpsClient() {
           onRefresh={walletConnected ? () => void trader.refresh() : undefined}
           refreshing={trader.loading}
           walletConnected={walletConnected}
+          perpsGate
           className="lg:sticky lg:top-4"
         />
       </div>
