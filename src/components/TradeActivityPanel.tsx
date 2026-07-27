@@ -27,6 +27,8 @@ type Props = {
   emptyText?: string;
   /** Show filter chips + refresh (Portfolio activity tab) */
   showToolbar?: boolean;
+  /** Tighter list height (wallet drawer) */
+  drawer?: boolean;
 };
 
 export function TradeActivityPanel({
@@ -35,6 +37,7 @@ export function TradeActivityPanel({
   compact = false,
   emptyText = "No activity yet.",
   showToolbar = false,
+  drawer = false,
 }: Props) {
   const [items, setItems] = useState<TradeActivityItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,7 +74,7 @@ export function TradeActivityPanel({
     return <p className="text-sm text-zinc-600 text-center p-4">Connect wallet to see activity.</p>;
   }
 
-  const toolbar = showToolbar && !compact && (
+  const toolbar = showToolbar && (
     <div className="px-4 py-2 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-2">
       <div className="flex flex-wrap gap-1">
         {FILTERS.map((f) => (
@@ -144,13 +147,17 @@ export function TradeActivityPanel({
   return (
     <>
       {toolbar}
-      {!compact && showToolbar && (
+      {!compact && showToolbar && !drawer && (
         <p className="px-4 py-1 text-[10px] text-zinc-600 border-b border-zinc-800/80">
           {visible.length} event{visible.length === 1 ? "" : "s"}
           {filter !== "all" ? ` · ${FILTERS.find((f) => f.id === filter)?.label}` : ""}
         </p>
       )}
-      <ul className={`divide-y divide-zinc-800/80 overflow-y-auto ${compact ? "max-h-40" : "max-h-[28rem]"}`}>
+      <ul
+        className={`divide-y divide-zinc-800/80 overflow-y-auto ${
+          compact ? "max-h-40" : drawer ? "max-h-[min(50vh,16rem)]" : "max-h-[28rem]"
+        }`}
+      >
         {visible.map((a) => {
           const meta = activityKindMeta(a.kind);
           return (

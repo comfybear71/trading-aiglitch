@@ -203,9 +203,11 @@ export default function MarketsClient() {
               {" · "}
 
               <Link href="/about" className="text-purple-400/90 hover:underline">
-
                 Transparency →
-
+              </Link>
+              {" · "}
+              <Link href="/roadmap" className="text-purple-400/90 hover:underline">
+                Roadmap →
               </Link>
 
             </p>

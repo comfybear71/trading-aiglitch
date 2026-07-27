@@ -155,12 +155,20 @@ export default function TradeHomeClient() {
             Charts, pair stats, and refresh live on Markets — this page is your front door.
           </p>
         </div>
-        <Link
-          href="/markets"
-          className="text-xs font-bold px-4 py-2 rounded-lg border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10"
-        >
-          Go to Markets →
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/markets"
+            className="text-xs font-bold px-4 py-2 rounded-lg border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10"
+          >
+            Go to Markets →
+          </Link>
+          <Link
+            href="/roadmap"
+            className="text-xs font-bold px-4 py-2 rounded-lg border border-purple-500/35 text-purple-300 hover:bg-purple-500/10"
+          >
+            Roadmap →
+          </Link>
+        </div>
       </section>
     </div>
   );
