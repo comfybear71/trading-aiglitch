@@ -19,6 +19,10 @@ import {
   truncWallet,
 } from "@/lib/phantom";
 import { isTradeAdminWallet } from "@/lib/trade-admin";
+import {
+  clearCrossSiteWalletCookie,
+  setCrossSiteWalletCookie,
+} from "@/lib/cross-site-wallet";
 
 interface TraderWalletContextValue {
   wallet: string | null;
@@ -77,6 +81,7 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
       if (addr) {
         setWallet(addr);
         localStorage.setItem(TRADER_WALLET_STORAGE_KEY, addr);
+        setCrossSiteWalletCookie(addr);
         await refresh(addr);
       }
       if (!cancelled) setLoading(false);
@@ -90,6 +95,7 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
     async (addr: string) => {
       setWallet(addr);
       localStorage.setItem(TRADER_WALLET_STORAGE_KEY, addr);
+      setCrossSiteWalletCookie(addr);
       setError(null);
       await refresh(addr);
     },
@@ -114,6 +120,7 @@ export function TraderWalletProvider({ children }: { children: React.ReactNode }
   const disconnect = useCallback(async () => {
     await disconnectPhantom();
     localStorage.removeItem(TRADER_WALLET_STORAGE_KEY);
+    clearCrossSiteWalletCookie();
     setWallet(null);
     setEligibility(null);
     setError(null);

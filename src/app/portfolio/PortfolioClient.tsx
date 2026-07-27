@@ -304,12 +304,8 @@ export default function PortfolioClient() {
         </p>
       )}
 
-      <p className="text-[10px] text-zinc-600 text-center">
-        Persona treasury &amp; bot ops →{" "}
-        <Link href="/ops" className="text-purple-400 hover:underline">
-          Ops
-        </Link>{" "}
-        (admin wallet or password)
+      <p className="text-[10px] text-zinc-600 text-center leading-relaxed">
+        AI persona treasury tools are admin-only — no action needed here.
       </p>
     </div>
   );
