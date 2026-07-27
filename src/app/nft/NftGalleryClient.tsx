@@ -363,14 +363,6 @@ export default function NftGalleryClient() {
                 Connect Phantom
               </button>
             )}
-            {trader.isAdminWallet && (
-              <Link
-                href="/nft/studio"
-                className="px-3 py-2 bg-purple-500/20 border border-purple-500/40 text-purple-200 rounded-lg text-xs font-bold hover:bg-purple-500/30"
-              >
-                NFT Studio
-              </Link>
-            )}
             <Link
               href="/swap"
               className="px-3 py-2 bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 rounded-lg text-xs font-bold hover:bg-cyan-500/25"
