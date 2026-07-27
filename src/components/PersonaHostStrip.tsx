@@ -6,7 +6,7 @@ import { PERSONA_HOST_SCRIPTS, type PersonaHostScript } from "@/lib/persona-host
 
 function HostCard({ host }: { host: PersonaHostScript }) {
   return (
-    <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/40 via-zinc-950 to-cyan-950/20 p-4 sm:p-5 flex flex-col sm:flex-row gap-4">
+    <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/40 via-zinc-950 to-cyan-950/20 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 min-h-[19.5rem] sm:min-h-[11.25rem]">
       <div className="flex sm:flex-col items-center sm:items-start gap-3 sm:w-24 shrink-0">
         <div
           className="w-16 h-16 rounded-2xl bg-black/50 border border-purple-500/40 flex items-center justify-center text-3xl shadow-lg shadow-purple-900/30"
@@ -19,25 +19,29 @@ function HostCard({ host }: { host: PersonaHostScript }) {
           <p className="text-[9px] text-zinc-600 font-mono truncate">{host.personaId}</p>
         </div>
       </div>
-      <div className="flex-1 min-w-0 space-y-2">
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
         <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-400/80">Persona host</p>
-        <h3 className="text-lg font-black text-white leading-tight">{host.headline}</h3>
-        <p className="text-sm text-zinc-400 leading-relaxed">{host.body}</p>
+        <h3 className="text-lg font-black text-white leading-tight mt-2">{host.headline}</h3>
+        <p className="text-sm text-zinc-400 leading-relaxed mt-2 flex-1 min-h-[5.25rem] sm:min-h-[4.75rem]">
+          {host.body}
+        </p>
+        <div className="mt-2 min-h-[1.25rem]">
         {host.ctaHref && host.ctaLabel &&
           (host.ctaHref.startsWith("http") ? (
             <a
               href={host.ctaHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block text-[11px] font-bold text-purple-300 hover:text-purple-200 mt-1"
+              className="inline-block text-[11px] font-bold text-purple-300 hover:text-purple-200"
             >
               {host.ctaLabel} →
             </a>
           ) : (
-            <Link href={host.ctaHref} className="inline-block text-[11px] font-bold text-purple-300 hover:text-purple-200 mt-1">
+            <Link href={host.ctaHref} className="inline-block text-[11px] font-bold text-purple-300 hover:text-purple-200">
               {host.ctaLabel} →
             </Link>
           ))}
+        </div>
       </div>
     </div>
   );
@@ -85,7 +89,9 @@ export function PersonaHostStrip({ className = "" }: { className?: string }) {
           </button>
         </div>
       </div>
-      <HostCard host={host} />
+      <div className="min-h-[19.5rem] sm:min-h-[11.25rem]">
+        <HostCard host={host} />
+      </div>
     </section>
   );
 }
