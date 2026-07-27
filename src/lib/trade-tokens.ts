@@ -70,6 +70,19 @@ export const TRADE_CURATED_JUPITER_TOKENS: TradeTokenRow[] = [
     defaultQuote: "SOL",
     yieldLst: true,
   },
+  {
+    symbol: "PSOL",
+    mint: "pSo1f9nQXWgXibFtKf7NWYxb5enAM4qfP6UJSiXRQfL",
+    decimals: 9,
+    defaultQuote: "SOL",
+    yieldLst: true,
+  },
+  {
+    symbol: "WBTC",
+    mint: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+    decimals: 8,
+    defaultQuote: "USDC",
+  },
 ];
 
 export const TRADE_SWAP_TOKENS: TradeTokenRow[] = [

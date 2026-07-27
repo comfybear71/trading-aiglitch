@@ -23,5 +23,9 @@ export function metaForSymbol(
   meta: Record<string, TradeTokenMetaRow>,
   symbol: string,
 ): TradeTokenMetaRow | undefined {
-  return meta[symbol] ?? meta[symbol.toUpperCase()];
+  if (meta[symbol]) return meta[symbol];
+  const upper = symbol.toUpperCase();
+  if (meta[upper]) return meta[upper];
+  const key = Object.keys(meta).find((k) => k.toUpperCase() === upper);
+  return key ? meta[key] : undefined;
 }
