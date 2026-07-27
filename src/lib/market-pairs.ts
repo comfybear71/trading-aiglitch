@@ -35,13 +35,20 @@ export interface GlitchPairUiMeta {
   featuredOtc?: boolean;
 }
 
+/** Shown on Markets — no fake §GLITCH/USDC or §GLITCH/$BUDJU swap rows. */
+export const ECOSYSTEM_MARKET_PAIR_IDS = ["GLITCH_SOL", "BUDJU_USDC", "BUDJU_SOL"] as const;
+
 const FALLBACK_PAIRS: PairMeta[] = [
-  { id: "GLITCH_USDC", label: "§GLITCH/USDC", base: "GLITCH", quote: "USDC" },
   { id: "GLITCH_SOL", label: "§GLITCH/SOL", base: "GLITCH", quote: "SOL" },
   { id: "BUDJU_USDC", label: "$BUDJU/USDC", base: "BUDJU", quote: "USDC" },
   { id: "BUDJU_SOL", label: "$BUDJU/SOL", base: "BUDJU", quote: "SOL" },
-  { id: "GLITCH_BUDJU", label: "§GLITCH/$BUDJU", base: "GLITCH", quote: "BUDJU" },
 ];
+
+export function filterEcosystemMarketPairs(catalog: PairMeta[]): PairMeta[] {
+  const allowed = new Set<string>(ECOSYSTEM_MARKET_PAIR_IDS);
+  const filtered = catalog.filter((p) => allowed.has(p.id));
+  return filtered.length > 0 ? filtered : FALLBACK_PAIRS;
+}
 
 export function swapHref(sell: string, buy: string) {
   return `/swap?sell=${encodeURIComponent(sell)}&buy=${encodeURIComponent(buy)}`;
@@ -75,13 +82,6 @@ export function pairActions(base: string, quote: string): PairAction[] {
     const actions: PairAction[] = [
       { href: GLITCH_EXCHANGE_PATH, label: "Buy with SOL", variant: "primary" },
     ];
-    if (base === "BUDJU" || quote === "BUDJU") {
-      actions.push({
-        href: swapHref("BUDJU", "USDC"),
-        label: "Swap $BUDJU (not §GLITCH)",
-        variant: "secondary",
-      });
-    }
     return actions;
   }
 
@@ -97,7 +97,7 @@ export async function fetchPairCatalog(): Promise<PairMeta[]> {
     const res = await fetch("/api/exchange?action=pairs");
     const data = await res.json();
     const catalog: PairMeta[] = Array.isArray(data.pairs) ? data.pairs : [];
-    return catalog.length > 0 ? catalog : FALLBACK_PAIRS;
+    return filterEcosystemMarketPairs(catalog);
   } catch {
     return FALLBACK_PAIRS;
   }

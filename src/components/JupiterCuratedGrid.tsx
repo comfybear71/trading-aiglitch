@@ -8,80 +8,81 @@ export interface CuratedMarketToken extends TradeTokenRow {
   priceUsd?: number;
 }
 
+function ListSkeleton() {
+  return (
+    <ul className="rounded-xl border border-zinc-800/90 divide-y divide-zinc-800/80 overflow-hidden">
+      {Array.from({ length: 6 }, (_, i) => (
+        <li key={i} className="px-4 py-3 h-14 bg-zinc-900/40 animate-pulse" />
+      ))}
+    </ul>
+  );
+}
+
 export function JupiterCuratedGrid({
   tokens,
   loading,
+  solPriceUsd,
 }: {
   tokens: CuratedMarketToken[];
   loading: boolean;
+  solPriceUsd?: number;
 }) {
   if (loading && tokens.length === 0) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 h-[168px] animate-pulse" />
-        ))}
-      </div>
-    );
+    return <ListSkeleton />;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-      <article className="rounded-xl border border-cyan-500/25 bg-cyan-950/10 p-4 flex flex-col min-h-[168px]">
-        <p className="text-sm font-black text-white">SOL / USDC</p>
-        <p className="text-[10px] text-zinc-500 mt-0.5">Jupiter · core pair</p>
-        <p className="text-xs text-zinc-400 mt-3 flex-1">Primary on-ramp for swaps and LSTs.</p>
+    <ul className="rounded-xl border border-zinc-800/90 divide-y divide-zinc-800/80 overflow-hidden bg-zinc-950/30">
+      <li className="px-4 py-3 flex flex-wrap items-center gap-3 gap-y-2 hover:bg-cyan-950/15 transition-colors">
+        <div className="min-w-[140px] flex-1">
+          <p className="text-sm font-black text-white">SOL / USDC</p>
+          <p className="text-[10px] text-zinc-500">Jupiter · SPL swap</p>
+        </div>
+        <p className="text-base font-black text-white tabular-nums sm:w-28 sm:text-right">
+          {solPriceUsd != null && solPriceUsd > 0 ? fmtMarketUsd(solPriceUsd) : "—"}
+        </p>
         <Link
           href={swapHref("SOL", "USDC")}
-          className="mt-auto text-center py-2 rounded-lg bg-gradient-to-r from-cyan-600/85 to-purple-600/85 text-[11px] font-bold text-white hover:opacity-95"
+          className="ml-auto shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600/85 to-purple-600/85 text-[11px] font-bold text-white hover:opacity-95"
         >
           Swap SOL ↔ USDC
         </Link>
-      </article>
+      </li>
 
       {tokens.map((t) => {
         const quote = t.defaultQuote ?? "USDC";
         const href = swapHref(quote, t.symbol);
         return (
-          <article
+          <li
             key={t.symbol}
-            className="rounded-xl border border-cyan-500/25 bg-cyan-950/10 p-4 flex flex-col min-h-[168px] hover:border-cyan-400/40 transition-colors"
+            className="px-4 py-3 flex flex-wrap items-center gap-3 gap-y-2 hover:bg-cyan-950/15 transition-colors"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div>
+            <div className="min-w-[140px] flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm font-black text-white">{t.symbol}</p>
-                <p className="text-[10px] text-zinc-500 mt-0.5">
-                  Jupiter · vs {quote}
-                  {t.yieldLst ? (
-                    <span className="ml-1 text-amber-400/90">· staking yield LST</span>
-                  ) : null}
-                </p>
+                {t.yieldLst ? (
+                  <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-500/40 text-amber-300/90">
+                    Yield LST
+                  </span>
+                ) : null}
               </div>
-              {t.yieldLst ? (
-                <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-500/40 text-amber-300/90 shrink-0">
-                  Yield
-                </span>
-              ) : null}
+              <p className="text-[10px] text-zinc-500">
+                Jupiter · vs {quote}
+                {t.yieldLst ? " · swap in/out (Earn UI later)" : " · 1M $BUDJU gate"}
+              </p>
             </div>
-            <p className="text-xl font-black text-white mt-3 tabular-nums">
+            <p className="text-base font-black text-white tabular-nums sm:w-28 sm:text-right">
               {t.priceUsd != null && t.priceUsd > 0 ? fmtMarketUsd(t.priceUsd) : "—"}
             </p>
-            {t.yieldLst ? (
-              <p className="text-[10px] text-zinc-500 mt-1">
-                Swap in/out on Jupiter. Earn/Lend deposit UI coming later.
-              </p>
-            ) : (
-              <p className="text-[10px] text-zinc-500 mt-1 flex-1">Curated major · same 1M $BUDJU swap gate.</p>
-            )}
             <Link
               href={href}
-              className="mt-auto pt-3 text-center py-2 rounded-lg bg-gradient-to-r from-cyan-600/85 to-purple-600/85 text-[11px] font-bold text-white hover:opacity-95"
+              className="ml-auto shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600/85 to-purple-600/85 text-[11px] font-bold text-white hover:opacity-95"
             >
-              Buy {t.symbol} with {quote}
+              Swap → {t.symbol}
             </Link>
-          </article>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 }
