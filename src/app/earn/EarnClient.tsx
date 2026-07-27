@@ -1,38 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { TokenIcon } from "@/components/TokenIcon";
+import { fmtTokenAmount } from "@/components/WalletHoldingRow";
 import { useTraderWallet } from "@/context/TraderWalletContext";
-import { fetchCuratedPrices } from "@/lib/curated-markets-client";
+import { fetchCuratedMarkets, fetchCuratedPrices } from "@/lib/curated-markets-client";
 import {
   JUPITER_EARN_DOCS_URL,
   JUPITER_EARN_URL,
   TRADE_YIELD_LSTS,
 } from "@/lib/earn-lsts";
 import { fmtMarketUsd, swapHref } from "@/lib/market-pairs";
-import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
 import { metaForSymbol, useTradeTokenMeta } from "@/lib/use-trade-token-meta";
-import { amountForSymbol } from "@/lib/wallet-token-balances";
-import { fmtTokenAmount } from "@/components/WalletHoldingRow";
+import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
+import { mergedTokenAmount } from "@/lib/wallet-token-balances";
+
+type IconRow = { iconUrl?: string | null; iconEmoji?: string; name?: string };
 
 export default function EarnClient() {
   const trader = useTraderWallet();
   const tokenMeta = useTradeTokenMeta();
   const { rows: walletRows, reload } = useWalletTokenBalances(trader.wallet);
   const [prices, setPrices] = useState<Record<string, number | undefined>>({});
+  const [curatedIcons, setCuratedIcons] = useState<Record<string, IconRow>>({});
   const [loading, setLoading] = useState(true);
+
+  const earnSymbols = useMemo(() => TRADE_YIELD_LSTS.map((t) => t.symbol), []);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const symbols = [...TRADE_YIELD_LSTS.map((t) => t.symbol), "SOL"];
-      const p = await fetchCuratedPrices(symbols);
+      const symbols = [...earnSymbols, "SOL", "USDC"];
+      const [p, curated] = await Promise.all([
+        fetchCuratedPrices(symbols),
+        fetchCuratedMarkets(),
+      ]);
       setPrices(p);
+      const iconMap: Record<string, IconRow> = {};
+      for (const t of curated?.tokens ?? []) {
+        iconMap[t.symbol] = {
+          iconUrl: t.iconUrl,
+          iconEmoji: t.iconEmoji,
+          name: t.name,
+        };
+      }
+      setCuratedIcons(iconMap);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [earnSymbols]);
 
   useEffect(() => {
     void load();
@@ -48,8 +65,9 @@ export default function EarnClient() {
         <p className="text-[10px] uppercase tracking-[0.25em] text-amber-400/90 font-bold">Phase 6</p>
         <h1 className="text-2xl sm:text-3xl font-black text-white">Earn &amp; liquid staking</h1>
         <p className="text-sm text-zinc-400 leading-relaxed max-w-2xl">
-          <strong className="text-zinc-300 font-semibold">Swap</strong> jupSOL and mSOL here via Jupiter (same 1M{" "}
-          $BUDJU gate as other majors). <strong className="text-zinc-300 font-semibold">Deposit / lend</strong> on{" "}
+          <strong className="text-zinc-300 font-semibold">Swap</strong> jupSOL, mSOL, PSOL, and WBTC here via Jupiter
+          (same 1M $BUDJU gate as other majors). <strong className="text-zinc-300 font-semibold">Deposit / lend</strong>{" "}
+          on{" "}
           <a href={JUPITER_EARN_URL} target="_blank" rel="noopener noreferrer" className="text-amber-300/90 hover:underline">
             Jupiter Earn
           </a>{" "}
@@ -67,45 +85,52 @@ export default function EarnClient() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-black text-white uppercase tracking-wide">Curated LSTs</h2>
+        <h2 className="text-sm font-black text-white uppercase tracking-wide">Curated LSTs &amp; yield assets</h2>
         <ul className="rounded-xl border border-zinc-800/90 divide-y divide-zinc-800/80 overflow-hidden bg-zinc-950/30">
           {TRADE_YIELD_LSTS.map((lst) => {
             const price = prices[lst.symbol];
             const solPrice = prices.SOL;
-            const hrefIn = swapHref("SOL", lst.symbol);
-            const hrefOut = swapHref(lst.symbol, "SOL");
-            const balance = trader.wallet ? amountForSymbol(walletRows, lst.symbol) : 0;
+            const quoteIn = lst.defaultQuote === "USDC" ? "USDC" : "SOL";
+            const hrefIn = swapHref(quoteIn, lst.symbol);
+            const hrefOut = swapHref(lst.symbol, quoteIn);
+            const balance = trader.wallet ? mergedTokenAmount(walletRows, lst.symbol, 0) : 0;
+            const walletUsd =
+              balance > 0 && price != null && price > 0 && Number.isFinite(price)
+                ? balance * price
+                : null;
             const m = metaForSymbol(tokenMeta, lst.symbol);
+            const curated = curatedIcons[lst.symbol];
+            const iconUrl = curated?.iconUrl ?? m?.iconUrl;
+            const iconEmoji = curated?.iconEmoji ?? m?.iconEmoji;
             return (
               <li key={lst.symbol} className="p-4 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1 flex gap-3">
-                    <TokenIcon
-                      symbol={lst.symbol}
-                      iconUrl={m?.iconUrl}
-                      iconEmoji={m?.iconEmoji}
-                      size={36}
-                    />
+                    <TokenIcon symbol={lst.symbol} iconUrl={iconUrl} iconEmoji={iconEmoji} size={40} />
                     <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-lg font-black text-white">{lst.symbol}</p>
-                      <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-500/40 text-amber-300/90">
-                        {lst.issuer}
-                      </span>
-                    </div>
-                    <p className="text-xs text-zinc-500 mt-1 leading-relaxed">{lst.summary}</p>
-                    {trader.wallet && balance > 0 ? (
-                      <p className="text-[11px] text-cyan-300/90 font-mono mt-1.5">
-                        Your wallet: {fmtTokenAmount(balance, 6)} {lst.symbol}
-                      </p>
-                    ) : trader.wallet ? (
-                      <p className="text-[11px] text-zinc-600 mt-1.5">Your wallet: 0 {lst.symbol}</p>
-                    ) : null}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-lg font-black text-white">{lst.symbol}</p>
+                        <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border border-amber-500/40 text-amber-300/90">
+                          {lst.issuer}
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-500 mt-1 leading-relaxed">{lst.summary}</p>
+                      {trader.wallet ? (
+                        <p className="text-[11px] text-cyan-300/90 font-mono mt-1.5">
+                          Your wallet: {fmtTokenAmount(balance, lst.decimals <= 6 ? lst.decimals : 6)} {lst.symbol}
+                          {walletUsd != null ? (
+                            <span className="text-zinc-400 ml-2">· {fmtMarketUsd(walletUsd)}</span>
+                          ) : balance > 0 && !loading ? (
+                            <span className="text-zinc-600 ml-2">· USD —</span>
+                          ) : null}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                   <p className="text-base font-black text-white tabular-nums shrink-0">
                     {loading ? "…" : price != null && price > 0 ? fmtMarketUsd(price) : "—"}
-                    {solPrice != null && solPrice > 0 && price != null && price > 0 ? (
+                    <span className="block text-[10px] font-normal text-zinc-500 text-right">per token</span>
+                    {solPrice != null && solPrice > 0 && price != null && price > 0 && lst.defaultQuote === "SOL" ? (
                       <span className="block text-[10px] font-normal text-zinc-500 text-right">
                         ~{(price / solPrice).toFixed(4)} SOL
                       </span>
@@ -117,13 +142,13 @@ export default function EarnClient() {
                     href={hrefIn}
                     className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600/85 to-purple-600/85 text-[11px] font-bold text-white hover:opacity-95"
                   >
-                    Swap SOL → {lst.symbol}
+                    Swap {quoteIn} → {lst.symbol}
                   </Link>
                   <Link
                     href={hrefOut}
                     className="px-3 py-1.5 rounded-lg border border-zinc-700 text-[11px] font-bold text-zinc-300 hover:border-cyan-500/40"
                   >
-                    Swap {lst.symbol} → SOL
+                    Swap {lst.symbol} → {quoteIn}
                   </Link>
                   <a
                     href={JUPITER_EARN_URL}
