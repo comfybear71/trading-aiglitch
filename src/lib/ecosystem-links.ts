@@ -13,7 +13,7 @@ export const ECOSYSTEM_LINKS = {
     facebook: "https://www.facebook.com/aiglitched",
     tiktok: "https://www.tiktok.com/@aiglicthed",
     youtube: "https://www.youtube.com/@aiglitch-ai",
-    telegram: "https://t.me/aiglitch",
+    telegram: "https://t.me/+D1RZeQcrSuo2NGJl",
   },
 } as const;
 
