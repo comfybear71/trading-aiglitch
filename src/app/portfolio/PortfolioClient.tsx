@@ -17,9 +17,10 @@ import { SwapActivityLine } from "@/components/SwapActivityLine";
 import { BUDJU_SITE } from "@/lib/budju-brand";
 import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
 import { useTradeTokenMeta, metaForSymbol } from "@/lib/use-trade-token-meta";
+import { fetchCuratedPrices } from "@/lib/curated-markets-client";
 import {
-  amountForSymbol,
   isMeaningfulBalance,
+  mergedTokenAmount,
   WALLET_CORE_SYMBOLS,
 } from "@/lib/wallet-token-balances";
 import { TRADE_CURATED_JUPITER_TOKENS } from "@/lib/trade-tokens";
@@ -65,11 +66,27 @@ export default function PortfolioClient() {
   const { otc, loading: otcLoading, refreshing: otcRefreshing } = useOtcConfig();
   const tokenMeta = useTradeTokenMeta();
   const { rows: walletRows, reload: reloadWalletRows } = useWalletTokenBalances(trader.wallet);
+  const [curatedPrices, setCuratedPrices] = useState<Record<string, number | undefined>>({});
   const b = trader.eligibility?.balances;
   const priceBook = mergeOtcGlitchPrice(prices, otc?.price_usd);
   const balanceKey = b
     ? [b.sol, b.usdc, b.budju, b.glitch, otc?.price_usd ?? ""].join("|")
     : "";
+
+  useEffect(() => {
+    if (!trader.wallet) {
+      setCuratedPrices({});
+      return;
+    }
+    const extras =
+      walletRows?.filter(
+        (r) =>
+          !WALLET_CORE_SYMBOLS.includes(r.symbol as (typeof WALLET_CORE_SYMBOLS)[number]) &&
+          isMeaningfulBalance(r.symbol, r.amount),
+      ) ?? [];
+    if (extras.length === 0) return;
+    void fetchCuratedPrices(extras.map((r) => r.symbol)).then(setCuratedPrices);
+  }, [trader.wallet, walletRows]);
 
   const loadRecentActivity = useCallback(async () => {
     if (!trader.wallet) {
@@ -144,16 +161,6 @@ export default function PortfolioClient() {
     );
   }
 
-  let netUsd = 0;
-  if (b) {
-    for (const h of HOLDINGS) {
-      const amt = b[h.key];
-      const v = usdValue(amt, h.symbol, priceBook);
-      if (v != null) netUsd += v;
-    }
-  }
-  const nwDelta = netWorthDelta(nwHistory.length ? nwHistory : loadNetWorthHistory(trader.wallet ?? ""));
-
   const curatedDecimals = new Map(TRADE_CURATED_JUPITER_TOKENS.map((t) => [t.symbol, t.decimals]));
   const extraHoldings =
     walletRows?.filter(
@@ -162,10 +169,34 @@ export default function PortfolioClient() {
         isMeaningfulBalance(r.symbol, r.amount),
     ) ?? [];
 
-  const holdingAmount = (key: (typeof HOLDINGS)[number]["key"], symbol: string) => {
-    if (walletRows) return amountForSymbol(walletRows, symbol);
-    return b?.[key] ?? 0;
+  const holdingAmount = (key: (typeof HOLDINGS)[number]["key"], symbol: string) =>
+    mergedTokenAmount(walletRows, symbol, b?.[key] ?? 0);
+
+  const usdForSymbol = (amount: number, symbol: string): number | null => {
+    const p =
+      priceBook[symbol as keyof typeof priceBook] ?? curatedPrices[symbol];
+    if (p == null || !Number.isFinite(p) || !Number.isFinite(amount)) return null;
+    return amount * p;
   };
+
+  const chipSymbols = [
+    ...HOLDINGS.map((h) => h.symbol),
+    ...extraHoldings.map((r) => r.symbol),
+  ];
+
+  let netUsd = 0;
+  if (b) {
+    for (const h of HOLDINGS) {
+      const amt = holdingAmount(h.key, h.symbol);
+      const v = usdForSymbol(amt, h.symbol);
+      if (v != null) netUsd += v;
+    }
+    for (const r of extraHoldings) {
+      const v = usdForSymbol(r.amount, r.symbol);
+      if (v != null) netUsd += v;
+    }
+  }
+  const nwDelta = netWorthDelta(nwHistory.length ? nwHistory : loadNetWorthHistory(trader.wallet ?? ""));
 
   const refreshAll = () => {
     void trader.refresh();
@@ -233,7 +264,8 @@ export default function PortfolioClient() {
           <div className="mt-4 space-y-2">
             <div className="flex h-2 rounded-full overflow-hidden gap-px bg-zinc-800">
               {HOLDINGS.map((h) => {
-                const val = usdValue(b[h.key], h.symbol, priceBook) ?? 0;
+                const amt = holdingAmount(h.key, h.symbol);
+                const val = usdForSymbol(amt, h.symbol) ?? 0;
                 const pct = Math.max(0, (val / netUsd) * 100);
                 if (pct < 0.5) return null;
                 return (
@@ -248,7 +280,8 @@ export default function PortfolioClient() {
             </div>
             <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-zinc-500">
               {HOLDINGS.map((h) => {
-                const val = usdValue(b[h.key], h.symbol, priceBook) ?? 0;
+                const amt = holdingAmount(h.key, h.symbol);
+                const val = usdForSymbol(amt, h.symbol) ?? 0;
                 const pct = netUsd > 0 ? (val / netUsd) * 100 : 0;
                 if (pct < 0.5) return null;
                 return (
@@ -264,7 +297,9 @@ export default function PortfolioClient() {
         <div className="mt-4">
           <HoldingsChips
             activeSymbol={chipFilter}
-            onSelect={(s) => setChipFilter((prev) => (prev === s ? null : s))}
+            onSelect={setChipFilter}
+            symbols={chipSymbols}
+            showAll
             size="sm"
           />
         </div>
@@ -352,7 +387,7 @@ export default function PortfolioClient() {
         <ul className="divide-y divide-zinc-800/80">
           {HOLDINGS.filter((h) => !chipFilter || h.symbol === chipFilter).map((h) => {
             const amt = holdingAmount(h.key, h.symbol);
-            const val = usdValue(amt, h.symbol, priceBook);
+            const val = usdForSymbol(amt, h.symbol);
             const pct = netUsd > 0 && val != null ? Math.min(100, (val / netUsd) * 100) : 0;
             const m = metaForSymbol(tokenMeta, h.symbol);
             return (
@@ -412,7 +447,7 @@ export default function PortfolioClient() {
           {extraHoldings
             .filter((r) => !chipFilter || chipFilter === r.symbol)
             .map((r) => {
-              const val = usdValue(r.amount, r.symbol, priceBook);
+              const val = usdForSymbol(r.amount, r.symbol);
               const m = metaForSymbol(tokenMeta, r.symbol);
               return (
                 <li key={r.mint} className="px-4 py-3 flex items-center justify-between gap-3 bg-zinc-950/20">

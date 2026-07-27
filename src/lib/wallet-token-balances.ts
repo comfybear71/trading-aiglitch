@@ -40,3 +40,12 @@ export function amountForSymbol(
   const row = rows.find((r) => r.symbol.toUpperCase() === symbol.toUpperCase());
   return row?.amount ?? 0;
 }
+
+/** Wallet lane vs eligibility gate — use higher (fixes stale zero wallet API rows). */
+export function mergedTokenAmount(
+  walletRows: WalletTokenBalanceRow[] | null | undefined,
+  symbol: string,
+  eligibilityAmount: number,
+): number {
+  return Math.max(amountForSymbol(walletRows, symbol), eligibilityAmount);
+}
