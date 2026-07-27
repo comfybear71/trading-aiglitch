@@ -34,6 +34,13 @@ const QUICK_ACTIONS = [
     accent: "border-fuchsia-500/35 bg-fuchsia-950/20 hover:border-fuchsia-400/50",
   },
   {
+    href: "/earn",
+    title: "Earn",
+    desc: "jupSOL · mSOL · Jupiter link",
+    emoji: "🌾",
+    accent: "border-amber-500/35 bg-amber-950/20 hover:border-amber-400/50",
+  },
+  {
     href: "/portfolio",
     title: "Portfolio",
     desc: "Balances · send · activity",

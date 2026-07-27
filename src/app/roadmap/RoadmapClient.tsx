@@ -11,7 +11,12 @@ const PRODUCT_PHASES = [
   { status: "done", title: "Phase 3 — Platform CTAs", detail: "Trade home links to feed, channels, hatchery, NFT shop." },
   { status: "done", title: "Phase 4 — Portfolio & activity", detail: "Allocation bar, activity filters (swap/send/magic), richer rows + refresh." },
   { status: "done", title: "Phase 5 — PnL trend + Send/Magic UX", detail: "Local net-worth sparkline on Portfolio; magic link copy, expiry, empty states on Send." },
-  { status: "planned", title: "Phase 6 — Jupiter Earn / LST yield", detail: "Swap LSTs on Markets today; deposit/withdraw via Jupiter Earn/Lend when spec + copy are pinned (no APY promises in UI)." },
+  {
+    status: "done",
+    title: "Phase 6 — Jupiter Earn / LST yield (v1)",
+    detail:
+      "/earn hub: jupSOL & mSOL swap links + Jupiter Earn external deposits. In-app lend UI deferred; no APY in UI until verified on-chain.",
+  },
   {
     status: "planned",
     title: "Phase 7 — Jupiter Perps (advanced / high risk)",
@@ -73,8 +78,7 @@ export default function RoadmapClient() {
           returns. Perps can liquidate your margin; not financial advice.
         </p>
         <p className="text-[11px] text-zinc-500">
-          Phases 6–7 on the list above: yield LSTs / Earn first, then perps (link or embed, then native if it earns its
-          keep).
+          Phase 6 v1 (Earn hub) shipped; Phase 7 perps next (link or embed, then native if it earns its keep).
         </p>
       </section>
 

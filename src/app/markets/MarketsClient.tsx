@@ -130,7 +130,11 @@ export default function MarketsClient() {
             <h2 className="text-xl font-black text-white mt-1">Top pairs &amp; yield LSTs</h2>
             <p className="text-sm text-zinc-500 mt-1 max-w-xl">
               Curated majors swap via Jupiter (same 1M $BUDJU gate). jupSOL &amp; mSOL are liquid
-              staking tokens — swap in/out here; Jupiter Earn/Lend deposits come in a later phase.{" "}
+              staking tokens — swap in/out here; lend/deposit on{" "}
+              <Link href="/earn" className="text-amber-400/90 hover:underline">
+                Earn
+              </Link>{" "}
+              (Jupiter link) until in-app deposits ship.{" "}
               <a
                 href="https://station.jup.ag/docs"
                 target="_blank"
