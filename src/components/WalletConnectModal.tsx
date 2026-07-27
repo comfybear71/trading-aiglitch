@@ -9,13 +9,14 @@ import { getPhantom } from "@/lib/phantom";
 import { isMobileWeb, needsPhantomMobileBrowser, openInPhantomBrowser } from "@/lib/phantom-mobile";
 import { MobilePhantomHint } from "@/components/OpenInPhantomButton";
 import { balanceForSymbol } from "@/lib/trade-balance";
-import { usdValue, useTradePrices } from "@/lib/use-trade-prices";
+import { useTradePrices } from "@/lib/use-trade-prices";
 import { WalletHoldingRow } from "@/components/WalletHoldingRow";
 import { useTradeTokenMeta } from "@/lib/use-trade-token-meta";
 import { useWalletTokenBalances } from "@/lib/use-wallet-token-balances";
+import { fetchCuratedPrices } from "@/lib/curated-markets-client";
 import {
-  amountForSymbol,
   isMeaningfulBalance,
+  mergedTokenAmount,
   WALLET_CORE_SYMBOLS,
 } from "@/lib/wallet-token-balances";
 import { TRADE_CURATED_JUPITER_TOKENS } from "@/lib/trade-tokens";
@@ -235,6 +236,7 @@ export function WalletConnectMenu({
   const [chipFilter, setChipFilter] = useState<string | null>(null);
   const [drawerTab, setDrawerTab] = useState<"wallet" | "activity">("wallet");
   const [activityRefresh, setActivityRefresh] = useState(0);
+  const [curatedPrices, setCuratedPrices] = useState<Record<string, number | undefined>>({});
   const { prices } = useTradePrices(open && !!trader.wallet);
   const tokenMeta = useTradeTokenMeta();
   const { rows: walletRows, reload: reloadWalletRows } = useWalletTokenBalances(
@@ -249,6 +251,20 @@ export function WalletConnectMenu({
   useEffect(() => {
     if (open && drawerTab === "activity") setActivityRefresh((k) => k + 1);
   }, [open, drawerTab]);
+  const extraHoldings =
+    walletRows?.filter(
+      (r) =>
+        !WALLET_CORE_SYMBOLS.includes(r.symbol as (typeof WALLET_CORE_SYMBOLS)[number]) &&
+        isMeaningfulBalance(r.symbol, r.amount),
+    ) ?? [];
+
+  const curatedDecimals = new Map(TRADE_CURATED_JUPITER_TOKENS.map((t) => [t.symbol, t.decimals]));
+
+  useEffect(() => {
+    if (!open || extraHoldings.length === 0) return;
+    void fetchCuratedPrices(extraHoldings.map((r) => r.symbol)).then(setCuratedPrices);
+  }, [open, walletRows, extraHoldings.length]);
+
   if (!open || !trader.wallet) return null;
 
   const b = trader.eligibility?.balances;
@@ -262,14 +278,16 @@ export function WalletConnectMenu({
     { symbol: "GLITCH", key: "glitch", decimals: 0 },
   ];
 
-  const extraHoldings =
-    walletRows?.filter(
-      (r) =>
-        !WALLET_CORE_SYMBOLS.includes(r.symbol as (typeof WALLET_CORE_SYMBOLS)[number]) &&
-        isMeaningfulBalance(r.symbol, r.amount),
-    ) ?? [];
+  const usdForSymbol = (amount: number, symbol: string): number | null => {
+    const p = prices[symbol as keyof typeof prices] ?? curatedPrices[symbol];
+    if (p == null || !Number.isFinite(p) || !Number.isFinite(amount)) return null;
+    return amount * p;
+  };
 
-  const curatedDecimals = new Map(TRADE_CURATED_JUPITER_TOKENS.map((t) => [t.symbol, t.decimals]));
+  const chipSymbols = [
+    ...coreHoldings.map((h) => h.symbol),
+    ...extraHoldings.map((r) => r.symbol),
+  ];
 
   return (
     <div className="fixed inset-0 z-50" role="presentation">
@@ -296,7 +314,7 @@ export function WalletConnectMenu({
             </div>
             {b && (
               <p className="text-2xl font-black text-white mt-1">
-                {b.sol.toFixed(4)} SOL
+                {mergedTokenAmount(walletRows, "SOL", b.sol).toFixed(4)} SOL
                 <span className="text-sm font-normal text-zinc-500 ml-2">on-chain</span>
               </p>
             )}
@@ -386,15 +404,16 @@ export function WalletConnectMenu({
           <HoldingsChips
             size="sm"
             activeSymbol={chipFilter}
-            onSelect={(s) => setChipFilter((prev) => (prev === s ? null : s))}
+            onSelect={setChipFilter}
+            symbols={chipSymbols}
+            showAll
           />
           {b && (
             <ul className="space-y-0 text-sm">
               {coreHoldings
                 .filter((h) => !chipFilter || chipFilter === h.symbol)
                 .map((h) => {
-                  const amt =
-                    walletRows != null ? amountForSymbol(walletRows, h.symbol) : (b[h.key] ?? 0);
+                  const amt = mergedTokenAmount(walletRows, h.symbol, b[h.key] ?? 0);
                   return (
                     <WalletHoldingRow
                       key={h.symbol}
@@ -402,7 +421,7 @@ export function WalletConnectMenu({
                       amount={amt}
                       decimals={h.decimals}
                       compact={h.compact}
-                      usd={usdValue(amt, h.symbol, prices)}
+                      usd={usdForSymbol(amt, h.symbol)}
                       meta={tokenMeta}
                     />
                   );
@@ -415,7 +434,7 @@ export function WalletConnectMenu({
                     symbol={r.symbol}
                     amount={r.amount}
                     decimals={curatedDecimals.get(r.symbol) ?? r.decimals}
-                    usd={usdValue(r.amount, r.symbol, prices)}
+                    usd={usdForSymbol(r.amount, r.symbol)}
                     meta={tokenMeta}
                   />
                 ))}
