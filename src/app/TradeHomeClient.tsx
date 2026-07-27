@@ -41,6 +41,13 @@ const QUICK_ACTIONS = [
     accent: "border-amber-500/35 bg-amber-950/20 hover:border-amber-400/50",
   },
   {
+    href: "/perps",
+    title: "Perps",
+    desc: "Leverage · high risk · Jupiter",
+    emoji: "⚡",
+    accent: "border-red-500/35 bg-red-950/20 hover:border-red-400/50",
+  },
+  {
     href: "/portfolio",
     title: "Portfolio",
     desc: "Balances · send · activity",
